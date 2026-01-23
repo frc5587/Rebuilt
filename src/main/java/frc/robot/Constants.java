@@ -4,6 +4,8 @@
 
 package frc.robot;
 
+import edu.wpi.first.math.controller.PIDController;
+
 /**
  * The Constants class provides a convenient place for teams to hold robot-wide numerical or boolean
  * constants. This class should not be used for any other purpose. All constants should be declared
@@ -14,6 +16,13 @@ package frc.robot;
  */
 public final class Constants {
   public static class OperatorConstants {
+    public static class ShooterConstants {
+      public static final double SHOOTER_HIGH_SPEED = 300.0;
+      public static final double SHOOTER_LOW_SPEED = 60.0;
+      public static final double HIGH_DUTY_CYCLE = 0.3;
+      public static final double LOW_DUTY_CYCLE = -0.3;
+    }
     public static final int kDriverControllerPort = 0;
+ 
   }
 }
