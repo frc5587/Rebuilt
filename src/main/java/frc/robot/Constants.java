@@ -25,13 +25,15 @@ public final class Constants {
     public static final Matter CHASSIS    = new Matter(new Translation3d(0, 0, Units.inchesToMeters(8)), ROBOT_MASS);
     public static final double LOOP_TIME  = 0.13; //s, 20ms + 110ms sprk max velocity lag
     public static final double MAX_SPEED  = Units.feetToMeters(14.5);
-    
+
     public static final double WHEEL_LOCK_TIME = 10; //seconds
 
   }
 
   public static class OperatorConstants {
 
+    public static final double DEADBAND = 0.1;
+    
     public static class ShooterConstants {
 
       public static final double SHOOTER_HIGH_SPEED = 300.0;
@@ -40,8 +42,6 @@ public final class Constants {
       public static final double LOW_DUTY_CYCLE = -0.3;
 
     }
-
-    public static final int kDriverControllerPort = 0;
  
   }
 }
