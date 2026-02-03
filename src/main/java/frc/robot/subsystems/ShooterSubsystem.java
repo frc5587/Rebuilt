@@ -33,7 +33,6 @@ import yams.motorcontrollers.local.SparkWrapper;
 
 
 public class ShooterSubsystem extends SubsystemBase {
-
     private SmartMotorControllerConfig smcConfig = new SmartMotorControllerConfig(this)
     .withControlMode(ControlMode.CLOSED_LOOP)
     .withClosedLoopController(50, 0, 0, DegreesPerSecond.of(90), DegreesPerSecondPerSecond.of(45))
