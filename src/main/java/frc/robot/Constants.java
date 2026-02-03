@@ -16,13 +16,12 @@ import edu.wpi.first.math.controller.PIDController;
  */
 public final class Constants {
   public static class OperatorConstants {
-    public static class ShooterConstants {
-      public static final double SHOOTER_HIGH_SPEED = 300.0;
-      public static final double SHOOTER_LOW_SPEED = 60.0;
-      public static final double HIGH_DUTY_CYCLE = 0.3;
-      public static final double LOW_DUTY_CYCLE = -0.3;
-    }
     public static final int kDriverControllerPort = 0;
- 
+  }
+  public static class ShooterConstants {
+    public static final double SHOOTER_HIGH_SPEED = 300.0;
+    public static final double SHOOTER_LOW_SPEED = 60.0;
+    public static final double HIGH_DUTY_CYCLE = 0.3;
+    public static final double LOW_DUTY_CYCLE = -0.3;
   }
 }
