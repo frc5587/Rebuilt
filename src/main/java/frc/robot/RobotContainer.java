@@ -18,6 +18,7 @@ import com.pathplanner.lib.auto.NamedCommands;
 
 import edu.wpi.first.wpilibj.DriverStation;
 import edu.wpi.first.wpilibj.Filesystem;
+import edu.wpi.first.wpilibj.RobotBase;
 import edu.wpi.first.wpilibj.smartdashboard.SendableChooser;
 import edu.wpi.first.wpilibj.smartdashboard.SmartDashboard;
 import edu.wpi.first.wpilibj2.command.Command;
@@ -37,16 +38,32 @@ public class RobotContainer {
   private final SwerveSubsystem drivebase = new SwerveSubsystem(new File(Filesystem.getDeployDirectory(), "swerve"));
 
   // Replace with CommandPS4Controller or CommandJoystick if needed
-  private final CommandXboxController m_driverController =
-      new CommandXboxController(0);
+  private final CommandXboxController driverController = new CommandXboxController(0);
   private final CommandXboxController operatorController = new CommandXboxController(1);
 
   private final SendableChooser<Command> autoChooser;
 
+  /**
+   * Converts driver input into a field-relative ChassisSpeeds that is controlled
+   * by angular velocity.
+   */
+  SwerveInputStream driveFieldOriented = SwerveInputStream.of(drivebase.getSwerveDrive(),
+      () -> driverController.getLeftY() * -1,
+      () -> driverController.getLeftX() * -1)
+      .withControllerRotationAxis(() -> driverController.getRightX() * -1)
+      .deadband(OperatorConstants.DEADBAND)
+      .scaleTranslation(0.8)
+      .allianceRelativeControl(true)
+      .robotRelative(false);
+
+  /**
+   * Clone's the angular velocity input stream and converts it to a fieldRelative
+   * input stream.
+   */
   SwerveInputStream driveAngularVelocity = SwerveInputStream.of(drivebase.getSwerveDrive(),
-                                                                () -> m_driverController.getLeftY() * -1,
-                                                                () -> m_driverController.getLeftX() * -1)
-                                                            .withControllerRotationAxis(m_driverController::getRightX)
+                                                                () -> driverController.getLeftY() * -1,
+                                                                () -> driverController.getLeftX() * -1)
+                                                            .withControllerRotationAxis(driverController::getRightX)
                                                             .deadband(OperatorConstants.DEADBAND)
                                                             .scaleTranslation(0.8)
                                                             .allianceRelativeControl(true);
@@ -81,9 +98,32 @@ public class RobotContainer {
    * joysticks}.
    */
   private void configureBindings() {
-    // Schedule `ExampleCommand` when `exampleCondition` changes to `true`
-    new Trigger(shooter::exampleCondition)
-        .onTrue(new ExampleCommand(shooter));
+    // Swerve
+    Command driveFieldOrientedAnglularVelocity = drivebase.driveFieldOriented(driveFieldOriented);
+    Command driveRobotOrientedAngularVelocity  = drivebase.driveFieldOriented(driveRobotOriented);
+    if (RobotBase.isSimulation()) {
+      drivebase.setDefaultCommand(driveFieldOrientedAnglularVelocity);
+    } 
+    else if (DriverStation.isTest()) {
+      drivebase.setDefaultCommand(driveFieldOrientedAnglularVelocity); // Overrides drive command above!
+    }
+    else {
+      drivebase.setDefaultCommand(driveFieldOrientedAnglularVelocity); // this is the main drive command
+    }
+
+    // Dpad to rotate robot
+    driverController.povUp().onTrue(Commands.runOnce(() -> {drivebase.overrideHeading(0.);}));
+    driverController.povRight().onTrue(Commands.runOnce(() -> {drivebase.overrideHeading(Math.PI/-2.);}));
+    driverController.povDown().onTrue(Commands.runOnce(() -> {drivebase.overrideHeading(-1*Math.PI);}));
+    driverController.povLeft().onTrue(Commands.runOnce(() -> {drivebase.overrideHeading(Math.PI/2.);}));
+
+    // Holds the current heading when maintainHeading is toggled on
+    driverController.leftBumper().onTrue(Commands.runOnce(() -> {drivebase.overrideHeading(drivebase.getIdealHeadingRadians());}));
+    driverController.rightBumper().onTrue(Commands.runOnce(() -> {drivebase.deactivateOverrideHeading();}));
+
+    // Stuff
+    driverController.start().onTrue((Commands.runOnce(drivebase::zeroGyro)));
+    driverController.back().whileTrue(Commands.runOnce(drivebase::lock, drivebase).repeatedly());
 
     operatorController.leftBumper().whileTrue(shooter.setLowVelocity()).onFalse(shooter.setZeroVelocity());
     operatorController.rightBumper().whileTrue(shooter.setHighVelocity()).onFalse(shooter.setZeroVelocity());
