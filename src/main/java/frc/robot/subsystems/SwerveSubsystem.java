@@ -151,6 +151,10 @@ public class SwerveSubsystem extends SubsystemBase
       swerveDrive.updateOdometry();
       vision.updatePoseEstimation(swerveDrive);
     }
+
+    if (headingOverrideActive == false) {
+      idealHeadingRadians = getHeading().getRadians();
+    }
   }
 
   @Override
