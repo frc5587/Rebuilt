@@ -42,6 +42,17 @@ public class RobotContainer {
   // The robot's subsystems and commands are defined here...
   private final ShooterSubsystem shooter = new ShooterSubsystem();
   private final SwerveSubsystem drivebase = new SwerveSubsystem(new File(Filesystem.getDeployDirectory(), "swerve"));
+  Supplier<Vector3> velocity = () -> {
+    ChassisSpeeds velocity = drivebase.getFieldVelocity();
+    return new Vector3(velocity.vxMetersPerSecond, velocity.vyMetersPerSecond, 0);
+  };
+  DoubleSupplier angularVelocity = () -> drivebase.getFieldVelocity().omegaRadiansPerSecond;
+  Supplier<Vector3> position = () -> {
+    Pose2d position = drivebase.getPose();
+    return new Vector3(position.getX(), position.getY(), 0);
+  };
+  DoubleSupplier heading = () -> drivebase.getHeading().getRadians();
+  AimingMath aimingMath = new AimingMath(velocity, angularVelocity, position, heading, new Vector3(8.217694-0.584994,5.156994-0.584994,1.433600));
 
   // Replace with CommandPS4Controller or CommandJoystick if needed
   private final CommandXboxController driverController = new CommandXboxController(0);
@@ -76,20 +87,6 @@ public class RobotContainer {
   
   SwerveInputStream driveRobotOriented = driveAngularVelocity.copy().robotRelative(true)
                                                              .allianceRelativeControl(false);
-
-  Supplier<Vector3> velocity = () -> {
-    ChassisSpeeds velocity = drivebase.getFieldVelocity();
-    return new Vector3(velocity.vxMetersPerSecond, velocity.vyMetersPerSecond, 0);
-  };
-  DoubleSupplier angularVelocity = () -> drivebase.getFieldVelocity().omegaRadiansPerSecond;
-  Supplier<Vector3> position = () -> {
-    Pose2d position = drivebase.getPose();
-    return new Vector3(position.getX(), position.getY(), 0);
-  };
-  DoubleSupplier heading = () -> drivebase.getHeading().getRadians();
-  AimingMath aimingMath = new AimingMath(velocity, angularVelocity, position, heading, Vector3.origin());
-
-
   /** The container for the robot. Contains subsystems, OI devices, and commands. */
   public RobotContainer() {
     // Configure the trigger bindings
@@ -143,12 +140,13 @@ public class RobotContainer {
     driverController.start().onTrue((Commands.runOnce(drivebase::zeroGyro)));
     driverController.back().whileTrue(Commands.runOnce(drivebase::lock, drivebase).repeatedly());
 
-    operatorController.leftBumper().whileTrue(shooter.setLowVelocity()).onFalse(shooter.setZeroVelocity());
-    operatorController.rightBumper().whileTrue(shooter.setHighVelocity()).onFalse(shooter.setZeroVelocity());
-    operatorController.leftTrigger().whileTrue(shooter.setLow()).onFalse(shooter.setZero());
-    operatorController.rightTrigger().whileTrue(shooter.setHigh()).onFalse(shooter.setZero());
+    // driverController.leftBumper().whileTrue(shooter.setLowVelocity()).onFalse(shooter.setZeroVelocity());
+    // driverController.rightBumper().whileTrue(shooter.setHighVelocity()).onFalse(shooter.setZeroVelocity());
+    driverController.leftTrigger().whileTrue(shooter.setLow()).onFalse(shooter.setZero());
+    driverController.rightTrigger().whileTrue(shooter.setHigh()).onFalse(shooter.setZero());
 
-    operatorController.start().onTrue(Commands.runOnce(aimingMath::logSim));
+    driverController.start().onTrue(Commands.runOnce(aimingMath::logSim));
+    driverController.back().onTrue(Commands.runOnce(aimingMath::resetSim));
   }
 
   /**

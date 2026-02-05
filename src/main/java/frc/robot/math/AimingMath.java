@@ -4,12 +4,12 @@ import java.util.function.Supplier;
 
 import edu.wpi.first.wpilibj.Timer;
 import edu.wpi.first.wpilibj.smartdashboard.SmartDashboard;
-import edu.wpi.first.wpilibj2.command.Command;
 import edu.wpi.first.wpilibj2.command.SubsystemBase;
 import frc.robot.Constants;
 
 import java.util.function.DoubleSupplier;
 import java.util.function.Function;
+import java.math.BigDecimal;
 import java.util.ArrayList;
 
 public class AimingMath extends SubsystemBase {
@@ -19,6 +19,7 @@ public class AimingMath extends SubsystemBase {
   private final DoubleSupplier heading;
   
   private Vector3 goalPosition;
+  private String simLog = "test 2";
   
   private ArrayList<Double> times = new ArrayList<Double>();
   private ArrayList<Double> shotSpeeds = new ArrayList<Double>();
@@ -39,6 +40,8 @@ public class AimingMath extends SubsystemBase {
     robotPosition = _robotPosition;
     heading = _heading;
     goalPosition = _goalPosition;
+
+    SmartDashboard.putString("SimResults", simLog);
   }
   
   public void setGoal(Vector3 _goalPosition) {
@@ -128,11 +131,10 @@ public class AimingMath extends SubsystemBase {
   @Override
   public void periodic() {
     double idealShotSpeed = getIdealShotSpeed();
-    double idealAngle = getIdealAngle(idealShotSpeed);
     
     // Replace with actual or simulated values
     double shotSpeed = idealShotSpeed * 1.0;
-    double angle = idealAngle * 1.0;
+    double angle = 0;
     
     times.add(Timer.getFPGATimestamp());
     shotSpeeds.add(shotSpeed);
@@ -141,18 +143,29 @@ public class AimingMath extends SubsystemBase {
     velocities.add(robotVelocity.get());
     headings.add(heading.getAsDouble());
     angularVelocities.add(angularVelocityRadians.getAsDouble());
+
+    SmartDashboard.putString("SimResults", simLog);
+  }
+
+  public void resetSim() {
+    times.clear();
+    shotSpeeds.clear();
+    angles.clear();
+    positions.clear();
+    velocities.clear();
+    headings.clear();
+    angularVelocities.clear();
   }
   
   public void logSim() {
-    String sim = "";
-    sim += parseList("t_list",times,(Double item) -> ""+item);
-    sim += parseList("s_list",shotSpeeds,(Double item) -> ""+item);
-    sim += parseList("a_ngleList",angles,(Double item) -> ""+item);
-    sim += parseList("p_ositionList",positions,(Vector3 item) -> item.toString());
-    sim += parseList("v_elocityList",velocities,(Vector3 item) -> item.toString());
-    sim += parseList("h_eadingList",headings,(Double item) -> ""+item);
-    sim += parseList("a_ngularVelocityList",angularVelocities,(Double item) -> ""+item);
-    SmartDashboard.putString("SimResults", sim);
+    simLog = "";
+    simLog += parseList("t_list",times,(Double item) -> BigDecimal.valueOf(item).toPlainString());
+    simLog += parseList("s_list",shotSpeeds,(Double item) -> BigDecimal.valueOf(item).toPlainString());
+    simLog += parseList("a_ngleList",angles,(Double item) -> BigDecimal.valueOf(item).toPlainString());
+    simLog += parseList("p_ositionList",positions,(Vector3 item) -> item.toString());
+    simLog += parseList("v_elocityList",velocities,(Vector3 item) -> item.toString());
+    simLog += parseList("h_eadingList",headings,(Double item) -> BigDecimal.valueOf(item).toPlainString());
+    simLog += parseList("a_ngularVelocityList",angularVelocities,(Double item) -> BigDecimal.valueOf(item).toPlainString());
   }
   
   private <T> String parseList(String name, ArrayList<T> list, Function<T,String> function) {
@@ -162,7 +175,7 @@ public class AimingMath extends SubsystemBase {
       result += function.apply(list.get(i));
       result += ",";
     }
-    result += list.get(list.size()-1);
+    result += function.apply(list.get(list.size()-1));
     result += "\\right]\n";
     return result;
   }

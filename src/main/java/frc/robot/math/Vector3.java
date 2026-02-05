@@ -1,5 +1,7 @@
 package frc.robot.math;
 
+import java.math.BigDecimal;
+
 public class Vector3 {
   public double x;
   public double y;
@@ -63,6 +65,6 @@ public class Vector3 {
   }
   
   public String toString() {
-    return "("+x+","+y+","+z+")";
+    return "("+BigDecimal.valueOf(x).toPlainString()+","+BigDecimal.valueOf(y).toPlainString()+","+BigDecimal.valueOf(z).toPlainString()+")";
   }
 }

@@ -83,9 +83,7 @@ public class ShooterSubsystem extends SubsystemBase {
      * @return {@link edu.wpi.first.wpilibj2.command.RunCommand}
      */
     public Command setHighVelocity() {
-      return runOnce(() -> {
-        setVelocity(RPM.of(shooterHighSpeed));
-      });
+      return setVelocity(RPM.of(shooterHighSpeed));
     }
 
     /**
@@ -94,9 +92,7 @@ public class ShooterSubsystem extends SubsystemBase {
      * @return {@link edu.wpi.first.wpilibj2.command.RunCommand}
      */
     public Command setLowVelocity() {
-      return runOnce(() -> {
-        setVelocity(RPM.of(shooterLowSpeed));
-      });
+      return setVelocity(RPM.of(shooterLowSpeed));
     }
 
     /**
@@ -105,9 +101,7 @@ public class ShooterSubsystem extends SubsystemBase {
      * @return {@link edu.wpi.first.wpilibj2.command.runCommand}
      */
     public Command setZeroVelocity() {
-      return runOnce(() -> {
-        setVelocity(RPM.of(0));
-      });
+      return setVelocity(RPM.of(0));
     }
 
     /**
@@ -124,9 +118,7 @@ public class ShooterSubsystem extends SubsystemBase {
      * @return {@link edu.wpi.first.wpilibj2.command.RunCommand}
      */
     public Command setHigh() {
-      return runOnce(() -> {
-        set(highDutyCycle);
-      });
+      return set(highDutyCycle);
     }
 
     /**
@@ -135,9 +127,7 @@ public class ShooterSubsystem extends SubsystemBase {
      * @return {@link edu.wpi.first.wpilibj2.command.RunCommand}
      */
     public Command setLow() {
-      return runOnce(() -> {
-        set(lowDutyCycle);
-      });
+      return set(lowDutyCycle);
     }
 
     /**
@@ -146,38 +136,12 @@ public class ShooterSubsystem extends SubsystemBase {
      * @return {@link edu.wpi.first.wpilibj2.command.RunCommand}
      */
     public Command setZero() {
-      return runOnce(() -> {
-        set(0);
-      });
+      return set(0);
     }
 
 
   /** Creates a new ExampleSubsystem. */
   public ShooterSubsystem() {}
-
-  /**
-   * Example command factory method.
-   *
-   * @return a command
-   */
-  public Command exampleMethodCommand() {
-    // Inline construction of command goes here.
-    // Subsystem::RunOnce implicitly requires `this` subsystem.
-    return runOnce(
-        () -> {
-          /* one-time action goes here */
-        });
-  }
-
-  /**
-   * An example method querying a boolean state of the subsystem (for example, a digital sensor).
-   *
-   * @return value of some boolean subsystem state, such as a digital sensor.
-   */
-  public boolean exampleCondition() {
-    // Query some boolean state, such as a digital sensor.
-    return false;
-  }
 
   @Override
   public void periodic() {
