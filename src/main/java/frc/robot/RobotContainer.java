@@ -7,15 +7,21 @@ package frc.robot;
 import frc.robot.Constants.OperatorConstants;
 import frc.robot.commands.Autos;
 import frc.robot.commands.ExampleCommand;
+import frc.robot.math.AimingMath;
+import frc.robot.math.Vector3;
 import frc.robot.subsystems.ShooterSubsystem;
 import frc.robot.subsystems.SwerveSubsystem;
 import swervelib.SwerveInputStream;
 
 import java.io.File;
+import java.util.function.DoubleSupplier;
+import java.util.function.Supplier;
 
 import com.pathplanner.lib.auto.AutoBuilder;
 import com.pathplanner.lib.auto.NamedCommands;
 
+import edu.wpi.first.math.geometry.Pose2d;
+import edu.wpi.first.math.kinematics.ChassisSpeeds;
 import edu.wpi.first.wpilibj.DriverStation;
 import edu.wpi.first.wpilibj.Filesystem;
 import edu.wpi.first.wpilibj.RobotBase;
@@ -70,6 +76,18 @@ public class RobotContainer {
   
   SwerveInputStream driveRobotOriented = driveAngularVelocity.copy().robotRelative(true)
                                                              .allianceRelativeControl(false);
+
+  Supplier<Vector3> velocity = () -> {
+    ChassisSpeeds velocity = drivebase.getFieldVelocity();
+    return new Vector3(velocity.vxMetersPerSecond, velocity.vyMetersPerSecond, 0);
+  };
+  DoubleSupplier angularVelocity = () -> drivebase.getFieldVelocity().omegaRadiansPerSecond;
+  Supplier<Vector3> position = () -> {
+    Pose2d position = drivebase.getPose();
+    return new Vector3(position.getX(), position.getY(), 0);
+  };
+  DoubleSupplier heading = () -> drivebase.getHeading().getRadians();
+  AimingMath aimingMath = new AimingMath(velocity, angularVelocity, position, heading, Vector3.origin());
 
 
   /** The container for the robot. Contains subsystems, OI devices, and commands. */
@@ -129,6 +147,8 @@ public class RobotContainer {
     operatorController.rightBumper().whileTrue(shooter.setHighVelocity()).onFalse(shooter.setZeroVelocity());
     operatorController.leftTrigger().whileTrue(shooter.setLow()).onFalse(shooter.setZero());
     operatorController.rightTrigger().whileTrue(shooter.setHigh()).onFalse(shooter.setZero());
+
+    operatorController.start().onTrue(Commands.runOnce(aimingMath::logSim));
   }
 
   /**

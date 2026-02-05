@@ -143,18 +143,16 @@ public class AimingMath extends SubsystemBase {
     angularVelocities.add(angularVelocityRadians.getAsDouble());
   }
   
-  public Command logSim() {
-    return run( () -> {
-      String sim = "";
-      sim += parseList("t_list",times,(Double item) -> ""+item);
-      sim += parseList("s_list",shotSpeeds,(Double item) -> ""+item);
-      sim += parseList("a_ngleList",angles,(Double item) -> ""+item);
-      sim += parseList("p_ositionList",positions,(Vector3 item) -> item.toString());
-      sim += parseList("v_elocityList",velocities,(Vector3 item) -> item.toString());
-      sim += parseList("h_eadingList",headings,(Double item) -> ""+item);
-      sim += parseList("a_ngularVelocityList",angularVelocities,(Double item) -> ""+item);
-      SmartDashboard.putString("Sim results", sim);
-    });
+  public void logSim() {
+    String sim = "";
+    sim += parseList("t_list",times,(Double item) -> ""+item);
+    sim += parseList("s_list",shotSpeeds,(Double item) -> ""+item);
+    sim += parseList("a_ngleList",angles,(Double item) -> ""+item);
+    sim += parseList("p_ositionList",positions,(Vector3 item) -> item.toString());
+    sim += parseList("v_elocityList",velocities,(Vector3 item) -> item.toString());
+    sim += parseList("h_eadingList",headings,(Double item) -> ""+item);
+    sim += parseList("a_ngularVelocityList",angularVelocities,(Double item) -> ""+item);
+    SmartDashboard.putString("SimResults", sim);
   }
   
   private <T> String parseList(String name, ArrayList<T> list, Function<T,String> function) {
