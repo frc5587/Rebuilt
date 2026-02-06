@@ -19,7 +19,7 @@ public class AimingMath extends SubsystemBase {
   private final DoubleSupplier heading;
   
   private Vector3 goalPosition;
-  private String simLog = "test 2";
+  private String simLog = "";
   
   private ArrayList<Double> times = new ArrayList<Double>();
   private ArrayList<Double> shotSpeeds = new ArrayList<Double>();
@@ -103,7 +103,7 @@ public class AimingMath extends SubsystemBase {
     return max;
   }
 
-  public double getIdealAngle(double speed) {
+  public double getIdealHeading(double speed) {
     Vector3 position = Vector3.add(robotPosition.get(),
                                    Vector3.rotate(Constants.ShooterConstants.turretPlacement,
                                                   Vector3.origin(),
@@ -125,7 +125,7 @@ public class AimingMath extends SubsystemBase {
     double A = (targetAngle - driveAngle) % (2 * Math.PI);
     double C = Math.asin((c*Math.sin(A)) / a);
 
-    return targetAngle + C + heading.getAsDouble();
+    return targetAngle + C;
   }
 
   @Override

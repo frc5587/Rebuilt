@@ -28,7 +28,6 @@ public final class Constants {
     public static final double MAX_SPEED  = Units.feetToMeters(14.5);
 
     public static final double WHEEL_LOCK_TIME = 10; //seconds
-
   }
 
   public static class OperatorConstants {

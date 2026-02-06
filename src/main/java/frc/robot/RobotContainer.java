@@ -52,7 +52,7 @@ public class RobotContainer {
     return new Vector3(position.getX(), position.getY(), 0);
   };
   DoubleSupplier heading = () -> drivebase.getHeading().getRadians();
-  AimingMath aimingMath = new AimingMath(velocity, angularVelocity, position, heading, new Vector3(8.217694-0.584994,5.156994-0.584994,1.433600));
+  AimingMath aimingMath = new AimingMath(velocity, angularVelocity, position, heading, new Vector3(4.625626,4.0346315,1.8288));
 
   // Replace with CommandPS4Controller or CommandJoystick if needed
   private final CommandXboxController driverController = new CommandXboxController(0);
@@ -140,13 +140,19 @@ public class RobotContainer {
     driverController.start().onTrue((Commands.runOnce(drivebase::zeroGyro)));
     driverController.back().whileTrue(Commands.runOnce(drivebase::lock, drivebase).repeatedly());
 
-    // driverController.leftBumper().whileTrue(shooter.setLowVelocity()).onFalse(shooter.setZeroVelocity());
-    // driverController.rightBumper().whileTrue(shooter.setHighVelocity()).onFalse(shooter.setZeroVelocity());
-    driverController.leftTrigger().whileTrue(shooter.setLow()).onFalse(shooter.setZero());
-    driverController.rightTrigger().whileTrue(shooter.setHigh()).onFalse(shooter.setZero());
+    // Shoot while move sim
+    driverController.leftTrigger().onTrue(Commands.runOnce(aimingMath::logSim));
+    driverController.rightTrigger().onTrue(Commands.runOnce(aimingMath::resetSim));
 
-    driverController.start().onTrue(Commands.runOnce(aimingMath::logSim));
-    driverController.back().onTrue(Commands.runOnce(aimingMath::resetSim));
+    // Shoot while move
+    driverController.x().whileTrue(Commands.run(() -> drivebase.overrideHeading(aimingMath.getIdealHeading(aimingMath.getIdealShotSpeed()))))
+                        .onFalse(Commands.runOnce(() -> {drivebase.deactivateOverrideHeading();}));
+
+    // Shooter sim stuff
+    operatorController.leftBumper().whileTrue(shooter.setLowVelocity()).onFalse(shooter.setZeroVelocity());
+    operatorController.rightBumper().whileTrue(shooter.setHighVelocity()).onFalse(shooter.setZeroVelocity());
+    operatorController.leftTrigger().whileTrue(shooter.setLow()).onFalse(shooter.setZero());
+    operatorController.rightTrigger().whileTrue(shooter.setHigh()).onFalse(shooter.setZero());
   }
 
   /**
