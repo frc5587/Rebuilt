@@ -154,8 +154,8 @@ public class RobotContainer {
 
     // Shoot while move
     driverController.x().whileTrue(Commands.run(() -> {drivebase.overrideHeading(aimingMath.getIdealHeading());
-                                                       aimingMath.IsShooting = true;}))
-                                  //  .alongWith(shooter.setVelocity(RPM.of(aimingMath.getIdealShotSpeed()*ShooterConstants.SHOT_SPEED_CONVERSION_FACTOR))))
+                                                       aimingMath.IsShooting = true;})
+                                   .alongWith(shooter.setVelocity(RPM.of(aimingMath.getIdealShotSpeed()*ShooterConstants.SHOT_SPEED_CONVERSION_FACTOR))))
                         .onFalse(Commands.runOnce(() -> {drivebase.deactivateOverrideHeading();
                                                          aimingMath.IsShooting = false;}));
 
