@@ -6,6 +6,7 @@ import edu.wpi.first.wpilibj.Timer;
 import edu.wpi.first.wpilibj.smartdashboard.SmartDashboard;
 import edu.wpi.first.wpilibj2.command.SubsystemBase;
 import frc.robot.Constants;
+import frc.robot.Constants.ShooterConstants;
 
 import java.util.function.DoubleSupplier;
 import java.util.function.Function;
@@ -100,7 +101,7 @@ public class AimingMath extends SubsystemBase {
         max = temp;
       }
     }
-    return max;
+    return ShooterConstants.shotSpeedConversionFactor * max;
   }
 
   public double getIdealHeading(double speed) {
@@ -126,6 +127,10 @@ public class AimingMath extends SubsystemBase {
     double C = Math.asin((c*Math.sin(A)) / a);
 
     return targetAngle + C;
+  }
+
+  public double getIdealHeading() {
+    return getIdealHeading(getIdealShotSpeed()/ShooterConstants.shotSpeedConversionFactor);
   }
 
   @Override

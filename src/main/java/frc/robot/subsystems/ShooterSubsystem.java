@@ -10,6 +10,7 @@ import static edu.wpi.first.units.Units.DegreesPerSecondPerSecond;
 import static edu.wpi.first.units.Units.Inches;
 import static edu.wpi.first.units.Units.Pounds;
 import static edu.wpi.first.units.Units.RPM;
+import static edu.wpi.first.units.Units.RotationsPerSecondPerSecond;
 
 import com.revrobotics.spark.SparkLowLevel.MotorType;
 import com.revrobotics.spark.SparkMax;
@@ -35,8 +36,8 @@ import yams.motorcontrollers.local.SparkWrapper;
 public class ShooterSubsystem extends SubsystemBase {
     private SmartMotorControllerConfig smcConfig = new SmartMotorControllerConfig(this)
     .withControlMode(ControlMode.CLOSED_LOOP)
-    .withClosedLoopController(50, 0, 0, DegreesPerSecond.of(90), DegreesPerSecondPerSecond.of(45))
-    .withSimClosedLoopController(50, 0, 0, DegreesPerSecond.of(90), DegreesPerSecondPerSecond.of(45))
+    .withClosedLoopController(1, 0, 0)
+    .withSimClosedLoopController(0.2, 0.1, 0)
     .withFeedforward(new SimpleMotorFeedforward(0, 0, 0))
     .withSimFeedforward(new SimpleMotorFeedforward(0, 0, 0))
     .withTelemetry("ShooterMotor", TelemetryVerbosity.HIGH)
@@ -56,11 +57,6 @@ public class ShooterSubsystem extends SubsystemBase {
     .withTelemetry("ShooterMech", TelemetryVerbosity.HIGH);
 
     private FlyWheel shooter = new FlyWheel(shooterConfig);
-
-    private double shooterHighSpeed = ShooterConstants.SHOOTER_HIGH_SPEED;
-    private double shooterLowSpeed = ShooterConstants.SHOOTER_LOW_SPEED;
-    private double highDutyCycle = ShooterConstants.HIGH_DUTY_CYCLE;
-    private double lowDutyCycle = ShooterConstants.LOW_DUTY_CYCLE;
 
     /**
      * Gets the current velocity of the shooter.
@@ -83,7 +79,7 @@ public class ShooterSubsystem extends SubsystemBase {
      * @return {@link edu.wpi.first.wpilibj2.command.RunCommand}
      */
     public Command setHighVelocity() {
-      return setVelocity(RPM.of(shooterHighSpeed));
+      return setVelocity(RPM.of(ShooterConstants.SHOOTER_HIGH_SPEED));
     }
 
     /**
@@ -92,7 +88,7 @@ public class ShooterSubsystem extends SubsystemBase {
      * @return {@link edu.wpi.first.wpilibj2.command.RunCommand}
      */
     public Command setLowVelocity() {
-      return setVelocity(RPM.of(shooterLowSpeed));
+      return setVelocity(RPM.of(ShooterConstants.SHOOTER_LOW_SPEED));
     }
 
     /**
@@ -118,7 +114,7 @@ public class ShooterSubsystem extends SubsystemBase {
      * @return {@link edu.wpi.first.wpilibj2.command.RunCommand}
      */
     public Command setHigh() {
-      return set(highDutyCycle);
+      return set(ShooterConstants.HIGH_DUTY_CYCLE);
     }
 
     /**
@@ -127,7 +123,7 @@ public class ShooterSubsystem extends SubsystemBase {
      * @return {@link edu.wpi.first.wpilibj2.command.RunCommand}
      */
     public Command setLow() {
-      return set(lowDutyCycle);
+      return set(ShooterConstants.LOW_DUTY_CYCLE);
     }
 
     /**

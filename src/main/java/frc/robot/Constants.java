@@ -21,7 +21,6 @@ import swervelib.math.Matter;
 public final class Constants {
 
   public static class DrivebaseConstants {
-
     public static final double ROBOT_MASS = (148 - 20.3) * 0.453592; // 32lbs * kg per pound
     public static final Matter CHASSIS    = new Matter(new Translation3d(0, 0, Units.inchesToMeters(8)), ROBOT_MASS);
     public static final double LOOP_TIME  = 0.13; //s, 20ms + 110ms sprk max velocity lag
@@ -41,13 +40,11 @@ public final class Constants {
     public static final double LOW_DUTY_CYCLE = -0.3;
 
     // Robot constants
-    public static final Vector3 turretPlacement = new Vector3(0.2,0.2,0.4);
+    public static final double shotSpeedConversionFactor = 300;
+    public static final Vector3 turretPlacement = new Vector3(0.2,0,0.4);
     public static final double pitch = Math.PI / 4;
     public static final double maxShotSpeed = 20;
     public static final double minShotSpeed = 1;
-    // Number of iterations in the binary search
-    // 54 is expirimentally determined to reach maximum accuracy
-    // 64 should be a 100% garentee
     public static final int searchDepth = 10;
     public static final double gravity = 9.81;
   }

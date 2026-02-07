@@ -5,6 +5,7 @@
 package frc.robot;
 
 import frc.robot.Constants.OperatorConstants;
+import frc.robot.Constants.ShooterConstants;
 import frc.robot.commands.Autos;
 import frc.robot.commands.ExampleCommand;
 import frc.robot.math.AimingMath;
@@ -12,6 +13,8 @@ import frc.robot.math.Vector3;
 import frc.robot.subsystems.ShooterSubsystem;
 import frc.robot.subsystems.SwerveSubsystem;
 import swervelib.SwerveInputStream;
+
+import static edu.wpi.first.units.Units.RPM;
 
 import java.io.File;
 import java.util.function.DoubleSupplier;
@@ -22,6 +25,8 @@ import com.pathplanner.lib.auto.NamedCommands;
 
 import edu.wpi.first.math.geometry.Pose2d;
 import edu.wpi.first.math.kinematics.ChassisSpeeds;
+import edu.wpi.first.units.AngularVelocityUnit;
+import edu.wpi.first.units.measure.AngularVelocity;
 import edu.wpi.first.wpilibj.DriverStation;
 import edu.wpi.first.wpilibj.Filesystem;
 import edu.wpi.first.wpilibj.RobotBase;
@@ -101,6 +106,8 @@ public class RobotContainer {
 
     //Put the autoChooser on the SmartDashboard
     SmartDashboard.putData("Auto Chooser", autoChooser);
+
+    shooter.setDefaultCommand(shooter.set(0));
   }
 
   /**
@@ -145,14 +152,17 @@ public class RobotContainer {
     driverController.rightTrigger().onTrue(Commands.runOnce(aimingMath::resetSim));
 
     // Shoot while move
-    driverController.x().whileTrue(Commands.run(() -> drivebase.overrideHeading(aimingMath.getIdealHeading(aimingMath.getIdealShotSpeed()))))
+    driverController.x().whileTrue(Commands.run(() -> {drivebase.overrideHeading(aimingMath.getIdealHeading());})
+                                   .alongWith(shooter.setVelocity(RPM.of(aimingMath.getIdealShotSpeed()))))
                         .onFalse(Commands.runOnce(() -> {drivebase.deactivateOverrideHeading();}));
 
+    driverController.b().whileTrue(shooter.setVelocity(RPM.of(300)));
+
     // Shooter sim stuff
-    operatorController.leftBumper().whileTrue(shooter.setLowVelocity()).onFalse(shooter.setZeroVelocity());
-    operatorController.rightBumper().whileTrue(shooter.setHighVelocity()).onFalse(shooter.setZeroVelocity());
-    operatorController.leftTrigger().whileTrue(shooter.setLow()).onFalse(shooter.setZero());
-    operatorController.rightTrigger().whileTrue(shooter.setHigh()).onFalse(shooter.setZero());
+    // operatorController.leftBumper().whileTrue(shooter.setLowVelocity()).onFalse(shooter.setZeroVelocity());
+    // operatorController.rightBumper().whileTrue(shooter.setHighVelocity()).onFalse(shooter.setZeroVelocity());
+    // operatorController.leftTrigger().whileTrue(shooter.setLow()).onFalse(shooter.setZero());
+    // operatorController.rightTrigger().whileTrue(shooter.setHigh()).onFalse(shooter.setZero());
   }
 
   /**
