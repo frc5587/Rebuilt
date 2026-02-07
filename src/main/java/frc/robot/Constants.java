@@ -46,7 +46,7 @@ public final class Constants {
     public static final Vector3 SHOOTER_POSITION = new Vector3(0.2,0,0.4);
     public static final double MAX_SHOT_SPEED = 20;
     public static final double MIN_SHOOT_SPEED = 1;
-    public static final int SEARCH_DEPTH = 10;
+    public static final int SEARCH_DEPTH = 3;
     public static final double GRAVITY = 9.81;
   }
 }

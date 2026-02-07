@@ -88,42 +88,19 @@ public class AimingMath extends SubsystemBase {
                                     1.0/turretDistance);
     Vector3 velocity = Vector3.add(robotVelocity.get(),
                                   Vector3.scale(tangent,angularVelocityRadians.getAsDouble()*turretDistance));
-    double c = velocity.length();
-    Vector3 idealVector = Vector3.subtract(goalPosition, position).get2D();
-    double targetAngle = idealVector.getCounterclockwiseAngle();
-    double driveAngle = velocity.getCounterclockwiseAngle();
-    double A = (targetAngle - driveAngle) % (2 * Math.PI);
-    double distance = idealVector.get2D().length();
 
-    double min = Constants.ShooterConstants.MIN_SHOOT_SPEED;
-    double max = Constants.ShooterConstants.MAX_SHOT_SPEED;
+    double speed = 0;
+    Vector3 adjustedGoalPosition = new Vector3(goalPosition.x, goalPosition.y, goalPosition.z);
     for (int i = 0; i < Constants.ShooterConstants.SEARCH_DEPTH; i++) {
-      double temp = (min+max)/2;
-      
-      double a = temp * Math.cos(Constants.ShooterConstants.PITCH);
-      double C = Math.asin((c*Math.sin(A)) / a);
-      double B = Math.PI - A - C;
-      double b = 0;
-      if (A == 0) {
-        b = a + c;
-      }
-      else if (A == Math.PI) {
-        b = a - c;
-      }
-      else {
-        b = (a*Math.sin(B))/Math.sin(A);
-      }
-      double time = distance / b;
-      double current = temp*time*Math.sin(Constants.ShooterConstants.PITCH) - (Constants.ShooterConstants.GRAVITY/2)*time*time - goalPosition.z + Constants.ShooterConstants.SHOOTER_POSITION.z;
-      
-      if (current < 0) {
-        min = temp;
-      }
-      else {
-        max = temp;
-      }
+      Vector3 idealVector = Vector3.subtract(adjustedGoalPosition, position).get2D();
+      double distance = idealVector.get2D().length();
+      speed = ((distance*Math.sqrt(Constants.ShooterConstants.GRAVITY))/Math.cos(Constants.ShooterConstants.PITCH)) /
+              (Math.sqrt(2.)*Math.sqrt(Math.abs(adjustedGoalPosition.z-position.z-(distance*Math.tan(Constants.ShooterConstants.PITCH)))));
+      double time = distance/(speed*Math.cos(Constants.ShooterConstants.PITCH));
+
+      adjustedGoalPosition = Vector3.subtract(goalPosition,Vector3.scale(velocity, time));
     }
-    return max;
+    return speed;
   }
 
   public double getIdealHeading(double speed) {
