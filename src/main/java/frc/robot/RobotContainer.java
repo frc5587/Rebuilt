@@ -24,6 +24,7 @@ import com.pathplanner.lib.auto.AutoBuilder;
 import com.pathplanner.lib.auto.NamedCommands;
 
 import edu.wpi.first.math.geometry.Pose2d;
+import edu.wpi.first.math.geometry.Pose3d;
 import edu.wpi.first.math.kinematics.ChassisSpeeds;
 import edu.wpi.first.units.AngularVelocityUnit;
 import edu.wpi.first.units.measure.AngularVelocity;
@@ -57,7 +58,7 @@ public class RobotContainer {
     return new Vector3(position.getX(), position.getY(), 0);
   };
   DoubleSupplier heading = () -> drivebase.getHeading().getRadians();
-  AimingMath aimingMath = new AimingMath(velocity, angularVelocity, position, heading, new Vector3(4.625626,4.0346315,1.8288));
+  AimingMath aimingMath = new AimingMath(velocity, angularVelocity, position, heading, new Vector3(4.8,4.0346315,1.8288));
 
   // Replace with CommandPS4Controller or CommandJoystick if needed
   private final CommandXboxController driverController = new CommandXboxController(0);
@@ -152,9 +153,11 @@ public class RobotContainer {
     driverController.rightTrigger().onTrue(Commands.runOnce(aimingMath::resetSim));
 
     // Shoot while move
-    driverController.x().whileTrue(Commands.run(() -> {drivebase.overrideHeading(aimingMath.getIdealHeading());})
-                                   .alongWith(shooter.setVelocity(RPM.of(aimingMath.getIdealShotSpeed()))))
-                        .onFalse(Commands.runOnce(() -> {drivebase.deactivateOverrideHeading();}));
+    driverController.x().whileTrue(Commands.run(() -> {drivebase.overrideHeading(aimingMath.getIdealHeading());
+                                                       aimingMath.IsShooting = true;}))
+                                  //  .alongWith(shooter.setVelocity(RPM.of(aimingMath.getIdealShotSpeed()*ShooterConstants.SHOT_SPEED_CONVERSION_FACTOR))))
+                        .onFalse(Commands.runOnce(() -> {drivebase.deactivateOverrideHeading();
+                                                         aimingMath.IsShooting = false;}));
 
     driverController.b().whileTrue(shooter.setVelocity(RPM.of(300)));
 

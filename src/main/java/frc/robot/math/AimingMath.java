@@ -2,26 +2,44 @@ package frc.robot.math;
 
 import java.util.function.Supplier;
 
+import org.dyn4j.collision.FixtureModificationHandler;
+
+import edu.wpi.first.math.geometry.Pose3d;
+import edu.wpi.first.math.geometry.Rotation2d;
+import edu.wpi.first.math.geometry.Translation2d;
+import edu.wpi.first.math.kinematics.ChassisSpeeds;
+import edu.wpi.first.networktables.NetworkTableInstance;
+import edu.wpi.first.networktables.StructArrayPublisher;
+import edu.wpi.first.units.Units;
+import edu.wpi.first.units.measure.Angle;
+import edu.wpi.first.units.measure.Distance;
 import edu.wpi.first.wpilibj.Timer;
 import edu.wpi.first.wpilibj.smartdashboard.SmartDashboard;
 import edu.wpi.first.wpilibj2.command.SubsystemBase;
 import frc.robot.Constants;
 import frc.robot.Constants.ShooterConstants;
+import swervelib.simulation.ironmaple.simulation.SimulatedArena;
+import swervelib.simulation.ironmaple.simulation.seasonspecific.rebuilt2026.RebuiltFuelOnFly;
 
 import java.util.function.DoubleSupplier;
 import java.util.function.Function;
+
+import static edu.wpi.first.units.Units.Meters;
+import static edu.wpi.first.units.Units.MetersPerSecond;
+
 import java.math.BigDecimal;
 import java.util.ArrayList;
+import java.util.Arrays;
 
 public class AimingMath extends SubsystemBase {
+  private final Supplier<Vector3> robotPosition;
+  private final DoubleSupplier headingRadians;
   private final Supplier<Vector3> robotVelocity;
   private final DoubleSupplier angularVelocityRadians;
-  private final Supplier<Vector3> robotPosition;
-  private final DoubleSupplier heading;
   
   private Vector3 goalPosition;
+
   private String simLog = "";
-  
   private ArrayList<Double> times = new ArrayList<Double>();
   private ArrayList<Double> shotSpeeds = new ArrayList<Double>();
   private ArrayList<Double> angles = new ArrayList<Double>();
@@ -29,6 +47,12 @@ public class AimingMath extends SubsystemBase {
   private ArrayList<Vector3> velocities = new ArrayList<Vector3>();
   private ArrayList<Double> headings = new ArrayList<Double>();
   private ArrayList<Double> angularVelocities = new ArrayList<Double>();
+
+  public boolean IsShooting = false;
+  private ArrayList<Double> shotTimes = new ArrayList<Double>();
+  private StructArrayPublisher<Pose3d> fuelPosePublisher = NetworkTableInstance.getDefault()
+      .getStructArrayTopic("MyPoseArray", Pose3d.struct)
+      .publish();
   
   public AimingMath(Supplier<Vector3> _robotVelocity, 
                     DoubleSupplier _angularVelocityRadians,
@@ -39,8 +63,11 @@ public class AimingMath extends SubsystemBase {
     robotVelocity = _robotVelocity;
     angularVelocityRadians = _angularVelocityRadians;
     robotPosition = _robotPosition;
-    heading = _heading;
+    headingRadians = _heading;
     goalPosition = _goalPosition;
+
+    times.add(0.);
+    shotTimes.add(0.);
 
     SmartDashboard.putString("SimResults", simLog);
   }
@@ -48,52 +75,47 @@ public class AimingMath extends SubsystemBase {
   public void setGoal(Vector3 _goalPosition) {
     goalPosition = _goalPosition;
   }
-  
-  private double evalShotSpeed(double speed) {
+
+  public double getIdealShotSpeed() {
     Vector3 position = Vector3.add(robotPosition.get(),
-                                   Vector3.rotate(Constants.ShooterConstants.turretPlacement,
+                                    Vector3.rotate(Constants.ShooterConstants.SHOOTER_POSITION,
                                                   Vector3.origin(),
-                                                  heading.getAsDouble()));
-    double turretDistance = Constants.ShooterConstants.turretPlacement.get2D().length();
-    Vector3 tangent = Vector3.scale(Vector3.rotate(Constants.ShooterConstants.turretPlacement.get2D(),
-                                                   Vector3.origin(),
-                                                   Math.PI/2 + heading.getAsDouble()),
+                                                  headingRadians.getAsDouble()));
+    double turretDistance = Constants.ShooterConstants.SHOOTER_POSITION.get2D().length();
+    Vector3 tangent = Vector3.scale(Vector3.rotate(Constants.ShooterConstants.SHOOTER_POSITION.get2D(),
+                                                  Vector3.origin(),
+                                                  Math.PI/2 + headingRadians.getAsDouble()),
                                     1.0/turretDistance);
     Vector3 velocity = Vector3.add(robotVelocity.get(),
-                                   Vector3.scale(tangent,angularVelocityRadians.getAsDouble()*turretDistance));
-    
-    double a = speed * Math.cos(Constants.ShooterConstants.pitch);
+                                  Vector3.scale(tangent,angularVelocityRadians.getAsDouble()*turretDistance));
     double c = velocity.length();
-
     Vector3 idealVector = Vector3.subtract(goalPosition, position).get2D();
     double targetAngle = idealVector.getCounterclockwiseAngle();
     double driveAngle = velocity.getCounterclockwiseAngle();
     double A = (targetAngle - driveAngle) % (2 * Math.PI);
-    double C = Math.asin((c*Math.sin(A)) / a);
-    double B = Math.PI - A - C;
-
-    double b = 0;
-    if (A == 0) {
-      b = a + c;
-    }
-    else if (A == Math.PI) {
-      b = a - c;
-    }
-    else {
-      b = (a*Math.sin(B))/Math.sin(A);
-    }
-
     double distance = idealVector.get2D().length();
-    double time = distance / b;
-    return speed*time*Math.sin(Constants.ShooterConstants.pitch) - (Constants.ShooterConstants.gravity/2)*time*time - goalPosition.z + Constants.ShooterConstants.turretPlacement.z;
-  }
 
-  public double getIdealShotSpeed() {
-    double min = Constants.ShooterConstants.minShotSpeed;
-    double max = Constants.ShooterConstants.maxShotSpeed;
-    for (int i = 0; i < Constants.ShooterConstants.searchDepth; i++) {
+    double min = Constants.ShooterConstants.MIN_SHOOT_SPEED;
+    double max = Constants.ShooterConstants.MAX_SHOT_SPEED;
+    for (int i = 0; i < Constants.ShooterConstants.SEARCH_DEPTH; i++) {
       double temp = (min+max)/2;
-      double current = evalShotSpeed(temp);
+      
+      double a = temp * Math.cos(Constants.ShooterConstants.PITCH);
+      double C = Math.asin((c*Math.sin(A)) / a);
+      double B = Math.PI - A - C;
+      double b = 0;
+      if (A == 0) {
+        b = a + c;
+      }
+      else if (A == Math.PI) {
+        b = a - c;
+      }
+      else {
+        b = (a*Math.sin(B))/Math.sin(A);
+      }
+      double time = distance / b;
+      double current = temp*time*Math.sin(Constants.ShooterConstants.PITCH) - (Constants.ShooterConstants.GRAVITY/2)*time*time - goalPosition.z + Constants.ShooterConstants.SHOOTER_POSITION.z;
+      
       if (current < 0) {
         min = temp;
       }
@@ -101,23 +123,23 @@ public class AimingMath extends SubsystemBase {
         max = temp;
       }
     }
-    return ShooterConstants.shotSpeedConversionFactor * max;
+    return max;
   }
 
   public double getIdealHeading(double speed) {
     Vector3 position = Vector3.add(robotPosition.get(),
-                                   Vector3.rotate(Constants.ShooterConstants.turretPlacement,
+                                   Vector3.rotate(Constants.ShooterConstants.SHOOTER_POSITION,
                                                   Vector3.origin(),
-                                                  heading.getAsDouble()));
-    double turretDistance = Constants.ShooterConstants.turretPlacement.get2D().length();
-    Vector3 tangent = Vector3.scale(Vector3.rotate(Constants.ShooterConstants.turretPlacement.get2D(),
+                                                  headingRadians.getAsDouble()));
+    double turretDistance = Constants.ShooterConstants.SHOOTER_POSITION.get2D().length();
+    Vector3 tangent = Vector3.scale(Vector3.rotate(Constants.ShooterConstants.SHOOTER_POSITION.get2D(),
                                                    Vector3.origin(),
-                                                   Math.PI/2 + heading.getAsDouble()),
+                                                   Math.PI/2 + headingRadians.getAsDouble()),
                                     1.0/turretDistance);
     Vector3 velocity = Vector3.add(robotVelocity.get(),
                                    Vector3.scale(tangent,angularVelocityRadians.getAsDouble()*turretDistance));
     
-    double a = speed * Math.cos(Constants.ShooterConstants.pitch);
+    double a = speed * Math.cos(Constants.ShooterConstants.PITCH);
     double c = velocity.length();
 
     Vector3 idealVector = Vector3.subtract(goalPosition, position).get2D();
@@ -130,26 +152,51 @@ public class AimingMath extends SubsystemBase {
   }
 
   public double getIdealHeading() {
-    return getIdealHeading(getIdealShotSpeed()/ShooterConstants.shotSpeedConversionFactor);
+    return getIdealHeading(getIdealShotSpeed());
+  }
+
+  public void shoot(double shotSpeed) {
+    SimulatedArena.getInstance()
+                  .addGamePieceProjectile(new RebuiltFuelOnFly(
+                      new Translation2d(robotPosition.get().x,robotPosition.get().y),
+                      new Translation2d(), // shooter offet from center
+                      new ChassisSpeeds(robotVelocity.get().x,robotVelocity.get().y,angularVelocityRadians.getAsDouble()),
+                      new Rotation2d(headingRadians.getAsDouble()),
+                      Meters.of(ShooterConstants.SHOOTER_POSITION.z), // initial height of the ball, in meters
+                      MetersPerSecond.of(shotSpeed), // initial velocity, in m/s
+                      Angle.ofRelativeUnits(ShooterConstants.PITCH,Units.Radian)));
   }
 
   @Override
   public void periodic() {
-    double idealShotSpeed = getIdealShotSpeed();
-    
-    // Replace with actual or simulated values
-    double shotSpeed = idealShotSpeed * 1.0;
-    double angle = 0;
-    
-    times.add(Timer.getFPGATimestamp());
-    shotSpeeds.add(shotSpeed);
-    angles.add(angle);
-    positions.add(robotPosition.get());
-    velocities.add(robotVelocity.get());
-    headings.add(heading.getAsDouble());
-    angularVelocities.add(angularVelocityRadians.getAsDouble());
+    // if (times.get(times.size()-1) < Timer.getFPGATimestamp() - 0.2) {
+    //   double idealShotSpeed = getIdealShotSpeed();
+    //   // Replace with actual or simulated values
+    //   double shotSpeed = idealShotSpeed * 1.0;
+    //   double angle = 0;
+      
+    //   times.add(Timer.getFPGATimestamp());
+    //   shotSpeeds.add(shotSpeed);
+    //   angles.add(angle);
+    //   positions.add(robotPosition.get());
+    //   velocities.add(robotVelocity.get());
+    //   headings.add(headingRadians.getAsDouble());
+    //   angularVelocities.add(angularVelocityRadians.getAsDouble());
+    // }
+
+    if (IsShooting  &&  shotTimes.get(shotTimes.size()-1) < Timer.getFPGATimestamp() - 1/ShooterConstants.SHOTS_PER_SECOND) {
+      double idealShotSpeed = getIdealShotSpeed();
+      shoot(idealShotSpeed);
+
+      shotTimes.add(Timer.getFPGATimestamp());
+    }
 
     SmartDashboard.putString("SimResults", simLog);
+
+    // Get the positions of the fuel (both on the field and in the air)
+      Pose3d[] fuelPoses = SimulatedArena.getInstance()
+            .getGamePiecesArrayByType("Fuel");
+      fuelPosePublisher.accept(fuelPoses);
   }
 
   public void resetSim() {

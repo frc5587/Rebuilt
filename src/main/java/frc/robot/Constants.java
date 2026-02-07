@@ -40,12 +40,13 @@ public final class Constants {
     public static final double LOW_DUTY_CYCLE = -0.3;
 
     // Robot constants
-    public static final double shotSpeedConversionFactor = 300;
-    public static final Vector3 turretPlacement = new Vector3(0.2,0,0.4);
-    public static final double pitch = Math.PI / 4;
-    public static final double maxShotSpeed = 20;
-    public static final double minShotSpeed = 1;
-    public static final int searchDepth = 10;
-    public static final double gravity = 9.81;
+    public static final double PITCH = 1.2217304764;
+    public static final double SHOTS_PER_SECOND = 2;
+    public static final double SHOT_SPEED_CONVERSION_FACTOR = 300;
+    public static final Vector3 SHOOTER_POSITION = new Vector3(0.2,0,0.4);
+    public static final double MAX_SHOT_SPEED = 20;
+    public static final double MIN_SHOOT_SPEED = 1;
+    public static final int SEARCH_DEPTH = 10;
+    public static final double GRAVITY = 9.81;
   }
 }
