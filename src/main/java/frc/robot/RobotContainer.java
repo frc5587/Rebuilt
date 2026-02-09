@@ -16,11 +16,9 @@ import frc.robot.math.AimingMath;
 import frc.robot.math.Vector3;
 import frc.robot.subsystems.ShooterSubsystem;
 import frc.robot.subsystems.SwerveSubsystem;
-import swervelib.SwerveInputStream;
 
 import static edu.wpi.first.units.Units.RPM;
 
-import java.io.File;
 import java.util.function.DoubleSupplier;
 import java.util.function.Supplier;
 
@@ -61,15 +59,15 @@ public class RobotContainer {
     private final SwerveRequest.RobotCentric forwardStraight = new SwerveRequest.RobotCentric()
             .withDriveRequestType(DriveRequestType.OpenLoopVoltage);
   Supplier<Vector3> velocity = () -> {
-    ChassisSpeeds velocity = drivebase.getFieldVelocity();
+    ChassisSpeeds velocity = drivebase.getState().Speeds;
     return new Vector3(velocity.vxMetersPerSecond, velocity.vyMetersPerSecond, 0);
   };
-  DoubleSupplier angularVelocity = () -> drivebase.getFieldVelocity().omegaRadiansPerSecond;
+  DoubleSupplier angularVelocity = () -> drivebase.getState().Speeds.omegaRadiansPerSecond;
   Supplier<Vector3> position = () -> {
-    Pose2d position = drivebase.getPose();
+    Pose2d position = drivebase.getState().Pose;
     return new Vector3(position.getX(), position.getY(), 0);
   };
-  DoubleSupplier heading = () -> drivebase.getHeading().getRadians();
+  DoubleSupplier heading = () -> drivebase.getState().RawHeading.getRadians();
   AimingMath aimingMath = new AimingMath(velocity, angularVelocity, position, heading, new Vector3(4.8,4.0346315,1.8288));
 
   // Replace with CommandPS4Controller or CommandJoystick if needed
@@ -78,33 +76,7 @@ public class RobotContainer {
 
   private final SendableChooser<Command> autoChooser;
 
-  /**
-   * Converts driver input into a field-relative ChassisSpeeds that is controlled
-   * by angular velocity.
-   */
-  SwerveInputStream driveFieldOriented = SwerveInputStream.of(drivebase.getSwerveDrive(),
-      () -> driverController.getLeftY() * -1,
-      () -> driverController.getLeftX() * -1)
-      .withControllerRotationAxis(() -> driverController.getRightX() * -1)
-      .deadband(OperatorConstants.DEADBAND)
-      .scaleTranslation(0.8)
-      .allianceRelativeControl(true)
-      .robotRelative(false);
-
-  /**
-   * Clone's the angular velocity input stream and converts it to a fieldRelative
-   * input stream.
-   */
-  SwerveInputStream driveAngularVelocity = SwerveInputStream.of(drivebase.getSwerveDrive(),
-                                                                () -> driverController.getLeftY() * -1,
-                                                                () -> driverController.getLeftX() * -1)
-                                                            .withControllerRotationAxis(driverController::getRightX)
-                                                            .deadband(OperatorConstants.DEADBAND)
-                                                            .scaleTranslation(0.8)
-                                                            .allianceRelativeControl(true);
   
-  SwerveInputStream driveRobotOriented = driveAngularVelocity.copy().robotRelative(true)
-                                                             .allianceRelativeControl(false);
   /** The container for the robot. Contains subsystems, OI devices, and commands. */
   public RobotContainer() {
     // Configure the trigger bindings
@@ -115,7 +87,7 @@ public class RobotContainer {
     NamedCommands.registerCommand("test", Commands.print("I EXIST"));
 
     //Have the autoChooser pull in all PathPlanner autos as options
-    autoChooser = AutoBuilder.buildAutoChooser();//TODO fix robot error pls
+    autoChooser = AutoBuilder.buildAutoChooser();
 
     //Put the autoChooser on the SmartDashboard
     SmartDashboard.putData("Auto Chooser", autoChooser);
@@ -151,8 +123,8 @@ public class RobotContainer {
     //driverController.rightBumper().onTrue(Commands.runOnce(() -> {drivebase.deactivateOverrideHeading();}));
 
     // Stuff
-    driverController.start().onTrue((Commands.runOnce(drivebase::zeroGyro)));
-    driverController.back().whileTrue(Commands.runOnce(drivebase::lock, drivebase).repeatedly());
+    driverController.start().onTrue((Commands.runOnce(drivebase::seedFieldCentric)));
+    //driverController.back().whileTrue(Commands.runOnce(drivebase::lock, drivebase).repeatedly());
 
     // Shoot while move sim
     driverController.leftTrigger().onTrue(Commands.runOnce(aimingMath::logSim));
@@ -183,7 +155,7 @@ public class RobotContainer {
     return autoChooser.getSelected();
   }
 
-  public void setMotorBrake(boolean brake) {
-    drivebase.setMotorBrake(brake);
+  public void setMotorBrake(boolean brakee) {
+    if(brakee) {drivebase.applyRequest(() -> brake);}
   }
 }
