@@ -48,7 +48,7 @@ public class AimingMath extends SubsystemBase {
   private ArrayList<Double> headings = new ArrayList<Double>();
   private ArrayList<Double> angularVelocities = new ArrayList<Double>();
 
-  public boolean IsShooting = false;
+  public boolean isShooting = false;
   private ArrayList<Double> shotTimes = new ArrayList<Double>();
   private StructArrayPublisher<Pose3d> fuelPosePublisher = NetworkTableInstance.getDefault()
       .getStructArrayTopic("MyPoseArray", Pose3d.struct)
@@ -184,7 +184,7 @@ public class AimingMath extends SubsystemBase {
     //   angularVelocities.add(angularVelocityRadians.getAsDouble());
     // }
 
-    if (IsShooting  &&  shotTimes.get(shotTimes.size()-1) < Timer.getFPGATimestamp() - 1/ShooterConstants.SHOTS_PER_SECOND) {
+    if (isShooting  &&  shotTimes.get(shotTimes.size()-1) < Timer.getFPGATimestamp() - 1/ShooterConstants.SHOTS_PER_SECOND) {
       double idealShotSpeed = getIdealShotSpeed();
       shoot(idealShotSpeed);
 

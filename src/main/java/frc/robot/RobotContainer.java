@@ -7,11 +7,7 @@ package frc.robot;
 import com.ctre.phoenix6.swerve.SwerveModule.DriveRequestType;
 
 import frc.robot.Constants.DrivebaseConstants;
-import frc.robot.Constants.OperatorConstants;
 import frc.robot.Constants.ShooterConstants;
-import frc.robot.Constants.TunerConstants;
-import frc.robot.commands.Autos;
-import frc.robot.commands.ExampleCommand;
 import frc.robot.math.AimingMath;
 import frc.robot.math.Vector3;
 import frc.robot.subsystems.ShooterSubsystem;
@@ -27,13 +23,8 @@ import com.pathplanner.lib.auto.AutoBuilder;
 import com.pathplanner.lib.auto.NamedCommands;
 
 import edu.wpi.first.math.geometry.Pose2d;
-import edu.wpi.first.math.geometry.Pose3d;
 import edu.wpi.first.math.kinematics.ChassisSpeeds;
-import edu.wpi.first.units.AngularVelocityUnit;
-import edu.wpi.first.units.measure.AngularVelocity;
 import edu.wpi.first.wpilibj.DriverStation;
-import edu.wpi.first.wpilibj.Filesystem;
-import edu.wpi.first.wpilibj.RobotBase;
 import edu.wpi.first.wpilibj.smartdashboard.SendableChooser;
 import edu.wpi.first.wpilibj.smartdashboard.SmartDashboard;
 import edu.wpi.first.wpilibj2.command.Command;
@@ -48,16 +39,13 @@ import edu.wpi.first.wpilibj2.command.button.Trigger;
  * subsystems, commands, and trigger mappings) should be declared here.
  */
 public class RobotContainer {
-  // The robot's subsystems and commands are defined here...
   private final ShooterSubsystem shooter = new ShooterSubsystem();
   private final SwerveSubsystem drivebase = TunerConstants.createDrivetrain();
-      private final SwerveRequest.FieldCentric drive = new SwerveRequest.FieldCentric()
-            .withDeadband(DrivebaseConstants.MAX_SPEED * 0.1).withRotationalDeadband(DrivebaseConstants.MAX_SPIN_SPEED * 0.1) // Add a 10% deadband
-            .withDriveRequestType(DriveRequestType.OpenLoopVoltage); // Use open-loop control for drive motors
-    private final SwerveRequest.SwerveDriveBrake brake = new SwerveRequest.SwerveDriveBrake();
-    private final SwerveRequest.PointWheelsAt point = new SwerveRequest.PointWheelsAt();
-    private final SwerveRequest.RobotCentric forwardStraight = new SwerveRequest.RobotCentric()
-            .withDriveRequestType(DriveRequestType.OpenLoopVoltage);
+  private final SwerveRequest.FieldCentric drive = new SwerveRequest.FieldCentric()
+      .withDeadband(DrivebaseConstants.MAX_SPEED * 0.1).withRotationalDeadband(DrivebaseConstants.MAX_SPIN_SPEED * 0.1) // Add a 10% deadband
+      .withDriveRequestType(DriveRequestType.OpenLoopVoltage); // Use open-loop control for drive motors
+  private final SwerveRequest.SwerveDriveBrake brake = new SwerveRequest.SwerveDriveBrake();
+  // Aiming math
   Supplier<Vector3> velocity = () -> {
     ChassisSpeeds velocity = drivebase.getState().Speeds;
     return new Vector3(velocity.vxMetersPerSecond, velocity.vyMetersPerSecond, 0);
@@ -76,7 +64,6 @@ public class RobotContainer {
 
   private final SendableChooser<Command> autoChooser;
 
-  
   /** The container for the robot. Contains subsystems, OI devices, and commands. */
   public RobotContainer() {
     // Configure the trigger bindings
@@ -111,16 +98,12 @@ public class RobotContainer {
                    .withVelocityY(-driverController.getLeftX() * DrivebaseConstants.MAX_SPEED) // Drive left with negative X (left)
                    .withRotationalRate(-driverController.getRightX() * DrivebaseConstants.MAX_SPIN_SPEED) // Drive counterclockwise with negative X (left)
     ));
-
+    
     // Dpad to rotate robot
-    //driverController.povUp().onTrue(Commands.runOnce(() -> {drivebase.overrideHeading(0.);}));
-    //driverController.povRight().onTrue(Commands.runOnce(() -> {drivebase.overrideHeading(Math.PI/-2.);}));
-    //driverController.povDown().onTrue(Commands.runOnce(() -> {drivebase.overrideHeading(-1*Math.PI);}));
-    //driverController.povLeft().onTrue(Commands.runOnce(() -> {drivebase.overrideHeading(Math.PI/2.);}));
-
-    // Holds the current heading when maintainHeading is toggled on
-    //driverController.leftBumper().onTrue(Commands.runOnce(() -> {drivebase.overrideHeading(drivebase.getIdealHeadingRadians());}));
-    //driverController.rightBumper().onTrue(Commands.runOnce(() -> {drivebase.deactivateOverrideHeading();}));
+    driverController.povUp().whileTrue(drivebase.applyRequest(headingOverride(() -> 0.)));
+    driverController.povRight().whileTrue(drivebase.applyRequest(headingOverride(() -> Math.PI/-2.)));
+    driverController.povDown().whileTrue(drivebase.applyRequest(headingOverride(() -> -1*Math.PI)));
+    driverController.povLeft().whileTrue(drivebase.applyRequest(headingOverride(() -> Math.PI/2.)));
 
     // Stuff
     driverController.start().onTrue((Commands.runOnce(drivebase::seedFieldCentric)));
@@ -131,11 +114,17 @@ public class RobotContainer {
     driverController.rightTrigger().onTrue(Commands.runOnce(aimingMath::resetSim));
 
     // Shoot while move
-    //driverController.x().whileTrue(Commands.run(() -> {drivebase.overrideHeading(aimingMath.getIdealHeading());
-                                                    //   aimingMath.IsShooting = true;}))
-                                  //  .alongWith(shooter.setVelocity(RPM.of(aimingMath.getIdealShotSpeed()*ShooterConstants.SHOT_SPEED_CONVERSION_FACTOR))))
-   //                     .onFalse(Commands.runOnce(() -> {drivebase.deactivateOverrideHeading();
-   //                                                      aimingMath.IsShooting = false;}));
+    driverController.x().whileTrue(drivebase.applyRequest(() -> {
+                                                          DrivebaseConstants.HEADING_CONTROLLER.setGoal(0);
+                                                          return drive.withVelocityX(-driverController.getLeftY() * DrivebaseConstants.MAX_SPEED)
+                                                                      .withVelocityY(-driverController.getLeftX() * DrivebaseConstants.MAX_SPEED)
+                                                                      .withRotationalRate(DrivebaseConstants.MAX_SPIN_SPEED*
+                                                                          DrivebaseConstants.SHOOT_WHILE_MOVE_HEADING_CONTROLLER.calculate(
+                                                                          (drivebase.getState().Pose.getRotation().getRadians() - aimingMath.getIdealHeading() + Math.PI) % (2*Math.PI) - Math.PI));
+                                                          })
+                                   .alongWith(shooter.setVelocity(RPM.of(aimingMath.getIdealShotSpeed()*ShooterConstants.SHOT_SPEED_CONVERSION_FACTOR)))
+                                   .alongWith(Commands.run(() -> aimingMath.isShooting = true)))
+                       .onFalse(Commands.runOnce(() -> {aimingMath.isShooting = false;}));
 
     driverController.b().whileTrue(shooter.setVelocity(RPM.of(300)));
 
@@ -144,6 +133,16 @@ public class RobotContainer {
     // operatorController.rightBumper().whileTrue(shooter.setHighVelocity()).onFalse(shooter.setZeroVelocity());
     // operatorController.leftTrigger().whileTrue(shooter.setLow()).onFalse(shooter.setZero());
     // operatorController.rightTrigger().whileTrue(shooter.setHigh()).onFalse(shooter.setZero());
+  }
+
+  private Supplier<SwerveRequest> headingOverride(DoubleSupplier heading) { 
+    return () -> {
+      DrivebaseConstants.HEADING_CONTROLLER.setGoal(0);
+      return drive.withVelocityX(-driverController.getLeftY() * DrivebaseConstants.MAX_SPEED) // Drive forward with negative Y (forward)
+                      .withVelocityY(-driverController.getLeftX() * DrivebaseConstants.MAX_SPEED) // Drive left with negative X (left)
+                      .withRotationalRate(DrivebaseConstants.MAX_SPIN_SPEED*DrivebaseConstants.HEADING_CONTROLLER.calculate(
+                                              (drivebase.getState().Pose.getRotation().getRadians() - heading.getAsDouble() + Math.PI) % (2*Math.PI) - Math.PI));
+    };
   }
 
   /**
