@@ -103,33 +103,31 @@ public class AimingMath extends SubsystemBase {
     return speed;
   }
 
-  public double getIdealHeading(double speed) {
+  public double getIdealHeading() {
     Vector3 position = Vector3.add(robotPosition.get(),
-                                   Vector3.rotate(Constants.ShooterConstants.SHOOTER_POSITION,
+                                    Vector3.rotate(Constants.ShooterConstants.SHOOTER_POSITION,
                                                   Vector3.origin(),
                                                   headingRadians.getAsDouble()));
     double turretDistance = Constants.ShooterConstants.SHOOTER_POSITION.get2D().length();
     Vector3 tangent = Vector3.scale(Vector3.rotate(Constants.ShooterConstants.SHOOTER_POSITION.get2D(),
-                                                   Vector3.origin(),
-                                                   Math.PI/2 + headingRadians.getAsDouble()),
+                                                  Vector3.origin(),
+                                                  Math.PI/2 + headingRadians.getAsDouble()),
                                     1.0/turretDistance);
     Vector3 velocity = Vector3.add(robotVelocity.get(),
-                                   Vector3.scale(tangent,angularVelocityRadians.getAsDouble()*turretDistance));
-    
-    double a = speed * Math.cos(Constants.ShooterConstants.PITCH);
-    double c = velocity.length();
+                                  Vector3.scale(tangent,angularVelocityRadians.getAsDouble()*turretDistance));
 
-    Vector3 idealVector = Vector3.subtract(goalPosition, position).get2D();
-    double targetAngle = idealVector.getCounterclockwiseAngle();
-    double driveAngle = velocity.getCounterclockwiseAngle();
-    double A = (targetAngle - driveAngle) % (2 * Math.PI);
-    double C = Math.asin((c*Math.sin(A)) / a);
+    double speed = 0;
+    Vector3 adjustedGoalPosition = new Vector3(goalPosition.x, goalPosition.y, goalPosition.z);
+    for (int i = 0; i < Constants.ShooterConstants.SEARCH_DEPTH; i++) {
+      Vector3 idealVector = Vector3.subtract(adjustedGoalPosition, position).get2D();
+      double distance = idealVector.get2D().length();
+      speed = ((distance*Math.sqrt(Constants.ShooterConstants.GRAVITY))/Math.cos(Constants.ShooterConstants.PITCH)) /
+              (Math.sqrt(2.)*Math.sqrt(Math.abs(adjustedGoalPosition.z-position.z-(distance*Math.tan(Constants.ShooterConstants.PITCH)))));
+      double time = distance/(speed*Math.cos(Constants.ShooterConstants.PITCH));
 
-    return targetAngle + C;
-  }
-
-  public double getIdealHeading() {
-    return getIdealHeading(getIdealShotSpeed());
+      adjustedGoalPosition = Vector3.subtract(goalPosition,Vector3.scale(velocity, time));
+    }
+    return Vector3.subtract(adjustedGoalPosition, position).getCounterclockwiseAngle();
   }
 
   public void shoot(double shotSpeed) {
@@ -146,20 +144,20 @@ public class AimingMath extends SubsystemBase {
 
   @Override
   public void periodic() {
-    // if (times.get(times.size()-1) < Timer.getFPGATimestamp() - 0.2) {
-    //   double idealShotSpeed = getIdealShotSpeed();
-    //   // Replace with actual or simulated values
-    //   double shotSpeed = idealShotSpeed * 1.0;
-    //   double angle = 0;
+    if (times.get(times.size()-1) < Timer.getFPGATimestamp() - 0.06) {
+      double idealShotSpeed = getIdealShotSpeed();
+      // Replace with actual or simulated values
+      double shotSpeed = idealShotSpeed * 1.0;
+      double angle = 0;
       
-    //   times.add(Timer.getFPGATimestamp());
-    //   shotSpeeds.add(shotSpeed);
-    //   angles.add(angle);
-    //   positions.add(robotPosition.get());
-    //   velocities.add(robotVelocity.get());
-    //   headings.add(headingRadians.getAsDouble());
-    //   angularVelocities.add(angularVelocityRadians.getAsDouble());
-    // }
+      times.add(Timer.getFPGATimestamp());
+      shotSpeeds.add(shotSpeed);
+      angles.add(angle);
+      positions.add(robotPosition.get());
+      velocities.add(robotVelocity.get());
+      headings.add(headingRadians.getAsDouble());
+      angularVelocities.add(angularVelocityRadians.getAsDouble());
+    }
 
     if (IsShooting  &&  shotTimes.get(shotTimes.size()-1) < Timer.getFPGATimestamp() - 1/ShooterConstants.SHOTS_PER_SECOND) {
       double idealShotSpeed = getIdealShotSpeed();
@@ -184,6 +182,14 @@ public class AimingMath extends SubsystemBase {
     velocities.clear();
     headings.clear();
     angularVelocities.clear();
+
+    times.add(0.);
+    shotSpeeds.add(0.);
+    angles.add(0.);
+    positions.add(Vector3.origin());
+    velocities.add(Vector3.origin());
+    headings.add(0.);
+    angularVelocities.add(0.);
   }
   
   public void logSim() {
