@@ -32,7 +32,7 @@ public final class Constants {
     public static final double WHEEL_LOCK_TIME = 10; //seconds
 
     public static final ProfiledPIDController HEADING_CONTROLLER = new ProfiledPIDController(Math.PI,0,0.1,new Constraints(MAX_SPIN_SPEED, MAX_SPIN_ACCEL));
-    public static final ProfiledPIDController SHOOT_WHILE_MOVE_HEADING_CONTROLLER = new ProfiledPIDController(2,0,0.1,new Constraints(MAX_SPIN_SPEED, MAX_SPIN_ACCEL));
+    public static final ProfiledPIDController SHOOT_WHILE_MOVE_HEADING_CONTROLLER = new ProfiledPIDController(3,0,0.3,new Constraints(MAX_SPIN_SPEED, MAX_SPIN_ACCEL));
   }
 
   public static class OperatorConstants {

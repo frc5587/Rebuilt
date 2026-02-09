@@ -25,6 +25,7 @@ import com.pathplanner.lib.auto.AutoBuilder;
 import com.pathplanner.lib.auto.NamedCommands;
 
 import edu.wpi.first.math.geometry.Pose2d;
+import edu.wpi.first.math.geometry.Rotation2d;
 import edu.wpi.first.math.kinematics.ChassisSpeeds;
 import edu.wpi.first.wpilibj.DriverStation;
 import edu.wpi.first.wpilibj.smartdashboard.SendableChooser;
@@ -43,10 +44,16 @@ import edu.wpi.first.wpilibj2.command.button.Trigger;
 public class RobotContainer {
   private final ShooterSubsystem shooter = new ShooterSubsystem();
   private final SwerveSubsystem drivebase = TunerConstants.createDrivetrain();
+  // private final ArmSubsystem arm = new ArmSubsystem();
+
   private final SwerveRequest.FieldCentric drive = new SwerveRequest.FieldCentric()
       .withDeadband(DrivebaseConstants.MAX_SPEED * 0.1).withRotationalDeadband(DrivebaseConstants.MAX_SPIN_SPEED * 0.1) // Add a 10% deadband
       .withDriveRequestType(DriveRequestType.OpenLoopVoltage); // Use open-loop control for drive motors
+  private final SwerveRequest.FieldCentricFacingAngle driveFacingAngle = new SwerveRequest.FieldCentricFacingAngle()
+      .withDeadband(DrivebaseConstants.MAX_SPEED * 0.1).withRotationalDeadband(DrivebaseConstants.MAX_SPIN_SPEED * 0.1) // Add a 10% deadband
+      .withDriveRequestType(DriveRequestType.OpenLoopVoltage);
   private final SwerveRequest.SwerveDriveBrake brake = new SwerveRequest.SwerveDriveBrake();
+  
   // Aiming math
   Supplier<Vector3> velocity = () -> {
     ChassisSpeeds velocity = drivebase.getState().Speeds;
@@ -82,7 +89,7 @@ public class RobotContainer {
     SmartDashboard.putData("Auto Chooser", autoChooser);
 
     shooter.setDefaultCommand(shooter.set(0));
-    arm.setDefaultCommand(arm.setAngle(Degrees.of(0)));
+    // arm.setDefaultCommand(arm.setAngle(Degrees.of(0)));
   }
 
   /**
@@ -117,18 +124,13 @@ public class RobotContainer {
     driverController.rightTrigger().onTrue(Commands.runOnce(aimingMath::resetSim));
 
     // Shoot while move
-    driverController.x().whileTrue(drivebase.applyRequest(() -> {
-                                                          DrivebaseConstants.HEADING_CONTROLLER.setGoal(0);
-                                                          return drive.withVelocityX(-driverController.getLeftY() * DrivebaseConstants.MAX_SPEED)
-                                                                      .withVelocityY(-driverController.getLeftX() * DrivebaseConstants.MAX_SPEED)
-                                                                      .withRotationalRate(DrivebaseConstants.MAX_SPIN_SPEED*
-                                                                          DrivebaseConstants.SHOOT_WHILE_MOVE_HEADING_CONTROLLER.calculate(
-                                                                          (drivebase.getState().Pose.getRotation().getRadians() - aimingMath.getIdealHeading() + Math.PI) % (2*Math.PI) - Math.PI));
-                                                          })
+    driverController.x().whileTrue(drivebase.applyRequest(() -> driveFacingAngle.withVelocityX(-driverController.getLeftY() * DrivebaseConstants.MAX_SPEED)
+                                                                                .withVelocityY(-driverController.getLeftX() * DrivebaseConstants.MAX_SPEED)
+                                                                                .withTargetDirection(Rotation2d.fromRadians(aimingMath.getIdealHeading())))
                                    .alongWith(shooter.setVelocity(RPM.of(aimingMath.getIdealShotSpeed()*ShooterConstants.SHOT_SPEED_CONVERSION_FACTOR)))
                                    .alongWith(Commands.run(() -> aimingMath.isShooting = true)))
                        .onFalse(Commands.runOnce(() -> {aimingMath.isShooting = false;}));
-
+    SmartDashboard.putData(DrivebaseConstants.SHOOT_WHILE_MOVE_HEADING_CONTROLLER);
     driverController.b().whileTrue(shooter.setVelocity(RPM.of(300)));
 
     // Shooter sim stuff
@@ -136,16 +138,6 @@ public class RobotContainer {
     // operatorController.rightBumper().whileTrue(shooter.setHighVelocity()).onFalse(shooter.setZeroVelocity());
     // operatorController.leftTrigger().whileTrue(shooter.setLow()).onFalse(shooter.setZero());
     // operatorController.rightTrigger().whileTrue(shooter.setHigh()).onFalse(shooter.setZero());
-  }
-
-  private Supplier<SwerveRequest> headingOverride(DoubleSupplier heading) { 
-    return () -> {
-      DrivebaseConstants.HEADING_CONTROLLER.setGoal(0);
-      return drive.withVelocityX(-driverController.getLeftY() * DrivebaseConstants.MAX_SPEED) // Drive forward with negative Y (forward)
-                      .withVelocityY(-driverController.getLeftX() * DrivebaseConstants.MAX_SPEED) // Drive left with negative X (left)
-                      .withRotationalRate(DrivebaseConstants.MAX_SPIN_SPEED*DrivebaseConstants.HEADING_CONTROLLER.calculate(
-                                              (drivebase.getState().Pose.getRotation().getRadians() - heading.getAsDouble() + Math.PI) % (2*Math.PI) - Math.PI));
-    };
   }
 
   /**
