@@ -14,9 +14,11 @@ import frc.robot.commands.Autos;
 import frc.robot.commands.ExampleCommand;
 import frc.robot.math.AimingMath;
 import frc.robot.math.Vector3;
+import frc.robot.subsystems.ArmSubsystem;
 import frc.robot.subsystems.ShooterSubsystem;
 import frc.robot.subsystems.SwerveSubsystem;
 
+import static edu.wpi.first.units.Units.Degrees;
 import static edu.wpi.first.units.Units.RPM;
 
 import java.util.function.DoubleSupplier;
@@ -51,6 +53,8 @@ public class RobotContainer {
   // The robot's subsystems and commands are defined here...
   private final ShooterSubsystem shooter = new ShooterSubsystem();
   private final SwerveSubsystem drivebase = TunerConstants.createDrivetrain();
+  private final ArmSubsystem arm = new ArmSubsystem();
+
       private final SwerveRequest.FieldCentric drive = new SwerveRequest.FieldCentric()
             .withDeadband(DrivebaseConstants.MAX_SPEED * 0.1).withRotationalDeadband(DrivebaseConstants.MAX_SPIN_SPEED * 0.1) // Add a 10% deadband
             .withDriveRequestType(DriveRequestType.OpenLoopVoltage); // Use open-loop control for drive motors
@@ -93,6 +97,7 @@ public class RobotContainer {
     SmartDashboard.putData("Auto Chooser", autoChooser);
 
     shooter.setDefaultCommand(shooter.set(0));
+    arm.setDefaultCommand(arm.setAngle(Degrees.of(0)));
   }
 
   /**
@@ -137,13 +142,7 @@ public class RobotContainer {
    //                     .onFalse(Commands.runOnce(() -> {drivebase.deactivateOverrideHeading();
    //                                                      aimingMath.IsShooting = false;}));
 
-    driverController.b().whileTrue(shooter.setVelocity(RPM.of(300)));
-
-    // Shooter sim stuff
-    // operatorController.leftBumper().whileTrue(shooter.setLowVelocity()).onFalse(shooter.setZeroVelocity());
-    // operatorController.rightBumper().whileTrue(shooter.setHighVelocity()).onFalse(shooter.setZeroVelocity());
-    // operatorController.leftTrigger().whileTrue(shooter.setLow()).onFalse(shooter.setZero());
-    // operatorController.rightTrigger().whileTrue(shooter.setHigh()).onFalse(shooter.setZero());
+    operatorController.leftTrigger().whileTrue(arm.set(-0.3));
   }
 
   /**
