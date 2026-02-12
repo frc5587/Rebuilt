@@ -51,7 +51,8 @@ public class RobotContainer {
       .withDriveRequestType(DriveRequestType.OpenLoopVoltage); // Use open-loop control for drive motors
   private final SwerveRequest.FieldCentricFacingAngle driveFacingAngle = new SwerveRequest.FieldCentricFacingAngle()
       .withDeadband(DrivebaseConstants.MAX_SPEED * 0.1).withRotationalDeadband(DrivebaseConstants.MAX_SPIN_SPEED * 0.1) // Add a 10% deadband
-      .withDriveRequestType(DriveRequestType.OpenLoopVoltage);
+      .withDriveRequestType(DriveRequestType.OpenLoopVoltage)
+      .withHeadingPID(5, 0, 0.0);
   private final SwerveRequest.SwerveDriveBrake brake = new SwerveRequest.SwerveDriveBrake();
   
   // Aiming math
@@ -108,12 +109,6 @@ public class RobotContainer {
                    .withVelocityY(-driverController.getLeftX() * DrivebaseConstants.MAX_SPEED) // Drive left with negative X (left)
                    .withRotationalRate(-driverController.getRightX() * DrivebaseConstants.MAX_SPIN_SPEED) // Drive counterclockwise with negative X (left)
     ));
-    
-    // Dpad to rotate robot
-    driverController.povUp().whileTrue(drivebase.applyRequest(headingOverride(() -> 0.)));
-    driverController.povRight().whileTrue(drivebase.applyRequest(headingOverride(() -> Math.PI/-2.)));
-    driverController.povDown().whileTrue(drivebase.applyRequest(headingOverride(() -> -1*Math.PI)));
-    driverController.povLeft().whileTrue(drivebase.applyRequest(headingOverride(() -> Math.PI/2.)));
 
     // Stuff
     driverController.start().onTrue((Commands.runOnce(drivebase::seedFieldCentric)));
