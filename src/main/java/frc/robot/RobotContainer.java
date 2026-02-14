@@ -4,15 +4,33 @@
 
 package frc.robot;
 
-import frc.robot.Constants.OperatorConstants;
+import com.ctre.phoenix6.swerve.SwerveModule.DriveRequestType;
+
+import frc.robot.Constants.DrivebaseConstants;
 import frc.robot.Constants.ShooterConstants;
-import frc.robot.commands.Autos;
-import frc.robot.commands.ExampleCommand;
+import frc.robot.math.AimingMath;
+import frc.robot.math.Vector3;
 import frc.robot.subsystems.ShooterSubsystem;
+import frc.robot.subsystems.SwerveSubsystem;
 
 import static edu.wpi.first.units.Units.RPM;
 
+import java.util.function.DoubleSupplier;
+import java.util.function.Supplier;
+
+import com.ctre.phoenix6.swerve.SwerveRequest;
+import com.pathplanner.lib.auto.AutoBuilder;
+import com.pathplanner.lib.auto.NamedCommands;
+
+import edu.wpi.first.math.geometry.Pose2d;
+import edu.wpi.first.math.geometry.Rotation2d;
+import edu.wpi.first.math.kinematics.ChassisSpeeds;
+import edu.wpi.first.wpilibj.DriverStation;
+import edu.wpi.first.wpilibj.smartdashboard.SendableChooser;
+import edu.wpi.first.wpilibj.smartdashboard.SmartDashboard;
+
 import edu.wpi.first.wpilibj2.command.Command;
+import edu.wpi.first.wpilibj2.command.Commands;
 import edu.wpi.first.wpilibj2.command.button.CommandXboxController;
 import edu.wpi.first.wpilibj2.command.button.Trigger;
 
@@ -23,17 +41,55 @@ import edu.wpi.first.wpilibj2.command.button.Trigger;
  * subsystems, commands, and trigger mappings) should be declared here.
  */
 public class RobotContainer {
-  // The robot's subsystems and commands are defined here...
   private final ShooterSubsystem shooter = new ShooterSubsystem();
+  private final SwerveSubsystem drivebase = TunerConstants.createDrivetrain();
+  // private final ArmSubsystem arm = new ArmSubsystem();
+
+  private final SwerveRequest.FieldCentric drive = new SwerveRequest.FieldCentric()
+      .withDeadband(DrivebaseConstants.MAX_SPEED * 0.1).withRotationalDeadband(DrivebaseConstants.MAX_SPIN_SPEED * 0.1) // Add a 10% deadband
+      .withDriveRequestType(DriveRequestType.OpenLoopVoltage); // Use open-loop control for drive motors
+  private final SwerveRequest.FieldCentricFacingAngle driveFacingAngle = new SwerveRequest.FieldCentricFacingAngle()
+      .withDeadband(DrivebaseConstants.MAX_SPEED * 0.1).withRotationalDeadband(DrivebaseConstants.MAX_SPIN_SPEED * 0.1) // Add a 10% deadband
+      .withDriveRequestType(DriveRequestType.OpenLoopVoltage)
+      .withHeadingPID(10, 0, 0.0);
+  private final SwerveRequest.SwerveDriveBrake brake = new SwerveRequest.SwerveDriveBrake();
+  
+  // Aiming math
+  Supplier<Vector3> velocity = () -> {
+    ChassisSpeeds velocity = drivebase.getState().Speeds;
+    return new Vector3(velocity.vxMetersPerSecond, velocity.vyMetersPerSecond, 0);
+  };
+  DoubleSupplier angularVelocity = () -> drivebase.getState().Speeds.omegaRadiansPerSecond;
+  Supplier<Vector3> position = () -> {
+    Pose2d position = drivebase.getState().Pose;
+    return new Vector3(position.getX(), position.getY(), 0);
+  };
+  DoubleSupplier heading = () -> drivebase.getState().RawHeading.getRadians();
+  AimingMath aimingMath = new AimingMath(velocity, angularVelocity, position, heading, new Vector3(4.8,4.0346315,1.8288));
 
   // Replace with CommandPS4Controller or CommandJoystick if needed
-  private final CommandXboxController m_driverController =
-      new CommandXboxController(OperatorConstants.kDriverControllerPort);
+  private final CommandXboxController driverController = new CommandXboxController(0);
+  private final CommandXboxController operatorController = new CommandXboxController(1);
+
+  private final SendableChooser<Command> autoChooser;
 
   /** The container for the robot. Contains subsystems, OI devices, and commands. */
   public RobotContainer() {
     // Configure the trigger bindings
     configureBindings();
+    DriverStation.silenceJoystickConnectionWarning(true);
+    
+    //Create the NamedCommands that will be used in PathPlanner
+    NamedCommands.registerCommand("test", Commands.print("I EXIST"));
+
+    //Have the autoChooser pull in all PathPlanner autos as options
+    autoChooser = AutoBuilder.buildAutoChooser();
+
+    //Put the autoChooser on the SmartDashboard
+    SmartDashboard.putData("Auto Chooser", autoChooser);
+
+    shooter.setDefaultCommand(shooter.set(0));
+    // arm.setDefaultCommand(arm.setAngle(Degrees.of(0)));
   }
 
   /**
@@ -46,14 +102,36 @@ public class RobotContainer {
    * joysticks}.
    */
   private void configureBindings() {
-    // Schedule `ExampleCommand` when `exampleCondition` changes to `true`
-    new Trigger(shooter::exampleCondition)
-        .onTrue(new ExampleCommand(shooter));
+    // Swerve
+    drivebase.setDefaultCommand(drivebase.applyRequest(() ->
+              drive.withVelocityX(-driverController.getLeftY() * DrivebaseConstants.MAX_SPEED) // Drive forward with negative Y (forward)
+                   .withVelocityY(-driverController.getLeftX() * DrivebaseConstants.MAX_SPEED) // Drive left with negative X (left)
+                   .withRotationalRate(-driverController.getRightX() * DrivebaseConstants.MAX_SPIN_SPEED) // Drive counterclockwise with negative X (left)
+    ));
 
-    m_driverController.leftBumper().whileTrue(shooter.setLowVelocity()).onFalse(shooter.setZeroVelocity());
-    m_driverController.rightBumper().whileTrue(shooter.setHighVelocity()).onFalse(shooter.setZeroVelocity());
-    m_driverController.leftTrigger().whileTrue(shooter.setLow()).onFalse(shooter.setZero());
-    m_driverController.rightTrigger().whileTrue(shooter.setHigh()).onFalse(shooter.setZero());
+    // Stuff
+    driverController.start().onTrue((Commands.runOnce(drivebase::seedFieldCentric)));
+    //driverController.back().whileTrue(Commands.runOnce(drivebase::lock, drivebase).repeatedly());
+
+    // Shoot while move sim
+    driverController.leftTrigger().onTrue(Commands.runOnce(aimingMath::logSim));
+    driverController.rightTrigger().onTrue(Commands.runOnce(aimingMath::resetSim));
+
+    // Shoot while move
+    driverController.x().whileTrue(drivebase.applyRequest(() -> driveFacingAngle.withVelocityX(-driverController.getLeftY() * DrivebaseConstants.MAX_SPEED)
+                                                                                .withVelocityY(-driverController.getLeftX() * DrivebaseConstants.MAX_SPEED)
+                                                                                .withTargetDirection(Rotation2d.fromRadians(aimingMath.getIdealHeading())))
+                                   .alongWith(shooter.setVelocity(RPM.of(aimingMath.getIdealShotSpeed()*ShooterConstants.SHOT_SPEED_CONVERSION_FACTOR)))
+                                   .alongWith(Commands.run(() -> aimingMath.isShooting = true)))
+                       .onFalse(Commands.runOnce(() -> {aimingMath.isShooting = false;}));
+    SmartDashboard.putData(DrivebaseConstants.SHOOT_WHILE_MOVE_HEADING_CONTROLLER);
+    driverController.b().whileTrue(shooter.setVelocity(RPM.of(300)));
+
+    // Shooter sim stuff
+    // operatorController.leftBumper().whileTrue(shooter.setLowVelocity()).onFalse(shooter.setZeroVelocity());
+    // operatorController.rightBumper().whileTrue(shooter.setHighVelocity()).onFalse(shooter.setZeroVelocity());
+    // operatorController.leftTrigger().whileTrue(shooter.setLow()).onFalse(shooter.setZero());
+    // operatorController.rightTrigger().whileTrue(shooter.setHigh()).onFalse(shooter.setZero());
   }
 
   /**
@@ -62,7 +140,10 @@ public class RobotContainer {
    * @return the command to run in autonomous
    */
   public Command getAutonomousCommand() {
-    // An example command will be run in autonomous
-    return Autos.exampleAuto(shooter);
+    return autoChooser.getSelected();
+  }
+
+  public void setMotorBrake(boolean brakee) {
+    if(brakee) {drivebase.applyRequest(() -> brake);}
   }
 }
