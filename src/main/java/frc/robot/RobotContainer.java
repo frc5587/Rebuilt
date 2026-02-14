@@ -11,6 +11,10 @@ import frc.robot.Constants.ShooterConstants;
 import frc.robot.math.AimingMath;
 import frc.robot.math.Vector3;
 import frc.robot.subsystems.ArmSubsystem;
+import frc.robot.Constants.OperatorConstants;
+import frc.robot.Constants.ShooterConstants;
+import frc.robot.commands.Autos;
+import frc.robot.commands.ExampleCommand;
 import frc.robot.subsystems.ShooterSubsystem;
 import frc.robot.subsystems.SwerveSubsystem;
 
@@ -30,6 +34,8 @@ import edu.wpi.first.math.kinematics.ChassisSpeeds;
 import edu.wpi.first.wpilibj.DriverStation;
 import edu.wpi.first.wpilibj.smartdashboard.SendableChooser;
 import edu.wpi.first.wpilibj.smartdashboard.SmartDashboard;
+import static edu.wpi.first.units.Units.RPM;
+
 import edu.wpi.first.wpilibj2.command.Command;
 import edu.wpi.first.wpilibj2.command.Commands;
 import edu.wpi.first.wpilibj2.command.button.CommandXboxController;
