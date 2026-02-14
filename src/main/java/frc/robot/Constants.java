@@ -59,6 +59,15 @@ public final class Constants {
     public static final double DEADBAND = 0.1;
   }
 
+  public static class IntakeConstants {
+    public static final int INTAKE_ID = 40;
+    public static final double INTAKE_SPEED = 1.0;
+    public static final double INTAKE_REVERSE_SPEED = 0.5;
+    public static final int INTAKE_STALL_LIMIT = 30;
+    public static final int INTAKE_FREE_LIMIT = 25;
+    public static final boolean INTAKE_INVERTED = false; 
+  }
+
   public static class ShooterConstants {
     public static final int FLYWHEEL_ID = 30;
     public static final double SHOOTER_HIGH_SPEED = 300.0;
@@ -99,6 +108,9 @@ public final class Constants {
   public static class ArmConstants {
     public static final int LEFT_MOTOR_ID = 20;
     public static final int RIGHT_MOTOR_ID = 21;
+
+    public static final double ARM_BOTTOM_ANGLE = -20;
+    public static final double ARM_TOP_ANGLE = 40; //TODO find real values on robot
     public static final UnaryOperator<SmartMotorControllerConfig> APPLY_SMC_CONFIG = (SmartMotorControllerConfig config) -> {
       return config.withControlMode(ControlMode.CLOSED_LOOP)
                    .withClosedLoopController(50, 0, 0, DegreesPerSecond.of(90), DegreesPerSecondPerSecond.of(45))

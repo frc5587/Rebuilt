@@ -6,13 +6,17 @@ package frc.robot;
 
 import com.ctre.phoenix6.swerve.SwerveModule.DriveRequestType;
 
+import frc.robot.Constants.ArmConstants;
 import frc.robot.Constants.DrivebaseConstants;
 import frc.robot.Constants.ShooterConstants;
 import frc.robot.math.AimingMath;
 import frc.robot.math.Vector3;
+import frc.robot.subsystems.ArmSubsystem;
+import frc.robot.subsystems.Intake;
 import frc.robot.subsystems.ShooterSubsystem;
 import frc.robot.subsystems.SwerveSubsystem;
 
+import static edu.wpi.first.units.Units.Degrees;
 import static edu.wpi.first.units.Units.RPM;
 
 import java.util.function.DoubleSupplier;
@@ -43,7 +47,8 @@ import edu.wpi.first.wpilibj2.command.button.Trigger;
 public class RobotContainer {
   private final ShooterSubsystem shooter = new ShooterSubsystem();
   private final SwerveSubsystem drivebase = TunerConstants.createDrivetrain();
-  // private final ArmSubsystem arm = new ArmSubsystem();
+  private final Intake intake = new Intake();
+  private final ArmSubsystem arm = new ArmSubsystem();
 
   private final SwerveRequest.FieldCentric drive = new SwerveRequest.FieldCentric()
       .withDeadband(DrivebaseConstants.MAX_SPEED * 0.1).withRotationalDeadband(DrivebaseConstants.MAX_SPIN_SPEED * 0.1) // Add a 10% deadband
@@ -132,6 +137,13 @@ public class RobotContainer {
     // operatorController.rightBumper().whileTrue(shooter.setHighVelocity()).onFalse(shooter.setZeroVelocity());
     // operatorController.leftTrigger().whileTrue(shooter.setLow()).onFalse(shooter.setZero());
     // operatorController.rightTrigger().whileTrue(shooter.setHigh()).onFalse(shooter.setZero());
+
+    // Intake stuff
+    operatorController.rightBumper().whileTrue(Commands.runOnce(intake::forward).alongWith(arm.setAngle(Degrees.of(ArmConstants.ARM_BOTTOM_ANGLE))))
+        .onFalse(Commands.runOnce(intake::stop).alongWith(arm.setAngle(Degrees.of(ArmConstants.ARM_TOP_ANGLE))));
+
+    operatorController.leftBumper().whileTrue(Commands.runOnce(intake::backward).alongWith(arm.setAngle(Degrees.of(ArmConstants.ARM_BOTTOM_ANGLE))))
+        .onFalse(Commands.runOnce(intake::stop).alongWith(arm.setAngle(Degrees.of(ArmConstants.ARM_TOP_ANGLE))));
   }
 
   /**
