@@ -59,7 +59,7 @@ public class RobotContainer {
     ChassisSpeeds velocity = drivebase.getState().Speeds;
     return new Vector3(velocity.vxMetersPerSecond, velocity.vyMetersPerSecond, 0);
   };
-  DoubleSupplier angularVelocity = () -> drivebase.getState().Speeds.omegaRadiansPerSecond;
+  DoubleSupplier angularVelocity = () -> 0.;
   Supplier<Vector3> position = () -> {
     Pose2d position = drivebase.getState().Pose;
     return new Vector3(position.getX(), position.getY(), 0);
