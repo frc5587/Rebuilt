@@ -11,6 +11,7 @@ import com.revrobotics.spark.SparkMax;
 
 import edu.wpi.first.math.system.plant.DCMotor;
 import edu.wpi.first.units.measure.AngularVelocity;
+import edu.wpi.first.wpilibj.smartdashboard.SmartDashboard;
 import edu.wpi.first.wpilibj2.command.Command;
 import edu.wpi.first.wpilibj2.command.SubsystemBase;
 import frc.robot.Constants.ShooterConstants;
@@ -29,7 +30,6 @@ public class ShooterSubsystem extends SubsystemBase {
     private SmartMotorController sparkSmartMotorController = new SparkWrapper(spark, DCMotor.getNEO(1), smcConfig);
 
     private final FlyWheelConfig shooterConfig = ShooterConstants.APPLY_FLYWHEEL_CONFIG.apply(new FlyWheelConfig(sparkSmartMotorController));
-    
 
     private FlyWheel shooter = new FlyWheel(shooterConfig);
 
@@ -118,6 +118,13 @@ public class ShooterSubsystem extends SubsystemBase {
   public void periodic() {
     // This method will be called once per scheduler run
     shooter.updateTelemetry();
+    SmartDashboard.putNumber("flywheel velocity", sparkSmartMotorController.getMechanismVelocity().in(RPM));
+    // try {
+    //   SmartDashboard.putNumber("flywheel setpoint", sparkSmartMotorController.get().get().in(RPM));
+    // }
+    // catch(Exception e) {
+    //   SmartDashboard.putNumber("flywheel setpoint", 0.);
+    // }
   }
 
   @Override

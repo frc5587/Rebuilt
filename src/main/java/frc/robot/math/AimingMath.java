@@ -11,6 +11,7 @@ import edu.wpi.first.networktables.NetworkTableInstance;
 import edu.wpi.first.networktables.StructArrayPublisher;
 import edu.wpi.first.units.Units;
 import edu.wpi.first.units.measure.Angle;
+import edu.wpi.first.units.measure.Velocity;
 import edu.wpi.first.wpilibj.Timer;
 import edu.wpi.first.wpilibj.smartdashboard.Field2d;
 import edu.wpi.first.wpilibj.smartdashboard.SmartDashboard;
@@ -77,8 +78,12 @@ public class AimingMath extends SubsystemBase {
   }
 
   public double getIdealShotSpeed() {
+    return getIdealShotSpeed(0.);
+  }
+
+  public double getIdealShotSpeed(double lookahead) {
     Vector3 position = Vector3.add(robotPosition.get(),
-                                    Vector3.rotate(Constants.ShooterConstants.SHOOTER_POSITION,
+                                   Vector3.rotate(Constants.ShooterConstants.SHOOTER_POSITION,
                                                   Vector3.origin(),
                                                   headingRadians.getAsDouble()));
     double turretDistance = Constants.ShooterConstants.SHOOTER_POSITION.get2D().length();
@@ -88,6 +93,7 @@ public class AimingMath extends SubsystemBase {
                                     1.0/turretDistance);
     Vector3 velocity = Vector3.add(robotVelocity.get(),
                                   Vector3.scale(tangent,angularVelocityRadians.getAsDouble()*turretDistance));
+    position = Vector3.add(position, Vector3.scale(velocity, lookahead));
 
     double speed = 0;
     Vector3 adjustedGoalPosition = new Vector3(goalPosition.x, goalPosition.y, goalPosition.z);
@@ -104,60 +110,39 @@ public class AimingMath extends SubsystemBase {
   }
 
   public double getIdealHeading() {
-    Vector3 position = Vector3.add(robotPosition.get(),
-                                    Vector3.rotate(Constants.ShooterConstants.SHOOTER_POSITION,
-                                                  Vector3.origin(),
-                                                  headingRadians.getAsDouble()));
-    double turretDistance = Constants.ShooterConstants.SHOOTER_POSITION.get2D().length();
-    Vector3 tangent = Vector3.scale(Vector3.rotate(Constants.ShooterConstants.SHOOTER_POSITION.get2D(),
-                                                  Vector3.origin(),
-                                                  Math.PI/2 + headingRadians.getAsDouble()),
-                                    1.0/turretDistance);
-    Vector3 velocity = Vector3.add(robotVelocity.get(),
-                                  Vector3.scale(tangent,angularVelocityRadians.getAsDouble()*turretDistance));
-
-    double speed = 0;
-    Vector3 adjustedGoalPosition = new Vector3(goalPosition.x, goalPosition.y, goalPosition.z);
-    for (int i = 0; i < Constants.ShooterConstants.SEARCH_DEPTH; i++) {
-      Vector3 idealVector = Vector3.subtract(adjustedGoalPosition, position).get2D();
-      double distance = idealVector.get2D().length();
-      speed = ((distance*Math.sqrt(Constants.ShooterConstants.GRAVITY))/Math.cos(Constants.ShooterConstants.PITCH)) /
-              (Math.sqrt(2.)*Math.sqrt(Math.abs(adjustedGoalPosition.z-position.z-(distance*Math.tan(Constants.ShooterConstants.PITCH)))));
-      double time = distance/(speed*Math.cos(Constants.ShooterConstants.PITCH));
-
-      adjustedGoalPosition = Vector3.subtract(goalPosition,Vector3.scale(velocity, time));
-    }
-    return Vector3.subtract(adjustedGoalPosition.get2D(), position.get2D()).getCounterclockwiseAngle();
+    return getIdealHeading(getIdealShotSpeed(0.),0.);
   }
 
-  // public double getIdealHeading(double speed) {
-  //   Vector3 position = Vector3.add(robotPosition.get(),
-  //                                  Vector3.rotate(ShooterConstants.SHOOTER_POSITION,
-  //                                                 Vector3.origin(),
-  //                                                 headingRadians.getAsDouble()));
-  //   double turretDistance = ShooterConstants.SHOOTER_POSITION.get2D().length();
-  //   Vector3 tangent = Vector3.scale(Vector3.rotate(ShooterConstants.SHOOTER_POSITION.get2D(),
-  //                                                  Vector3.origin(),
-  //                                                  Math.PI/2 + headingRadians.getAsDouble()),
-  //                                   1.0/turretDistance);
-  //   Vector3 velocity = Vector3.add(robotVelocity.get(),
-  //                                  Vector3.scale(tangent,angularVelocityRadians.getAsDouble()*turretDistance));
+  public double getIdealHeading(double speed, double lookahead) {
+    Vector3 position = Vector3.add(robotPosition.get(),
+                                   Vector3.rotate(ShooterConstants.SHOOTER_POSITION,
+                                                  Vector3.origin(),
+                                                  headingRadians.getAsDouble()));
+    double turretDistance = ShooterConstants.SHOOTER_POSITION.get2D().length();
+    Vector3 tangent = Vector3.scale(Vector3.rotate(ShooterConstants.SHOOTER_POSITION.get2D(),
+                                                   Vector3.origin(),
+                                                   Math.PI/2 + headingRadians.getAsDouble()),
+                                    1.0/turretDistance);
+    Vector3 velocity = Vector3.add(robotVelocity.get(),
+                                   Vector3.scale(tangent,angularVelocityRadians.getAsDouble()*turretDistance));
+    position = Vector3.add(position, Vector3.scale(velocity, lookahead));
     
-  //   double a = speed * Math.cos(ShooterConstants.PITCH);
-  //   double c = velocity.length();
+    double a = speed * Math.cos(ShooterConstants.PITCH);
+    double c = velocity.length();
 
-  //   Vector3 idealVector = Vector3.subtract(goalPosition, position).get2D();
-  //   double targetAngle = idealVector.getCounterclockwiseAngle();
-  //   double driveAngle = velocity.getCounterclockwiseAngle();
-  //   double A = (targetAngle - driveAngle) % (2 * Math.PI);
-  //   double C = Math.asin((c*Math.sin(A)) / a);
+    Vector3 idealVector = Vector3.subtract(goalPosition, position).get2D();
+    double targetAngle = idealVector.getCounterclockwiseAngle();
+    double driveAngle = velocity.getCounterclockwiseAngle();
+    double A = (targetAngle - driveAngle) % (2 * Math.PI);
+    double C = Math.asin(Math.max(-1.,  Math.min((c*Math.sin(A)) / a, 1.0)));
 
-  //   return targetAngle + C;
-  // }
-
-  // public double getIdealHeading() {
-  //   return getIdealHeading(getIdealShotSpeed());
-  // }
+    if (c > 0.0001) {
+      return targetAngle + C;
+    }
+    else {
+      return targetAngle;
+    }
+  }
 
   public void shoot(double shotSpeed) {
     SimulatedArena.getInstance()
@@ -173,8 +158,8 @@ public class AimingMath extends SubsystemBase {
 
   @Override
   public void periodic() {
-    if (times.get(times.size()-1) < Timer.getFPGATimestamp() - 0.) {
-      double idealShotSpeed = getIdealShotSpeed();
+    if (times.get(times.size()-1) < Timer.getFPGATimestamp() - 0.07) {
+      double idealShotSpeed = getIdealShotSpeed(0.);
       // Replace with actual or simulated values
       double shotSpeed = idealShotSpeed * 1.0;
       double angle = 0;
@@ -185,6 +170,7 @@ public class AimingMath extends SubsystemBase {
       positions.add(robotPosition.get());
       velocities.add(robotVelocity.get());
       headings.add(headingRadians.getAsDouble());
+      // headings.add(getIdealHeading());
       angularVelocities.add(angularVelocityRadians.getAsDouble());
     }
 
