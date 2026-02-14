@@ -57,6 +57,7 @@ public class Vision {
    * Ambiguity defined as a value between (0,1). Used in
    * {@link Vision#filterPose}.
    */
+  @SuppressWarnings("unused")
   private final double maximumAmbiguity = 0.25;
   /**
    * Photon Vision Simulation
@@ -66,6 +67,7 @@ public class Vision {
    * Count of times that the odom thinks we're more than 10meters away from the
    * april tag.
    */
+  @SuppressWarnings("unused")
   private double longDistangePoseEstimationCount = 0;
   /**
    * Current pose from the pose estimator using wheel odometry.
@@ -264,6 +266,7 @@ public class Vision {
 
   /**
    * Camera Enum to select each camera
+   * TODO: edit positions
    */
   enum Cameras {
     /**
@@ -340,6 +343,7 @@ public class Vision {
     /**
      * Last read from the camera timestamp to prevent lag due to slow data fetches.
      */
+    @SuppressWarnings("unused")
     private double lastReadTimestamp = Microseconds.of(NetworkTablesJNI.now()).in(Seconds);
 
     /**

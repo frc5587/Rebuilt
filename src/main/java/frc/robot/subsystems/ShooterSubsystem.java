@@ -4,57 +4,32 @@
 
 package frc.robot.subsystems;
 
-import static edu.wpi.first.units.Units.Amps;
-import static edu.wpi.first.units.Units.DegreesPerSecond;
-import static edu.wpi.first.units.Units.DegreesPerSecondPerSecond;
-import static edu.wpi.first.units.Units.Inches;
-import static edu.wpi.first.units.Units.Pounds;
 import static edu.wpi.first.units.Units.RPM;
-import static edu.wpi.first.units.Units.RotationsPerSecondPerSecond;
 
 import com.revrobotics.spark.SparkLowLevel.MotorType;
 import com.revrobotics.spark.SparkMax;
 
-import edu.wpi.first.math.controller.SimpleMotorFeedforward;
 import edu.wpi.first.math.system.plant.DCMotor;
 import edu.wpi.first.units.measure.AngularVelocity;
 import edu.wpi.first.wpilibj2.command.Command;
 import edu.wpi.first.wpilibj2.command.SubsystemBase;
 import frc.robot.Constants.ShooterConstants;
-import yams.gearing.GearBox;
-import yams.gearing.MechanismGearing;
 import yams.mechanisms.config.FlyWheelConfig;
 import yams.mechanisms.velocity.FlyWheel;
 import yams.motorcontrollers.SmartMotorController;
 import yams.motorcontrollers.SmartMotorControllerConfig;
-import yams.motorcontrollers.SmartMotorControllerConfig.ControlMode;
-import yams.motorcontrollers.SmartMotorControllerConfig.MotorMode;
-import yams.motorcontrollers.SmartMotorControllerConfig.TelemetryVerbosity;
 import yams.motorcontrollers.local.SparkWrapper;
 
 
 public class ShooterSubsystem extends SubsystemBase {
-    private SmartMotorControllerConfig smcConfig = new SmartMotorControllerConfig(this)
-    .withControlMode(ControlMode.CLOSED_LOOP)
-    .withClosedLoopController(1, 0, 0)
-    .withSimClosedLoopController(0.2, 0.1, 0)
-    .withFeedforward(new SimpleMotorFeedforward(0, 0, 0))
-    .withSimFeedforward(new SimpleMotorFeedforward(0, 0, 0))
-    .withTelemetry("ShooterMotor", TelemetryVerbosity.HIGH)
-    .withGearing(new MechanismGearing(GearBox.fromReductionStages(3, 4)))
-    .withMotorInverted(false)
-    .withIdleMode(MotorMode.COAST)
-    .withStatorCurrentLimit(Amps.of(40));
+    private SmartMotorControllerConfig smcConfig = ShooterConstants.APPLY_SMC_CONFIG.apply(new SmartMotorControllerConfig(this));
 
-    private SparkMax spark = new SparkMax(4, MotorType.kBrushless);
+    private SparkMax spark = new SparkMax(ShooterConstants.FLYWHEEL_ID, MotorType.kBrushless);
 
     private SmartMotorController sparkSmartMotorController = new SparkWrapper(spark, DCMotor.getNEO(1), smcConfig);
 
-    private final FlyWheelConfig shooterConfig = new FlyWheelConfig(sparkSmartMotorController)
-    .withDiameter(Inches.of(4))
-    .withMass(Pounds.of(1))
-    .withUpperSoftLimit(RPM.of(1000))
-    .withTelemetry("ShooterMech", TelemetryVerbosity.HIGH);
+    private final FlyWheelConfig shooterConfig = ShooterConstants.APPLY_FLYWHEEL_CONFIG.apply(new FlyWheelConfig(sparkSmartMotorController));
+    
 
     private FlyWheel shooter = new FlyWheel(shooterConfig);
 

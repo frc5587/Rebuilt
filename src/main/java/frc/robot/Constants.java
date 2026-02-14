@@ -4,13 +4,33 @@
 
 package frc.robot;
 
+import static edu.wpi.first.units.Units.Amps;
+import static edu.wpi.first.units.Units.Degrees;
+import static edu.wpi.first.units.Units.DegreesPerSecond;
+import static edu.wpi.first.units.Units.DegreesPerSecondPerSecond;
+import static edu.wpi.first.units.Units.Inches;
+import static edu.wpi.first.units.Units.Pounds;
+import static edu.wpi.first.units.Units.RPM;
+import static edu.wpi.first.units.Units.Seconds;
+
+import java.util.function.UnaryOperator;
+
+import edu.wpi.first.math.controller.ArmFeedforward;
 import edu.wpi.first.math.controller.ProfiledPIDController;
+import edu.wpi.first.math.controller.SimpleMotorFeedforward;
 import edu.wpi.first.math.geometry.Translation3d;
-import edu.wpi.first.math.trajectory.TrapezoidProfile;
 import edu.wpi.first.math.trajectory.TrapezoidProfile.Constraints;
 import edu.wpi.first.math.util.Units;
 import frc.robot.math.Vector3;
 import swervelib.math.Matter;
+import yams.gearing.GearBox;
+import yams.gearing.MechanismGearing;
+import yams.mechanisms.config.ArmConfig;
+import yams.mechanisms.config.FlyWheelConfig;
+import yams.motorcontrollers.SmartMotorControllerConfig;
+import yams.motorcontrollers.SmartMotorControllerConfig.ControlMode;
+import yams.motorcontrollers.SmartMotorControllerConfig.MotorMode;
+import yams.motorcontrollers.SmartMotorControllerConfig.TelemetryVerbosity;
 
 /**
  * The Constants class provides a convenient place for teams to hold robot-wide numerical or boolean
@@ -40,10 +60,30 @@ public final class Constants {
   }
 
   public static class ShooterConstants {
+    public static final int FLYWHEEL_ID = 30;
     public static final double SHOOTER_HIGH_SPEED = 300.0;
     public static final double SHOOTER_LOW_SPEED = 60.0;
     public static final double HIGH_DUTY_CYCLE = 0.3;
     public static final double LOW_DUTY_CYCLE = -0.3;
+    public static final UnaryOperator<SmartMotorControllerConfig> APPLY_SMC_CONFIG = (SmartMotorControllerConfig config) -> {
+      return config.withControlMode(ControlMode.CLOSED_LOOP)
+                   .withControlMode(ControlMode.CLOSED_LOOP)
+                   .withClosedLoopController(1, 0, 0)
+                   .withSimClosedLoopController(0.2, 0.1, 0)
+                   .withFeedforward(new SimpleMotorFeedforward(0, 0, 0))
+                   .withSimFeedforward(new SimpleMotorFeedforward(0, 0, 0))
+                   .withTelemetry("ShooterMotor", TelemetryVerbosity.HIGH)
+                   .withGearing(new MechanismGearing(GearBox.fromReductionStages(3, 4)))
+                   .withMotorInverted(false)
+                   .withIdleMode(MotorMode.COAST)
+                   .withStatorCurrentLimit(Amps.of(40));
+    };
+    public static final UnaryOperator<FlyWheelConfig> APPLY_FLYWHEEL_CONFIG = (FlyWheelConfig config) -> {
+      return config.withDiameter(Inches.of(4))
+                   .withMass(Pounds.of(1))
+                   .withUpperSoftLimit(RPM.of(1000))
+                   .withTelemetry("ShooterMech", TelemetryVerbosity.HIGH);
+    };
 
     // Robot constants
     public static final double PITCH = 1.2217304764;
@@ -54,5 +94,32 @@ public final class Constants {
     public static final double MIN_SHOOT_SPEED = 1;
     public static final int SEARCH_DEPTH = 10;
     public static final double GRAVITY = 9.81;
+  }
+
+  public static class ArmConstants {
+    public static final int LEFT_MOTOR_ID = 20;
+    public static final int RIGHT_MOTOR_ID = 21;
+    public static final UnaryOperator<SmartMotorControllerConfig> APPLY_SMC_CONFIG = (SmartMotorControllerConfig config) -> {
+      return config.withControlMode(ControlMode.CLOSED_LOOP)
+                   .withClosedLoopController(50, 0, 0, DegreesPerSecond.of(90), DegreesPerSecondPerSecond.of(45))
+                   .withSimClosedLoopController(50, 0, 0, DegreesPerSecond.of(90), DegreesPerSecondPerSecond.of(45))
+                   .withFeedforward(new ArmFeedforward(0, 0, 0))
+                   .withSimFeedforward(new ArmFeedforward(0, 0, 0))
+                   .withTelemetry("ArmMotor", TelemetryVerbosity.HIGH)
+                   .withGearing(new MechanismGearing(GearBox.fromReductionStages(3,4))) //Can also use .withGearing(ratio)
+                   .withMotorInverted(false)
+                   .withIdleMode(MotorMode.BRAKE)
+                   .withStatorCurrentLimit(Amps.of(40))
+                   .withClosedLoopRampRate(Seconds.of(0.25))
+                   .withOpenLoopRampRate(Seconds.of(0.25));
+    };
+    public static final UnaryOperator<ArmConfig> APPLY_ARM_CONFIG = (ArmConfig config) -> {
+      return config.withSoftLimits(Degrees.of(-20), Degrees.of(10))
+                   .withHardLimit(Degrees.of(-30), Degrees.of(40))
+                   .withStartingPosition(Degrees.of(-5))
+                   .withLength(Inches.of(15.81))
+                   .withMass(Pounds.of(2))
+                   .withTelemetry("Arm", TelemetryVerbosity.HIGH);
+    };
   }
 }

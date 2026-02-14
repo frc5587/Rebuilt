@@ -2,8 +2,6 @@ package frc.robot.math;
 
 import java.util.function.Supplier;
 
-import org.dyn4j.collision.FixtureModificationHandler;
-
 import edu.wpi.first.math.geometry.Pose2d;
 import edu.wpi.first.math.geometry.Pose3d;
 import edu.wpi.first.math.geometry.Rotation2d;
@@ -13,7 +11,6 @@ import edu.wpi.first.networktables.NetworkTableInstance;
 import edu.wpi.first.networktables.StructArrayPublisher;
 import edu.wpi.first.units.Units;
 import edu.wpi.first.units.measure.Angle;
-import edu.wpi.first.units.measure.Distance;
 import edu.wpi.first.wpilibj.Timer;
 import edu.wpi.first.wpilibj.smartdashboard.Field2d;
 import edu.wpi.first.wpilibj.smartdashboard.SmartDashboard;
@@ -31,7 +28,6 @@ import static edu.wpi.first.units.Units.MetersPerSecond;
 
 import java.math.BigDecimal;
 import java.util.ArrayList;
-import java.util.Arrays;
 
 public class AimingMath extends SubsystemBase {
   private final Supplier<Vector3> robotPosition;

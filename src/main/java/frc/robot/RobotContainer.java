@@ -10,11 +10,9 @@ import frc.robot.Constants.DrivebaseConstants;
 import frc.robot.Constants.ShooterConstants;
 import frc.robot.math.AimingMath;
 import frc.robot.math.Vector3;
-import frc.robot.subsystems.ArmSubsystem;
 import frc.robot.subsystems.ShooterSubsystem;
 import frc.robot.subsystems.SwerveSubsystem;
 
-import static edu.wpi.first.units.Units.Degrees;
 import static edu.wpi.first.units.Units.RPM;
 
 import java.util.function.DoubleSupplier;
