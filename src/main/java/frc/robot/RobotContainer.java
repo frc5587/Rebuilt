@@ -58,6 +58,7 @@ public class RobotContainer {
   // Aiming math
   Supplier<Vector3> velocity = () -> {
     ChassisSpeeds velocity = drivebase.getState().Speeds;
+    velocity = ChassisSpeeds.fromRobotRelativeSpeeds(velocity, drivebase.getState().Pose.getRotation());
     return new Vector3(velocity.vxMetersPerSecond, velocity.vyMetersPerSecond, 0);
   };
   DoubleSupplier angularVelocity = () -> 0.;
@@ -121,12 +122,11 @@ public class RobotContainer {
     // Shoot while move
     driverController.x().whileTrue(drivebase.applyRequest(() -> driveFacingAngle.withVelocityX(-driverController.getLeftY() * DrivebaseConstants.SHOOT_WHILE_MOVING_SPEED)
                                                                                 .withVelocityY(-driverController.getLeftX() * DrivebaseConstants.SHOOT_WHILE_MOVING_SPEED)
-                                                                                .withTargetDirection(Rotation2d.fromRadians(aimingMath.getIdealHeading(aimingMath.getIdealShotSpeed(ShooterConstants.LOOKAHEAD),ShooterConstants.LOOKAHEAD))))
-                                   .alongWith(shooter.setVelocity(RPM.of(aimingMath.getIdealShotSpeed()*ShooterConstants.SHOT_SPEED_CONVERSION_FACTOR)))
+                                                                                .withTargetDirection(Rotation2d.fromRadians(aimingMath.getIdealHeading(aimingMath.getIdealShotSpeed(DrivebaseConstants.LOOKAHEAD),DrivebaseConstants.LOOKAHEAD))))
+                                   .alongWith(shooter.setVelocity(RPM.of(aimingMath.getIdealShotSpeed(ShooterConstants.LOOKAHEAD)*ShooterConstants.SHOT_SPEED_CONVERSION_FACTOR)))
                                    .alongWith(Commands.run(() -> aimingMath.isShooting = false)))
                        .onFalse(Commands.runOnce(() -> {aimingMath.isShooting = false;})
                                 .alongWith(shooter.setVelocity(RPM.of(0.))));
-    SmartDashboard.putData(DrivebaseConstants.SHOOT_WHILE_MOVE_HEADING_CONTROLLER);
     driverController.b().whileTrue(shooter.setVelocity(RPM.of(300)));
 
     // Shooter sim stuff

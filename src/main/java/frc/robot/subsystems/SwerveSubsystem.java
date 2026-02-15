@@ -299,7 +299,7 @@ public class SwerveSubsystem extends TunerSwerveDrivetrain implements Subsystem 
     }
 
     field.setRobotPose(getState().Pose);
-    SmartDashboard.putData("field", field);
+    SmartDashboard.putData("robot pose", field);
   }
 
   private void startSimThread() {
