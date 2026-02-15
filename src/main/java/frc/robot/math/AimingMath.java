@@ -13,7 +13,6 @@ import edu.wpi.first.networktables.StructPublisher;
 import edu.wpi.first.units.Units;
 import edu.wpi.first.units.measure.Angle;
 import edu.wpi.first.wpilibj.Timer;
-import edu.wpi.first.wpilibj.smartdashboard.Field2d;
 import edu.wpi.first.wpilibj.smartdashboard.SmartDashboard;
 import edu.wpi.first.wpilibj2.command.SubsystemBase;
 import frc.robot.Constants;
@@ -36,6 +35,8 @@ public class AimingMath extends SubsystemBase {
   private final DoubleSupplier headingRadians;
   private final Supplier<Vector3> robotVelocity;
   private final DoubleSupplier angularVelocityRadians;
+  private final Supplier<Vector3> inputRobotVelocity;
+  private final DoubleSupplier inputAngularVelocityRadians;
   
   private Vector3 goalPosition;
 
@@ -44,8 +45,8 @@ public class AimingMath extends SubsystemBase {
   private ArrayList<Double> shotSpeeds = new ArrayList<Double>();
   private ArrayList<Double> angles = new ArrayList<Double>();
   private ArrayList<Vector3> positions = new ArrayList<Vector3>();
-  private ArrayList<Vector3> velocities = new ArrayList<Vector3>();
   private ArrayList<Double> headings = new ArrayList<Double>();
+  private ArrayList<Vector3> velocities = new ArrayList<Vector3>();
   private ArrayList<Double> angularVelocities = new ArrayList<Double>();
 
   public boolean isShooting = false;
@@ -54,18 +55,25 @@ public class AimingMath extends SubsystemBase {
       .getStructArrayTopic("MyPoseArray", Pose3d.struct)
       .publish();
 
-  private final Field2d field = new Field2d();
+  Function<String,StructPublisher<Pose2d>> publisher = (String name) -> NetworkTableInstance.getDefault()
+                                                                                            .getStructTopic("aiming debug/"+name, Pose2d.struct).publish();
+  StructPublisher<Pose2d> idealPosePublisher = publisher.apply("ideal pose");
+  StructPublisher<Pose2d> futurePosePublisher = publisher.apply("future pose");
   
-  public AimingMath(Supplier<Vector3> _robotVelocity, 
-                    DoubleSupplier _angularVelocityRadians,
-                    Supplier<Vector3> _robotPosition,
+  public AimingMath(Supplier<Vector3> _robotPosition,
                     DoubleSupplier _heading,
+                    Supplier<Vector3> _robotVelocity, 
+                    DoubleSupplier _angularVelocityRadians,
+                    Supplier<Vector3> _inputRobotVelocity,
+                    DoubleSupplier _inputAngularVelocityRadians,
                     Vector3 _goalPosition) {
                   
-    robotVelocity = _robotVelocity;
-    angularVelocityRadians = _angularVelocityRadians;
     robotPosition = _robotPosition;
     headingRadians = _heading;
+    robotVelocity = _robotVelocity;
+    angularVelocityRadians = _angularVelocityRadians;
+    inputRobotVelocity = _inputRobotVelocity;
+    inputAngularVelocityRadians = _inputAngularVelocityRadians;
     goalPosition = _goalPosition;
 
     times.add(0.);
@@ -92,8 +100,8 @@ public class AimingMath extends SubsystemBase {
                                                   Vector3.origin(),
                                                   Math.PI/2 + headingRadians.getAsDouble()),
                                     1.0/turretDistance);
-    Vector3 velocity = Vector3.add(robotVelocity.get(),
-                                  Vector3.scale(tangent,angularVelocityRadians.getAsDouble()*turretDistance));
+    Vector3 velocity = Vector3.add(inputRobotVelocity.get(),
+                                  Vector3.scale(tangent,inputAngularVelocityRadians.getAsDouble()*turretDistance));
     position = Vector3.add(position, Vector3.scale(velocity, lookahead));
 
     double speed = 0;
@@ -124,8 +132,8 @@ public class AimingMath extends SubsystemBase {
                                                    Vector3.origin(),
                                                    Math.PI/2 + headingRadians.getAsDouble()),
                                     1.0/turretDistance);
-    Vector3 velocity = Vector3.add(robotVelocity.get(),
-                                   Vector3.scale(tangent,angularVelocityRadians.getAsDouble()*turretDistance));
+    Vector3 velocity = Vector3.add(inputRobotVelocity.get(),
+                                   Vector3.scale(tangent,inputAngularVelocityRadians.getAsDouble()*turretDistance));
     position = Vector3.add(position, Vector3.scale(velocity, lookahead));
     
     double a = speed * Math.cos(ShooterConstants.PITCH);
@@ -169,9 +177,9 @@ public class AimingMath extends SubsystemBase {
       shotSpeeds.add(shotSpeed);
       angles.add(angle);
       positions.add(robotPosition.get());
-      velocities.add(robotVelocity.get());
       headings.add(headingRadians.getAsDouble());
       // headings.add(getIdealHeading());
+      velocities.add(robotVelocity.get());
       angularVelocities.add(angularVelocityRadians.getAsDouble());
     }
 
@@ -182,10 +190,8 @@ public class AimingMath extends SubsystemBase {
       shotTimes.add(Timer.getFPGATimestamp());
     }
 
-    StructPublisher<Pose2d> publisher = NetworkTableInstance.getDefault()
-        .getStructTopic("MyPose", Pose2d.struct).publish();
-    publisher.accept(new Pose2d(new Translation2d(robotPosition.get().x, robotPosition.get().y), Rotation2d.fromRadians(getIdealHeading())));
-    publisher.accept(new Pose2d(new Translation2d(robotPosition.get().x + DrivebaseConstants.LOOKAHEAD*robotVelocity.get().x, 
+    idealPosePublisher.accept(new Pose2d(new Translation2d(robotPosition.get().x, robotPosition.get().y), Rotation2d.fromRadians(getIdealHeading())));
+    futurePosePublisher.accept(new Pose2d(new Translation2d(robotPosition.get().x + DrivebaseConstants.LOOKAHEAD*robotVelocity.get().x, 
                                                                              robotPosition.get().y + DrivebaseConstants.LOOKAHEAD*robotVelocity.get().y),
                                                                              Rotation2d.fromRadians(getIdealHeading(getIdealShotSpeed(DrivebaseConstants.LOOKAHEAD),DrivebaseConstants.LOOKAHEAD))));
     SmartDashboard.putNumber("ideal heading", getIdealHeading());

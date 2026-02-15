@@ -54,24 +54,28 @@ public class RobotContainer {
       .withDriveRequestType(DriveRequestType.OpenLoopVoltage)
       .withHeadingPID(DrivebaseConstants.SHOOT_WHILE_MOVE_HEADING_CONTROLLER.getP(), DrivebaseConstants.SHOOT_WHILE_MOVE_HEADING_CONTROLLER.getI(), DrivebaseConstants.SHOOT_WHILE_MOVE_HEADING_CONTROLLER.getD());
   private final SwerveRequest.SwerveDriveBrake brake = new SwerveRequest.SwerveDriveBrake();
-  
+
+  // Replace with CommandPS4Controller or CommandJoystick if needed
+  private final CommandXboxController driverController = new CommandXboxController(0);
+  private final CommandXboxController operatorController = new CommandXboxController(1);
+
   // Aiming math
-  Supplier<Vector3> velocity = () -> {
-    ChassisSpeeds velocity = drivebase.getState().Speeds;
-    velocity = ChassisSpeeds.fromRobotRelativeSpeeds(velocity, drivebase.getState().Pose.getRotation());
-    return new Vector3(velocity.vxMetersPerSecond, velocity.vyMetersPerSecond, 0);
-  };
-  DoubleSupplier angularVelocity = () -> 0.;
   Supplier<Vector3> position = () -> {
     Pose2d position = drivebase.getState().Pose;
     return new Vector3(position.getX(), position.getY(), 0);
   };
   DoubleSupplier heading = () -> drivebase.getState().RawHeading.getRadians();
-  AimingMath aimingMath = new AimingMath(velocity, angularVelocity, position, heading, new Vector3(4.625626,4.0346315,1.8288));
-
-  // Replace with CommandPS4Controller or CommandJoystick if needed
-  private final CommandXboxController driverController = new CommandXboxController(0);
-  private final CommandXboxController operatorController = new CommandXboxController(1);
+  Supplier<Vector3> velocity = () -> {
+    ChassisSpeeds velocity = drivebase.getState().Speeds;
+    velocity = ChassisSpeeds.fromRobotRelativeSpeeds(velocity, drivebase.getState().Pose.getRotation());
+    return new Vector3(velocity.vxMetersPerSecond, velocity.vyMetersPerSecond, 0);
+  };
+  DoubleSupplier angularVelocity = () -> drivebase.getState().Speeds.omegaRadiansPerSecond;
+  Supplier<Vector3> inputVelocity = () -> {
+    return new Vector3(-driverController.getLeftY() * DrivebaseConstants.SHOOT_WHILE_MOVING_SPEED, -driverController.getLeftX() * DrivebaseConstants.SHOOT_WHILE_MOVING_SPEED, 0);
+  };
+  DoubleSupplier inputAngularVelocity = () -> 0.;
+  AimingMath aimingMath = new AimingMath(position, heading, velocity, angularVelocity, inputVelocity, inputAngularVelocity, new Vector3(4.625626,4.0346315,1.8288));
 
   private final SendableChooser<Command> autoChooser;
 

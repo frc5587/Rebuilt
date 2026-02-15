@@ -3,6 +3,7 @@ package frc.robot.subsystems;
 import static edu.wpi.first.units.Units.*;
 
 import java.util.Optional;
+import java.util.function.Function;
 import java.util.function.Supplier;
 
 import com.ctre.phoenix6.SignalLogger;
@@ -22,10 +23,10 @@ import edu.wpi.first.math.geometry.Rotation2d;
 import edu.wpi.first.math.kinematics.ChassisSpeeds;
 import edu.wpi.first.math.numbers.N1;
 import edu.wpi.first.math.numbers.N3;
+import edu.wpi.first.networktables.NetworkTableInstance;
+import edu.wpi.first.networktables.StructPublisher;
 import edu.wpi.first.wpilibj.DriverStation;
 import edu.wpi.first.wpilibj.DriverStation.Alliance;
-import edu.wpi.first.wpilibj.smartdashboard.Field2d;
-import edu.wpi.first.wpilibj.smartdashboard.SmartDashboard;
 import edu.wpi.first.wpilibj.Notifier;
 import edu.wpi.first.wpilibj.RobotController;
 import edu.wpi.first.wpilibj2.command.Command;
@@ -60,6 +61,10 @@ public class SwerveSubsystem extends TunerSwerveDrivetrain implements Subsystem 
   private final SwerveRequest.SysIdSwerveTranslation m_translationCharacterization = new SwerveRequest.SysIdSwerveTranslation();
   private final SwerveRequest.SysIdSwerveSteerGains m_steerCharacterization = new SwerveRequest.SysIdSwerveSteerGains();
   private final SwerveRequest.SysIdSwerveRotation m_rotationCharacterization = new SwerveRequest.SysIdSwerveRotation();
+
+  Function<String,StructPublisher<Pose2d>> publisher = (String name) -> NetworkTableInstance.getDefault()
+                                                                                            .getStructTopic("swerve/"+name, Pose2d.struct).publish();
+  StructPublisher<Pose2d> currentPosePublisher = publisher.apply("current pose");
 
   /*
    * SysId routine for characterizing translation. This is used to find PID gains
@@ -123,8 +128,6 @@ public class SwerveSubsystem extends TunerSwerveDrivetrain implements Subsystem 
 
   /* The SysId routine to test */
   private SysIdRoutine m_sysIdRoutineToApply = m_sysIdRoutineTranslation;
-
-  private Field2d field = new Field2d();
 
   /**
    * Constructs a CTRE SwerveDrivetrain using the specified constants.
@@ -298,8 +301,7 @@ public class SwerveSubsystem extends TunerSwerveDrivetrain implements Subsystem 
       });
     }
 
-    field.setRobotPose(getState().Pose);
-    SmartDashboard.putData("robot pose", field);
+    currentPosePublisher.accept(getState().Pose);
   }
 
   private void startSimThread() {
