@@ -59,6 +59,9 @@ public class RobotContainer {
   private final CommandXboxController driverController = new CommandXboxController(0);
   private final CommandXboxController operatorController = new CommandXboxController(1);
 
+  double shootWhileMoveVelocityX = 0.;
+  double shootWhileMoveVelocityY = 0.;
+
   // Aiming math
   Supplier<Vector3> position = () -> {
     Pose2d position = drivebase.getState().Pose;
@@ -72,7 +75,7 @@ public class RobotContainer {
   };
   DoubleSupplier angularVelocity = () -> drivebase.getState().Speeds.omegaRadiansPerSecond;
   Supplier<Vector3> inputVelocity = () -> {
-    return new Vector3(-driverController.getLeftY() * DrivebaseConstants.SHOOT_WHILE_MOVING_SPEED, -driverController.getLeftX() * DrivebaseConstants.SHOOT_WHILE_MOVING_SPEED, 0);
+    return new Vector3(shootWhileMoveVelocityX, shootWhileMoveVelocityY, 0);
   };
   DoubleSupplier inputAngularVelocity = () -> 0.;
   AimingMath aimingMath = new AimingMath(position, heading, velocity, angularVelocity, inputVelocity, inputAngularVelocity, new Vector3(4.625626,4.0346315,1.8288));
@@ -124,13 +127,21 @@ public class RobotContainer {
     driverController.rightTrigger().onTrue(Commands.runOnce(aimingMath::resetSim));
 
     // Shoot while move
-    driverController.x().whileTrue(drivebase.applyRequest(() -> driveFacingAngle.withVelocityX(-driverController.getLeftY() * DrivebaseConstants.SHOOT_WHILE_MOVING_SPEED)
-                                                                                .withVelocityY(-driverController.getLeftX() * DrivebaseConstants.SHOOT_WHILE_MOVING_SPEED)
+    driverController.x().onTrue(Commands.runOnce(() -> {
+                            shootWhileMoveVelocityX = -driverController.getLeftY()*DrivebaseConstants.SHOOT_WHILE_MOVING_SPEED;
+                            shootWhileMoveVelocityY = -driverController.getLeftX()*DrivebaseConstants.SHOOT_WHILE_MOVING_SPEED;
+                        }))
+                        .whileTrue(drivebase.applyRequest(() -> driveFacingAngle.withVelocityX(shootWhileMoveVelocityX)
+                                                                                .withVelocityY(shootWhileMoveVelocityY)
                                                                                 .withTargetDirection(Rotation2d.fromRadians(aimingMath.getIdealHeading(aimingMath.getIdealShotSpeed(DrivebaseConstants.LOOKAHEAD),DrivebaseConstants.LOOKAHEAD))))
                                    .alongWith(shooter.setVelocity(RPM.of(aimingMath.getIdealShotSpeed(ShooterConstants.LOOKAHEAD)*ShooterConstants.SHOT_SPEED_CONVERSION_FACTOR)))
-                                   .alongWith(Commands.run(() -> aimingMath.isShooting = false)))
-                       .onFalse(Commands.runOnce(() -> {aimingMath.isShooting = false;})
-                                .alongWith(shooter.setVelocity(RPM.of(0.))));
+                                   .alongWith(Commands.run(() -> {
+                                       aimingMath.isShooting = false;
+                                       shootWhileMoveVelocityX = shootWhileMoveVelocityX + Math.min(Math.max(-driverController.getLeftY()*DrivebaseConstants.SHOOT_WHILE_MOVING_SPEED - shootWhileMoveVelocityX, -0.02*DrivebaseConstants.SHOOT_WHILE_MOVE_ACCEL_LIMIT),0.02*DrivebaseConstants.SHOOT_WHILE_MOVE_ACCEL_LIMIT);
+                                       shootWhileMoveVelocityY = shootWhileMoveVelocityY + Math.min(Math.max(-driverController.getLeftX()*DrivebaseConstants.SHOOT_WHILE_MOVING_SPEED - shootWhileMoveVelocityY, -0.02*DrivebaseConstants.SHOOT_WHILE_MOVE_ACCEL_LIMIT),0.02*DrivebaseConstants.SHOOT_WHILE_MOVE_ACCEL_LIMIT);
+                                   })))
+                        .onFalse(Commands.runOnce(() -> {aimingMath.isShooting = false;})
+                                 .alongWith(shooter.setVelocity(RPM.of(0.))));
     driverController.b().whileTrue(shooter.setVelocity(RPM.of(300)));
 
     // Shooter sim stuff

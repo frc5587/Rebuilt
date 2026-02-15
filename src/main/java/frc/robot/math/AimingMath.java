@@ -136,17 +136,16 @@ public class AimingMath extends SubsystemBase {
                                    Vector3.scale(tangent,inputAngularVelocityRadians.getAsDouble()*turretDistance));
     position = Vector3.add(position, Vector3.scale(velocity, lookahead));
     
-    double a = speed * Math.cos(ShooterConstants.PITCH);
-    double c = velocity.length();
+    double ballRelativeHorizontalSpeed = speed * Math.cos(ShooterConstants.PITCH);
+    double turretSpeed = velocity.length();
 
     Vector3 idealVector = Vector3.subtract(goalPosition, position).get2D();
     double targetAngle = idealVector.getCounterclockwiseAngle();
     double driveAngle = velocity.getCounterclockwiseAngle();
-    double A = (targetAngle - driveAngle) % (2 * Math.PI);
-    double C = Math.asin(Math.max(-1.,  Math.min((c*Math.sin(A)) / a, 1.0)));
+    double correctionAngle = Math.asin(Math.max(-1.,  Math.min((turretSpeed*Math.sin(targetAngle - driveAngle)) / ballRelativeHorizontalSpeed, 1.0)));
 
-    if (c > 0.0001) {
-      return targetAngle + C;
+    if (turretSpeed > 0.0001) {
+      return targetAngle + correctionAngle;
     }
     else {
       return targetAngle;
