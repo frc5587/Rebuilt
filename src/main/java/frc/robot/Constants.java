@@ -52,8 +52,8 @@ public final class Constants {
     public static final double MAX_SPIN_ACCEL = 8 * Math.PI;
     public static final double WHEEL_LOCK_TIME = 10; //seconds
 
-    public static final double LOOKAHEAD = 0.;
-    public static final double SHOOT_WHILE_MOVING_SPEED  = Units.feetToMeters(7);
+    public static final double LOOKAHEAD = 0.075;
+    public static final double SHOOT_WHILE_MOVING_SPEED  = Units.feetToMeters(10);
     public static final double SHOOT_WHILE_MOVE_ACCEL_LIMIT = 10;
     public static final ProfiledPIDController HEADING_CONTROLLER = new ProfiledPIDController(Math.PI,0,0.1,new Constraints(MAX_SPIN_SPEED_RADIANS_PER_SECOND, MAX_SPIN_ACCEL));
     public static final ProfiledPIDController SHOOT_WHILE_MOVE_HEADING_CONTROLLER = new ProfiledPIDController(15,0,0,new Constraints(MAX_SPIN_SPEED_RADIANS_PER_SECOND, MAX_SPIN_ACCEL));
@@ -94,8 +94,6 @@ public final class Constants {
     public static final double SHOTS_PER_SECOND = 2;
     public static final double SHOT_SPEED_CONVERSION_FACTOR = 30;
     public static final Vector3 SHOOTER_POSITION = new Vector3(0.2,0,0.4);
-    public static final double MAX_SHOT_SPEED = 20;
-    public static final double MIN_SHOOT_SPEED = 1;
     public static final int SEARCH_DEPTH = 5;
     public static final double GRAVITY = 9.81;
   }

@@ -28,6 +28,10 @@ public class Vector3 {
   public static Vector3 scale(Vector3 vector, double scalar) {
     return new Vector3(vector.x*scalar, vector.y*scalar, vector.z*scalar);
   }
+
+  public static Vector3 normalize(Vector3 vector) {
+    return scale(vector, 1/vector.length());
+  }
   
   public static Vector3 rotate(Vector3 point, Vector3 pivot, double angle) {
     double x = pivot.x + (pivot.x-point.x)*Math.cos(angle) - (pivot.y-point.y)*Math.sin(angle);
@@ -43,16 +47,16 @@ public class Vector3 {
     return Math.acos(dotProduct(vector1, vector2) / (vector1.length() * vector2.length()));
   }
 
-  public double getAngle() {
-    return getAngle(new Vector3(1,0,0),this);
+  public static double getAngle(Vector3 vector) {
+    return getAngle(new Vector3(1,0,0),vector);
   }
   
-  public double getCounterclockwiseAngle() {
-    if (y < 0) {
-      return 2*Math.PI-getAngle();
+  public static double getCounterclockwiseAngle(Vector3 vector) {
+    if (vector.y < 0) {
+      return 2*Math.PI-getAngle(vector);
     }
     else {
-      return getAngle();
+      return getAngle(vector);
     }
   }
   
