@@ -12,6 +12,7 @@ import static edu.wpi.first.units.Units.Inches;
 import static edu.wpi.first.units.Units.MetersPerSecondPerSecond;
 import static edu.wpi.first.units.Units.Pounds;
 import static edu.wpi.first.units.Units.RPM;
+import static edu.wpi.first.units.Units.RotationsPerSecondPerSecond;
 import static edu.wpi.first.units.Units.Seconds;
 
 import java.util.function.UnaryOperator;
@@ -52,7 +53,7 @@ public final class Constants {
     public static final double MAX_SPIN_ACCEL = 8 * Math.PI;
     public static final double WHEEL_LOCK_TIME = 10; //seconds
 
-    public static final double LOOKAHEAD = 0.075;
+    public static final double LOOKAHEAD = 0.1;
     public static final double SHOOT_WHILE_MOVING_SPEED  = Units.feetToMeters(10);
     public static final double SHOOT_WHILE_MOVE_ACCEL_LIMIT = 10;
     public static final ProfiledPIDController HEADING_CONTROLLER = new ProfiledPIDController(Math.PI,0,0.1,new Constraints(MAX_SPIN_SPEED_RADIANS_PER_SECOND, MAX_SPIN_ACCEL));
@@ -72,27 +73,27 @@ public final class Constants {
     public static final UnaryOperator<SmartMotorControllerConfig> APPLY_SMC_CONFIG = (SmartMotorControllerConfig config) -> {
       return config.withControlMode(ControlMode.CLOSED_LOOP)
                    .withClosedLoopController(1, 0, 0)
-                   .withSimClosedLoopController(50, 0, 0)
+                   .withSimClosedLoopController(1, 0, 0)
                    .withFeedforward(new SimpleMotorFeedforward(0, 0, 0))
                    .withSimFeedforward(new SimpleMotorFeedforward(0, 0, 0))
                    .withTelemetry("ShooterMotor", TelemetryVerbosity.HIGH)
-                   .withGearing(new MechanismGearing(GearBox.fromReductionStages(3, 4)))
+                   .withGearing(new MechanismGearing(GearBox.fromReductionStages(1)))
                    .withMotorInverted(false)
                    .withIdleMode(MotorMode.COAST)
                    .withStatorCurrentLimit(Amps.of(40));
     };
     public static final UnaryOperator<FlyWheelConfig> APPLY_FLYWHEEL_CONFIG = (FlyWheelConfig config) -> {
       return config.withDiameter(Inches.of(4))
-                   .withMass(Pounds.of(1))
+                   .withMass(Pounds.of(2.5))
                    .withUpperSoftLimit(RPM.of(1000))
                    .withTelemetry("ShooterMech", TelemetryVerbosity.HIGH);
     };
 
     // Aiming math
     public static final double PITCH = 1.2217304764;
-    public static final double LOOKAHEAD = 0.25;
+    public static final double LOOKAHEAD = 0.1;
     public static final double SHOTS_PER_SECOND = 2;
-    public static final double SHOT_SPEED_CONVERSION_FACTOR = 30;
+    public static final double SHOT_SPEED_CONVERSION_FACTOR = 187.978279242;
     public static final Vector3 SHOOTER_POSITION = new Vector3(0.2,0,0.4);
     public static final int SEARCH_DEPTH = 5;
     public static final double GRAVITY = 9.81;
