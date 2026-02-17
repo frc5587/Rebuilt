@@ -12,8 +12,11 @@ import frc.robot.math.AimingMath;
 import frc.robot.math.Vector3;
 import frc.robot.subsystems.ShooterSubsystem;
 import frc.robot.subsystems.SwerveSubsystem;
+import frc.robot.subsystems.ArmSubsystem;
+import yams.mechanisms.positional.Arm;
 
 import static edu.wpi.first.units.Units.RPM;
+import static edu.wpi.first.units.Units.Degrees;
 
 import java.util.function.DoubleSupplier;
 import java.util.function.Supplier;
@@ -43,7 +46,7 @@ import edu.wpi.first.wpilibj2.command.button.Trigger;
 public class RobotContainer {
   private final ShooterSubsystem shooter = new ShooterSubsystem();
   private final SwerveSubsystem drivebase = TunerConstants.createDrivetrain();
-  // private final ArmSubsystem arm = new ArmSubsystem();
+  private final ArmSubsystem arm = new ArmSubsystem();
 
   private final SwerveRequest.FieldCentric drive = new SwerveRequest.FieldCentric()
       .withDeadband(DrivebaseConstants.MAX_SPEED * 0.1).withRotationalDeadband(DrivebaseConstants.MAX_SPIN_SPEED_RADIANS_PER_SECOND * 0.1) // Add a 10% deadband
@@ -90,7 +93,7 @@ public class RobotContainer {
     SmartDashboard.putData("Auto Chooser", autoChooser);
 
     shooter.setDefaultCommand(shooter.set(0));
-    // arm.setDefaultCommand(arm.setAngle(Degrees.of(0)));
+    arm.setDefaultCommand(arm.setAngle(Degrees.of(0)));
   }
 
   /**
@@ -134,6 +137,8 @@ public class RobotContainer {
     // operatorController.rightBumper().whileTrue(shooter.setHighVelocity()).onFalse(shooter.setZeroVelocity());
     // operatorController.leftTrigger().whileTrue(shooter.setLow()).onFalse(shooter.setZero());
     // operatorController.rightTrigger().whileTrue(shooter.setHigh()).onFalse(shooter.setZero());
+
+    operatorController.rightTrigger().whileTrue(arm.setAngle(Degrees.of(-10)));
   }
 
   /**

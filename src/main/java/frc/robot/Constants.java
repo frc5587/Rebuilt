@@ -115,8 +115,8 @@ public final class Constants {
                    .withOpenLoopRampRate(Seconds.of(0.25));
     };
     public static final UnaryOperator<ArmConfig> APPLY_ARM_CONFIG = (ArmConfig config) -> {
-      return config.withSoftLimits(Degrees.of(-20), Degrees.of(10))
-                   .withHardLimit(Degrees.of(-30), Degrees.of(40))
+      return config.withSoftLimits(Degrees.of(-10), Degrees.of(125))
+                   .withHardLimit(Degrees.of(-10), Degrees.of(125))
                    .withStartingPosition(Degrees.of(-5))
                    .withLength(Inches.of(15.81))
                    .withMass(Pounds.of(2))
