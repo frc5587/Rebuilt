@@ -13,7 +13,7 @@ import frc.robot.math.Vector3;
 import frc.robot.subsystems.ShooterSubsystem;
 import frc.robot.subsystems.SwerveSubsystem;
 import frc.robot.subsystems.ArmSubsystem;
-import yams.mechanisms.positional.Arm;
+import frc.robot.subsystems.IntakeSubsystem;
 
 import static edu.wpi.first.units.Units.RPM;
 import static edu.wpi.first.units.Units.Degrees;
@@ -47,6 +47,7 @@ public class RobotContainer {
   private final ShooterSubsystem shooter = new ShooterSubsystem();
   private final SwerveSubsystem drivebase = TunerConstants.createDrivetrain();
   private final ArmSubsystem arm = new ArmSubsystem();
+  private final IntakeSubsystem intake = new IntakeSubsystem();
 
   private final SwerveRequest.FieldCentric drive = new SwerveRequest.FieldCentric()
       .withDeadband(DrivebaseConstants.MAX_SPEED * 0.1).withRotationalDeadband(DrivebaseConstants.MAX_SPIN_SPEED_RADIANS_PER_SECOND * 0.1) // Add a 10% deadband
@@ -94,6 +95,7 @@ public class RobotContainer {
 
     shooter.setDefaultCommand(shooter.set(0));
     arm.setDefaultCommand(arm.setAngle(Degrees.of(0)));
+    intake.setDefaultCommand(intake.stop());
   }
 
   /**
@@ -139,6 +141,7 @@ public class RobotContainer {
     // operatorController.rightTrigger().whileTrue(shooter.setHigh()).onFalse(shooter.setZero());
 
     operatorController.rightTrigger().whileTrue(arm.setAngle(Degrees.of(-10)));
+    operatorController.rightTrigger().whileTrue(intake.setVelocity(RPM.of(100)));//TODO dunno what to set this to
   }
 
   /**

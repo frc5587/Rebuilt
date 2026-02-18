@@ -22,15 +22,15 @@ public class ArmSubsystem extends SubsystemBase {
     
     private SmartMotorControllerConfig smcConfig = ArmConstants.APPLY_SMC_CONFIG.apply(new SmartMotorControllerConfig(this));
 
-    private SparkMax spark = new SparkMax(ArmConstants.LEFT_MOTOR_ID, MotorType.kBrushless);
+    private SparkMax leftspark = new SparkMax(ArmConstants.LEFT_MOTOR_ID, MotorType.kBrushless);
 
-    private SparkMax sparkspark = new SparkMax(ArmConstants.RIGHT_MOTOR_ID, MotorType.kBrushless);
+    private SparkMax rightspark = new SparkMax(ArmConstants.RIGHT_MOTOR_ID, MotorType.kBrushless);
 
-    private SmartMotorController sparkSmartMotorController = new SparkWrapper(spark, DCMotor.getNEO(1), smcConfig);
+    private SmartMotorController lSparkSmartMotorController = new SparkWrapper(leftspark, DCMotor.getNEO(1), smcConfig);
 
-    private SmartMotorController sparksparkSmartMotorController = new SparkWrapper(sparkspark, DCMotor.getNEO(1), smcConfig.withLooselyCoupledFollowers(sparkSmartMotorController));
+    private SmartMotorController rSparkSmartMotorController = new SparkWrapper(rightspark, DCMotor.getNEO(1), smcConfig.withLooselyCoupledFollowers(lSparkSmartMotorController));
 
-    private ArmConfig armCfg = ArmConstants.APPLY_ARM_CONFIG.apply(new ArmConfig(sparksparkSmartMotorController));
+    private ArmConfig armCfg = ArmConstants.APPLY_ARM_CONFIG.apply(new ArmConfig(rSparkSmartMotorController));
                                    
 
     private Arm arm = new Arm(armCfg);

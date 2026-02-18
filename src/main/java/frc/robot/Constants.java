@@ -123,4 +123,26 @@ public final class Constants {
                    .withTelemetry("Arm", TelemetryVerbosity.HIGH);
     };
   }
+
+  public static class IntakeConstants {
+    public static final int MOTOR_ID = 0;//TODO uhh idk what this should be
+    public static final UnaryOperator<SmartMotorControllerConfig> APPLY_SMC_CONFIG = (SmartMotorControllerConfig config) -> {
+      return config.withControlMode(ControlMode.CLOSED_LOOP)
+             .withClosedLoopController(50,0,0)
+             .withSimClosedLoopController(50,0,0)
+             .withFeedforward(new SimpleMotorFeedforward(0, 0, 0))
+             .withSimFeedforward(new SimpleMotorFeedforward(0, 0, 0))
+             .withTelemetry("IntakeMotor", TelemetryVerbosity.HIGH)
+             .withGearing(new MechanismGearing(GearBox.fromReductionStages(3,4)))//TODO figure out what this should be
+             .withMotorInverted(false)
+             .withIdleMode(MotorMode.COAST)
+             .withStatorCurrentLimit(Amps.of(40));
+    };
+    public static final UnaryOperator<FlyWheelConfig> APPLY_INTAKE_CONFIG = (FlyWheelConfig config) -> {//TODO Flywheel was the closest thing I could think of
+      return config.withDiameter(Inches.of(2))
+                   .withMass(Pounds.of(1))
+                   .withUpperSoftLimit(RPM.of(500))//help
+                   .withTelemetry("Intake", TelemetryVerbosity.HIGH);
+    };
+  }
 }
