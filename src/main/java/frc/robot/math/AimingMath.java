@@ -37,6 +37,7 @@ public class AimingMath extends SubsystemBase {
   private final DoubleSupplier angularVelocityRadians;
   private final Supplier<Vector3> inputRobotVelocity;
   private final DoubleSupplier inputAngularVelocityRadians;
+  private final DoubleSupplier flywheelRPM;
   
   private Vector3 goalPosition;
 
@@ -66,6 +67,7 @@ public class AimingMath extends SubsystemBase {
                     DoubleSupplier _angularVelocityRadians,
                     Supplier<Vector3> _inputRobotVelocity,
                     DoubleSupplier _inputAngularVelocityRadians,
+                    DoubleSupplier _flywheelRPM,
                     Vector3 _goalPosition) {
                   
     robotPosition = _robotPosition;
@@ -75,6 +77,7 @@ public class AimingMath extends SubsystemBase {
     inputRobotVelocity = _inputRobotVelocity;
     inputAngularVelocityRadians = _inputAngularVelocityRadians;
     goalPosition = _goalPosition;
+    flywheelRPM = _flywheelRPM;
 
     times.add(0.);
     shotTimes.add(0.);
@@ -183,9 +186,7 @@ public class AimingMath extends SubsystemBase {
   @Override
   public void periodic() {
     if (times.get(times.size()-1) < Timer.getFPGATimestamp() - 0.07) {
-      double idealShotSpeed = getIdealShotSpeed(robotPosition.get(),headingRadians.getAsDouble(),robotVelocity.get(),angularVelocityRadians.getAsDouble());
-      // Replace with actual or simulated values
-      double shotSpeed = idealShotSpeed * 1.0;
+      double shotSpeed = flywheelRPM.getAsDouble() / ShooterConstants.SHOT_SPEED_CONVERSION_FACTOR;
       double angle = 0;
       
       times.add(Timer.getFPGATimestamp());
@@ -193,13 +194,12 @@ public class AimingMath extends SubsystemBase {
       angles.add(angle);
       positions.add(robotPosition.get());
       headings.add(headingRadians.getAsDouble());
-      // headings.add(getIdealHeading());
       velocities.add(robotVelocity.get());
       angularVelocities.add(angularVelocityRadians.getAsDouble());
     }
 
     if (isShooting  &&  shotTimes.get(shotTimes.size()-1) < Timer.getFPGATimestamp() - 1/ShooterConstants.SHOTS_PER_SECOND) {
-      double shotSpeed = getIdealShotSpeed(robotPosition.get(),headingRadians.getAsDouble(),robotVelocity.get(),angularVelocityRadians.getAsDouble());
+      double shotSpeed = flywheelRPM.getAsDouble() / ShooterConstants.SHOT_SPEED_CONVERSION_FACTOR;
       shoot(shotSpeed);
 
       shotTimes.add(Timer.getFPGATimestamp());
@@ -211,6 +211,7 @@ public class AimingMath extends SubsystemBase {
                                                                              Rotation2d.fromRadians(getIdealHeading(getIdealShotSpeed(DrivebaseConstants.LOOKAHEAD),DrivebaseConstants.LOOKAHEAD,robotPosition.get(),headingRadians.getAsDouble(),robotVelocity.get(),angularVelocityRadians.getAsDouble()))));
     SmartDashboard.putNumber("ideal heading", getIdealHeading());
     SmartDashboard.putString("SimResults", simLog);
+    SmartDashboard.putNumber("ideal RPM", getIdealShotSpeed() * ShooterConstants.SHOT_SPEED_CONVERSION_FACTOR);
 
     // Get the positions of the fuel (both on the field and in the air)
       Pose3d[] fuelPoses = SimulatedArena.getInstance()

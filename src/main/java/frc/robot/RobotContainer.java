@@ -26,6 +26,7 @@ import edu.wpi.first.math.geometry.Pose2d;
 import edu.wpi.first.math.geometry.Rotation2d;
 import edu.wpi.first.math.kinematics.ChassisSpeeds;
 import edu.wpi.first.wpilibj.DriverStation;
+import edu.wpi.first.wpilibj.Timer;
 import edu.wpi.first.wpilibj.smartdashboard.SendableChooser;
 import edu.wpi.first.wpilibj.smartdashboard.SmartDashboard;
 
@@ -78,7 +79,7 @@ public class RobotContainer {
     return shootWhileMovingCalculationVelocity;
   };
   DoubleSupplier inputAngularVelocity = () -> 0.;
-  AimingMath aimingMath = new AimingMath(position, heading, velocity, angularVelocity, inputVelocity, inputAngularVelocity, new Vector3(4.625626,4.0346315,1.8288));
+  AimingMath aimingMath = new AimingMath(position, heading, velocity, angularVelocity, inputVelocity, inputAngularVelocity, () -> shooter.getVelocity().in(RPM), new Vector3(4.625626,4.0346315,1.8288));
 
   private final SendableChooser<Command> autoChooser;
 
@@ -97,7 +98,7 @@ public class RobotContainer {
     //Put the autoChooser on the SmartDashboard
     SmartDashboard.putData("Auto Chooser", autoChooser);
 
-    shooter.setDefaultCommand(shooter.set(0));
+    shooter.setDefaultCommand(shooter.stop());
     // arm.setDefaultCommand(arm.setAngle(Degrees.of(0)));
   }
 
@@ -133,7 +134,7 @@ public class RobotContainer {
                         .whileTrue(drivebase.applyRequest(() -> driveFacingAngle.withVelocityX(shootWhileMovingVelocity.x)
                                                                                 .withVelocityY(shootWhileMovingVelocity.y)
                                                                                 .withTargetDirection(Rotation2d.fromRadians(aimingMath.getIdealHeading(aimingMath.getIdealShotSpeed(DrivebaseConstants.LOOKAHEAD),DrivebaseConstants.LOOKAHEAD))))
-                                   .alongWith(shooter.setVelocity(RPM.of(aimingMath.getIdealShotSpeed(ShooterConstants.LOOKAHEAD)*ShooterConstants.SHOT_SPEED_CONVERSION_FACTOR)))
+                                   .alongWith(shooter.setVelocity(() -> RPM.of(aimingMath.getIdealShotSpeed(ShooterConstants.LOOKAHEAD)*ShooterConstants.SHOT_SPEED_CONVERSION_FACTOR)))
                                    .alongWith(Commands.run(() -> {
                                        aimingMath.isShooting = false;
                                        Vector3 difference = Vector3.subtract(new Vector3(-driverController.getLeftY()*DrivebaseConstants.SHOOT_WHILE_MOVING_SPEED, 
@@ -149,8 +150,8 @@ public class RobotContainer {
                                                                                                                       0.02*DrivebaseConstants.SHOOT_WHILE_MOVE_ACCEL_LIMIT));
                                    })))
                         .onFalse(Commands.runOnce(() -> {aimingMath.isShooting = false;})
-                                 .alongWith(shooter.setVelocity(RPM.of(0.))));
-    driverController.b().whileTrue(shooter.setVelocity(RPM.of(300)));
+                                 .alongWith(shooter.stop()));
+    driverController.b().whileTrue(shooter.setVelocity(() -> RPM.of(Timer.getFPGATimestamp()*10)));
 
     // Shooter sim stuff
     // operatorController.leftBumper().whileTrue(shooter.setLowVelocity()).onFalse(shooter.setZeroVelocity());
