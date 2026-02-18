@@ -91,17 +91,25 @@ public class AimingMath extends SubsystemBase {
   }
 
   public double getIdealShotSpeed(double lookahead) {
-    Vector3 position = Vector3.add(robotPosition.get(),
-                                   Vector3.rotate(Constants.ShooterConstants.SHOOTER_POSITION,
+    return getIdealShotSpeed(lookahead, robotPosition.get(), headingRadians.getAsDouble(), inputRobotVelocity.get(), inputAngularVelocityRadians.getAsDouble());
+  }
+
+  public double getIdealShotSpeed(Vector3 robotPosition, double heading, Vector3 robotVelocity, double angularVelocity) {
+    return getIdealShotSpeed(0.,robotPosition, heading, robotVelocity, angularVelocity);
+  }
+
+  public double getIdealShotSpeed(double lookahead, Vector3 robotPosition, double heading, Vector3 robotVelocity, double angularVelocity) {
+    Vector3 position = Vector3.add(robotPosition,
+                                   Vector3.rotate(ShooterConstants.SHOOTER_POSITION,
                                                   Vector3.origin(),
-                                                  headingRadians.getAsDouble()));
-    double turretDistance = Constants.ShooterConstants.SHOOTER_POSITION.get2D().length();
-    Vector3 tangent = Vector3.scale(Vector3.rotate(Constants.ShooterConstants.SHOOTER_POSITION.get2D(),
-                                                  Vector3.origin(),
-                                                  Math.PI/2 + headingRadians.getAsDouble()),
+                                                  heading));
+    double turretDistance = ShooterConstants.SHOOTER_POSITION.get2D().length();
+    Vector3 tangent = Vector3.scale(Vector3.rotate(ShooterConstants.SHOOTER_POSITION.get2D(),
+                                                   Vector3.origin(),
+                                                   Math.PI/2 + heading),
                                     1.0/turretDistance);
-    Vector3 velocity = Vector3.add(inputRobotVelocity.get(),
-                                  Vector3.scale(tangent,inputAngularVelocityRadians.getAsDouble()*turretDistance));
+    Vector3 velocity = Vector3.add(robotVelocity,
+                                   Vector3.scale(tangent,angularVelocity*turretDistance));
     position = Vector3.add(position, Vector3.scale(velocity, lookahead));
 
     double speed = 0;
@@ -123,17 +131,25 @@ public class AimingMath extends SubsystemBase {
   }
 
   public double getIdealHeading(double speed, double lookahead) {
-    Vector3 position = Vector3.add(robotPosition.get(),
+    return getIdealHeading(speed, lookahead, robotPosition.get(), headingRadians.getAsDouble(), inputRobotVelocity.get(), inputAngularVelocityRadians.getAsDouble());
+  }
+
+  public double getIdealHeading(Vector3 robotPosition, double heading, Vector3 robotVelocity, double angularVelocity) {
+    return getIdealHeading(getIdealShotSpeed(0., robotPosition, heading, robotVelocity, angularVelocity), 0., robotPosition, heading, robotVelocity, angularVelocity);
+  }
+
+  public double getIdealHeading(double speed, double lookahead, Vector3 robotPosition, double heading, Vector3 robotVelocity, double angularVelocity) {
+    Vector3 position = Vector3.add(robotPosition,
                                    Vector3.rotate(ShooterConstants.SHOOTER_POSITION,
                                                   Vector3.origin(),
-                                                  headingRadians.getAsDouble()));
+                                                  heading));
     double turretDistance = ShooterConstants.SHOOTER_POSITION.get2D().length();
     Vector3 tangent = Vector3.scale(Vector3.rotate(ShooterConstants.SHOOTER_POSITION.get2D(),
                                                    Vector3.origin(),
-                                                   Math.PI/2 + headingRadians.getAsDouble()),
+                                                   Math.PI/2 + heading),
                                     1.0/turretDistance);
-    Vector3 velocity = Vector3.add(inputRobotVelocity.get(),
-                                   Vector3.scale(tangent,inputAngularVelocityRadians.getAsDouble()*turretDistance));
+    Vector3 velocity = Vector3.add(robotVelocity,
+                                   Vector3.scale(tangent,angularVelocity*turretDistance));
     position = Vector3.add(position, Vector3.scale(velocity, lookahead));
     
     double ballRelativeHorizontalSpeed = speed * Math.cos(ShooterConstants.PITCH);
@@ -167,7 +183,7 @@ public class AimingMath extends SubsystemBase {
   @Override
   public void periodic() {
     if (times.get(times.size()-1) < Timer.getFPGATimestamp() - 0.07) {
-      double idealShotSpeed = getIdealShotSpeed(0.);
+      double idealShotSpeed = getIdealShotSpeed(robotPosition.get(),headingRadians.getAsDouble(),robotVelocity.get(),angularVelocityRadians.getAsDouble());
       // Replace with actual or simulated values
       double shotSpeed = idealShotSpeed * 1.0;
       double angle = 0;
@@ -183,8 +199,8 @@ public class AimingMath extends SubsystemBase {
     }
 
     if (isShooting  &&  shotTimes.get(shotTimes.size()-1) < Timer.getFPGATimestamp() - 1/ShooterConstants.SHOTS_PER_SECOND) {
-      double idealShotSpeed = getIdealShotSpeed();
-      shoot(idealShotSpeed);
+      double shotSpeed = getIdealShotSpeed(robotPosition.get(),headingRadians.getAsDouble(),robotVelocity.get(),angularVelocityRadians.getAsDouble());
+      shoot(shotSpeed);
 
       shotTimes.add(Timer.getFPGATimestamp());
     }
@@ -192,7 +208,7 @@ public class AimingMath extends SubsystemBase {
     idealPosePublisher.accept(new Pose2d(new Translation2d(robotPosition.get().x, robotPosition.get().y), Rotation2d.fromRadians(getIdealHeading())));
     futurePosePublisher.accept(new Pose2d(new Translation2d(robotPosition.get().x + DrivebaseConstants.LOOKAHEAD*robotVelocity.get().x, 
                                                                              robotPosition.get().y + DrivebaseConstants.LOOKAHEAD*robotVelocity.get().y),
-                                                                             Rotation2d.fromRadians(getIdealHeading(getIdealShotSpeed(DrivebaseConstants.LOOKAHEAD),DrivebaseConstants.LOOKAHEAD))));
+                                                                             Rotation2d.fromRadians(getIdealHeading(getIdealShotSpeed(DrivebaseConstants.LOOKAHEAD),DrivebaseConstants.LOOKAHEAD,robotPosition.get(),headingRadians.getAsDouble(),robotVelocity.get(),angularVelocityRadians.getAsDouble()))));
     SmartDashboard.putNumber("ideal heading", getIdealHeading());
     SmartDashboard.putString("SimResults", simLog);
 

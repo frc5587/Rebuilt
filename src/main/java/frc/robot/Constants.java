@@ -52,11 +52,11 @@ public final class Constants {
     public static final double MAX_SPIN_ACCEL = 8 * Math.PI;
     public static final double WHEEL_LOCK_TIME = 10; //seconds
 
-    public static final double LOOKAHEAD = 0.075;
+    public static final double LOOKAHEAD = 0.1;
     public static final double SHOOT_WHILE_MOVING_SPEED  = Units.feetToMeters(10);
     public static final double SHOOT_WHILE_MOVE_ACCEL_LIMIT = 10;
     public static final ProfiledPIDController HEADING_CONTROLLER = new ProfiledPIDController(Math.PI,0,0.1,new Constraints(MAX_SPIN_SPEED_RADIANS_PER_SECOND, MAX_SPIN_ACCEL));
-    public static final ProfiledPIDController SHOOT_WHILE_MOVE_HEADING_CONTROLLER = new ProfiledPIDController(15,0,0,new Constraints(MAX_SPIN_SPEED_RADIANS_PER_SECOND, MAX_SPIN_ACCEL));
+    public static final ProfiledPIDController SHOOT_WHILE_MOVE_HEADING_CONTROLLER = new ProfiledPIDController(25,0,0,new Constraints(MAX_SPIN_SPEED_RADIANS_PER_SECOND, MAX_SPIN_ACCEL));
   }
 
   public static class OperatorConstants {

@@ -2,7 +2,10 @@ package frc.robot.math;
 
 import java.math.BigDecimal;
 
-public class Vector3 {
+import edu.wpi.first.util.sendable.Sendable;
+import edu.wpi.first.util.sendable.SendableBuilder;
+
+public class Vector3 implements Sendable {
   public double x;
   public double y;
   public double z;
@@ -11,6 +14,14 @@ public class Vector3 {
     x = inputX;
     y = inputY;
     z = inputZ;
+  }
+
+  @Override
+  public void initSendable(SendableBuilder builder) {
+    builder.setSmartDashboardType("Vector3");
+    builder.addDoubleProperty("x", () -> x, (double input) -> x = input);
+    builder.addDoubleProperty("y", () -> y, (double input) -> y = input);
+    builder.addDoubleProperty("z", () -> z, (double input) -> z = input);
   }
   
   public static Vector3 origin() {

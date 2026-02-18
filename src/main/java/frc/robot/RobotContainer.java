@@ -75,7 +75,7 @@ public class RobotContainer {
   };
   DoubleSupplier angularVelocity = () -> drivebase.getState().Speeds.omegaRadiansPerSecond;
   Supplier<Vector3> inputVelocity = () -> {
-    return new Vector3(-driverController.getLeftY()*DrivebaseConstants.SHOOT_WHILE_MOVING_SPEED, -driverController.getLeftX()*DrivebaseConstants.SHOOT_WHILE_MOVING_SPEED, 0);
+    return shootWhileMovingCalculationVelocity;
   };
   DoubleSupplier inputAngularVelocity = () -> 0.;
   AimingMath aimingMath = new AimingMath(position, heading, velocity, angularVelocity, inputVelocity, inputAngularVelocity, new Vector3(4.625626,4.0346315,1.8288));
@@ -139,9 +139,14 @@ public class RobotContainer {
                                        Vector3 difference = Vector3.subtract(new Vector3(-driverController.getLeftY()*DrivebaseConstants.SHOOT_WHILE_MOVING_SPEED, 
                                                                                          -driverController.getLeftX()*DrivebaseConstants.SHOOT_WHILE_MOVING_SPEED, 0),
                                                                              shootWhileMovingVelocity);
+                                       if (difference.length() < 50.) {
+                                         shootWhileMovingCalculationVelocity = Vector3.add(shootWhileMovingVelocity, difference);
+                                       }
+                                       else {
+                                         shootWhileMovingCalculationVelocity = Vector3.add(shootWhileMovingVelocity, Vector3.scale(Vector3.normalize(difference), 50.));
+                                       }
                                        shootWhileMovingVelocity = Vector3.add(shootWhileMovingVelocity, Vector3.scale(Vector3.normalize(difference), 
                                                                                                                       0.02*DrivebaseConstants.SHOOT_WHILE_MOVE_ACCEL_LIMIT));
-                                       
                                    })))
                         .onFalse(Commands.runOnce(() -> {aimingMath.isShooting = false;})
                                  .alongWith(shooter.setVelocity(RPM.of(0.))));
