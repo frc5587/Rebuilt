@@ -195,7 +195,7 @@ public class AimingMath extends SubsystemBase {
                                                                              Rotation2d.fromRadians(getIdealHeading(getIdealShotSpeed(DrivebaseConstants.LOOKAHEAD),DrivebaseConstants.LOOKAHEAD))));
     SmartDashboard.putNumber("ideal heading", getIdealHeading());
     SmartDashboard.putString("SimResults", simLog);
-    SmartDashboard.putNumber("ideal RPM", getIdealShotSpeed())
+    SmartDashboard.putNumber("ideal RPM", getIdealShotSpeed() * ShooterConstants.SHOT_SPEED_CONVERSION_FACTOR);
 
     // Get the positions of the fuel (both on the field and in the air)
       Pose3d[] fuelPoses = SimulatedArena.getInstance()
