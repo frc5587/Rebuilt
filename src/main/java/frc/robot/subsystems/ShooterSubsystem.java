@@ -5,6 +5,9 @@
 package frc.robot.subsystems;
 
 import static edu.wpi.first.units.Units.RPM;
+import static edu.wpi.first.units.Units.Second;
+import static edu.wpi.first.units.Units.Seconds;
+import static edu.wpi.first.units.Units.Volts;
 
 import com.revrobotics.spark.SparkLowLevel.MotorType;
 import com.revrobotics.spark.SparkMax;
@@ -108,6 +111,13 @@ public class ShooterSubsystem extends SubsystemBase {
      */
     public Command setZero() {
       return set(0);
+    }
+
+    /**
+     * Run sysId on the {@link Shooter}
+     */
+    public Command sysID() {
+      return shooter.sysId(Volts.of(7), Volts.of(2).per(Second), Seconds.of(4));
     }
 
 
