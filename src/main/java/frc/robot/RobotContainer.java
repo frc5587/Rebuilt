@@ -140,8 +140,9 @@ public class RobotContainer {
     // operatorController.leftTrigger().whileTrue(shooter.setLow()).onFalse(shooter.setZero());
     // operatorController.rightTrigger().whileTrue(shooter.setHigh()).onFalse(shooter.setZero());
 
-    operatorController.rightTrigger().whileTrue(arm.setAngle(Degrees.of(-10)));
-    operatorController.rightTrigger().whileTrue(intake.setVelocity(RPM.of(100)));//TODO dunno what to set this to
+    operatorController.rightBumper().whileTrue(arm.setAngle(Degrees.of(-10)));
+    operatorController.rightBumper().whileTrue(intake.set(1)).onFalse(intake.stop());
+    operatorController.leftBumper().whileTrue(intake.set(-1)).onFalse(intake.stop());
   }
 
   /**

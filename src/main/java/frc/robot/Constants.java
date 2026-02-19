@@ -107,10 +107,10 @@ public final class Constants {
                    .withFeedforward(new ArmFeedforward(0, 0, 0))
                    .withSimFeedforward(new ArmFeedforward(0, 0, 0))
                    .withTelemetry("ArmMotor", TelemetryVerbosity.HIGH)
-                   .withGearing(new MechanismGearing(GearBox.fromReductionStages(3,4))) //Can also use .withGearing(ratio)
+                   .withGearing(new MechanismGearing(GearBox.fromReductionStages(3,5))) //Can also use .withGearing(ratio)
                    .withMotorInverted(false)
                    .withIdleMode(MotorMode.BRAKE)
-                   .withStatorCurrentLimit(Amps.of(40))
+                   .withStatorCurrentLimit(Amps.of(20))
                    .withClosedLoopRampRate(Seconds.of(0.25))
                    .withOpenLoopRampRate(Seconds.of(0.25));
     };
@@ -125,24 +125,35 @@ public final class Constants {
   }
 
   public static class IntakeConstants {
-    public static final int MOTOR_ID = 0;//TODO uhh idk what this should be
+    public static final int MOTOR_ID = 22;
     public static final UnaryOperator<SmartMotorControllerConfig> APPLY_SMC_CONFIG = (SmartMotorControllerConfig config) -> {
-      return config.withControlMode(ControlMode.CLOSED_LOOP)
-             .withClosedLoopController(50,0,0)
-             .withSimClosedLoopController(50,0,0)
-             .withFeedforward(new SimpleMotorFeedforward(0, 0, 0))
-             .withSimFeedforward(new SimpleMotorFeedforward(0, 0, 0))
-             .withTelemetry("IntakeMotor", TelemetryVerbosity.HIGH)
-             .withGearing(new MechanismGearing(GearBox.fromReductionStages(3,4)))//TODO figure out what this should be
+      return config.withControlMode(ControlMode.OPEN_LOOP)
+             .withTelemetry("IntakeMotor", TelemetryVerbosity.LOW)
+             .withGearing(new MechanismGearing(GearBox.fromReductionStages(3)))
              .withMotorInverted(false)
              .withIdleMode(MotorMode.COAST)
-             .withStatorCurrentLimit(Amps.of(40));
+             .withStatorCurrentLimit(Amps.of(20));  
     };
-    public static final UnaryOperator<FlyWheelConfig> APPLY_INTAKE_CONFIG = (FlyWheelConfig config) -> {//TODO Flywheel was the closest thing I could think of
+    public static final UnaryOperator<FlyWheelConfig> APPLY_INTAKE_CONFIG = (FlyWheelConfig config) -> {
       return config.withDiameter(Inches.of(2))
                    .withMass(Pounds.of(1))
-                   .withUpperSoftLimit(RPM.of(500))//help
-                   .withTelemetry("Intake", TelemetryVerbosity.HIGH);
+                   .withTelemetry("Intake", TelemetryVerbosity.LOW);
+    };
+  }
+  public static class IndexerConstants {
+    public static final int MOTOR_ID = 23;
+    public static final UnaryOperator<SmartMotorControllerConfig> APPLY_SMC_CONFIG = (SmartMotorControllerConfig config) -> {
+      return config.withControlMode(ControlMode.OPEN_LOOP)
+             .withTelemetry("IndexerMotor", TelemetryVerbosity.LOW)
+             .withGearing(new MechanismGearing(GearBox.fromReductionStages(4)))
+             .withMotorInverted(false)
+             .withIdleMode(MotorMode.COAST)
+             .withStatorCurrentLimit(Amps.of(20));  
+    };
+    public static final UnaryOperator<FlyWheelConfig> APPLY_INDEXER_CONFIG = (FlyWheelConfig config) -> {
+      return config.withDiameter(Inches.of(1))
+                   .withMass(Pounds.of(1))
+                   .withTelemetry("Indexer", TelemetryVerbosity.LOW);
     };
   }
 }
