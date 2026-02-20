@@ -175,8 +175,6 @@ public class RobotContainer {
     operatorController.rightTrigger().whileTrue(shooter.setHigh()).onFalse(shooter.setZero());
 
     operatorController.leftBumper().whileTrue(intake.set(-1)).onFalse(intake.stop());
-
-    
   }
 
   /**
