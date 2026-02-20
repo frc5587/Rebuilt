@@ -13,6 +13,7 @@ import frc.robot.math.Vector3;
 import frc.robot.subsystems.ShooterSubsystem;
 import frc.robot.subsystems.SwerveSubsystem;
 import frc.robot.subsystems.ArmSubsystem;
+import frc.robot.subsystems.IndexerSubsystem;
 import frc.robot.subsystems.IntakeSubsystem;
 
 import static edu.wpi.first.units.Units.RPM;
@@ -48,6 +49,7 @@ public class RobotContainer {
   private final SwerveSubsystem drivebase = TunerConstants.createDrivetrain();
   private final ArmSubsystem arm = new ArmSubsystem();
   private final IntakeSubsystem intake = new IntakeSubsystem();
+  private final IndexerSubsystem indexer = new IndexerSubsystem();
 
   private final SwerveRequest.FieldCentric drive = new SwerveRequest.FieldCentric()
       .withDeadband(DrivebaseConstants.MAX_SPEED * 0.1).withRotationalDeadband(DrivebaseConstants.MAX_SPIN_SPEED_RADIANS_PER_SECOND * 0.1) // Add a 10% deadband
@@ -143,6 +145,7 @@ public class RobotContainer {
     operatorController.rightBumper().whileTrue(arm.setAngle(Degrees.of(-10)));
     operatorController.rightBumper().whileTrue(intake.set(1)).onFalse(intake.stop());
     operatorController.leftBumper().whileTrue(intake.set(-1)).onFalse(intake.stop());
+    operatorController.rightTrigger().whileTrue(indexer.set(1)).onFalse(indexer.stop());
   }
 
   /**
