@@ -6,6 +6,7 @@ package frc.robot;
 
 import com.ctre.phoenix6.swerve.SwerveModule.DriveRequestType;
 
+import frc.robot.Constants.ArmConstants;
 import frc.robot.Constants.DrivebaseConstants;
 import frc.robot.Constants.ShooterConstants;
 import frc.robot.math.AimingMath;
@@ -13,6 +14,7 @@ import frc.robot.math.Vector3;
 import frc.robot.subsystems.ShooterSubsystem;
 import frc.robot.subsystems.SwerveSubsystem;
 import frc.robot.subsystems.ArmSubsystem;
+import frc.robot.subsystems.IndexerSubsystem;
 import frc.robot.subsystems.IntakeSubsystem;
 
 import static edu.wpi.first.units.Units.RPM;
@@ -49,6 +51,7 @@ public class RobotContainer {
   private final SwerveSubsystem drivebase = TunerConstants.createDrivetrain();
   private final ArmSubsystem arm = new ArmSubsystem();
   private final IntakeSubsystem intake = new IntakeSubsystem();
+  private final IndexerSubsystem indexer = new IndexerSubsystem();
 
   private final SwerveRequest.FieldCentric drive = new SwerveRequest.FieldCentric()
       .withDeadband(DrivebaseConstants.MAX_SPEED * 0.1).withRotationalDeadband(DrivebaseConstants.MAX_SPIN_SPEED_RADIANS_PER_SECOND * 0.1) // Add a 10% deadband
@@ -164,9 +167,16 @@ public class RobotContainer {
     // operatorController.leftTrigger().whileTrue(shooter.setLow()).onFalse(shooter.setZero());
     // operatorController.rightTrigger().whileTrue(shooter.setHigh()).onFalse(shooter.setZero());
 
-    operatorController.rightBumper().whileTrue(arm.setAngle(Degrees.of(-10)));
+    
+    operatorController.rightBumper().whileTrue(arm.setAngle(Degrees.of(ArmConstants.ARM_DOWN_ANGLE))).onFalse(arm.setAngle(Degrees.of(ArmConstants.ARM_UP_ANGLE)));
     operatorController.rightBumper().whileTrue(intake.set(1)).onFalse(intake.stop());
+    
+    operatorController.leftTrigger().whileTrue(indexer.set(1)).onFalse(indexer.stop());
+    operatorController.rightTrigger().whileTrue(shooter.setHigh()).onFalse(shooter.setZero());
+
     operatorController.leftBumper().whileTrue(intake.set(-1)).onFalse(intake.stop());
+
+    
   }
 
   /**

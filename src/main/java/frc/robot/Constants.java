@@ -68,8 +68,8 @@ public final class Constants {
     public static final int FLYWHEEL_ID = 30;
     public static final double SHOOTER_HIGH_SPEED = 300.0;
     public static final double SHOOTER_LOW_SPEED = 60.0;
-    public static final double HIGH_DUTY_CYCLE = 0.3;
-    public static final double LOW_DUTY_CYCLE = -0.3;
+    public static final double HIGH_DUTY_CYCLE = 0.6;
+    public static final double LOW_DUTY_CYCLE = 0.4;
     public static final UnaryOperator<SmartMotorControllerConfig> APPLY_SMC_CONFIG = (SmartMotorControllerConfig config) -> {
       return config.withControlMode(ControlMode.CLOSED_LOOP)
                    .withClosedLoopController(1, 0, 0)
@@ -102,6 +102,8 @@ public final class Constants {
   public static class ArmConstants {
     public static final int LEFT_MOTOR_ID = 20;
     public static final int RIGHT_MOTOR_ID = 21;
+    public static final double ARM_UP_ANGLE = 135.0;
+    public static final double ARM_DOWN_ANGLE = 0;
     public static final UnaryOperator<SmartMotorControllerConfig> APPLY_SMC_CONFIG = (SmartMotorControllerConfig config) -> {
       return config.withControlMode(ControlMode.CLOSED_LOOP)
                    .withClosedLoopController(50, 0, 0, DegreesPerSecond.of(90), DegreesPerSecondPerSecond.of(45))
@@ -117,8 +119,8 @@ public final class Constants {
                    .withOpenLoopRampRate(Seconds.of(0.25));
     };
     public static final UnaryOperator<ArmConfig> APPLY_ARM_CONFIG = (ArmConfig config) -> {
-      return config.withSoftLimits(Degrees.of(-10), Degrees.of(125))
-                   .withHardLimit(Degrees.of(-10), Degrees.of(125))
+      return config.withSoftLimits(Degrees.of(ARM_DOWN_ANGLE), Degrees.of(ARM_UP_ANGLE))
+                   .withHardLimit(Degrees.of(ARM_DOWN_ANGLE), Degrees.of(ARM_UP_ANGLE))
                    .withStartingPosition(Degrees.of(-5))
                    .withLength(Inches.of(15.81))
                    .withMass(Pounds.of(2))
