@@ -9,8 +9,10 @@ import static edu.wpi.first.units.Units.Degrees;
 import static edu.wpi.first.units.Units.DegreesPerSecond;
 import static edu.wpi.first.units.Units.DegreesPerSecondPerSecond;
 import static edu.wpi.first.units.Units.Inches;
+import static edu.wpi.first.units.Units.MetersPerSecondPerSecond;
 import static edu.wpi.first.units.Units.Pounds;
 import static edu.wpi.first.units.Units.RPM;
+import static edu.wpi.first.units.Units.RotationsPerSecondPerSecond;
 import static edu.wpi.first.units.Units.Seconds;
 
 import java.util.function.UnaryOperator;
@@ -47,13 +49,15 @@ public final class Constants {
     public static final Matter CHASSIS    = new Matter(new Translation3d(0, 0, Units.inchesToMeters(8)), ROBOT_MASS);
     public static final double LOOP_TIME  = 0.13; //s, 20ms + 110ms sprk max velocity lag
     public static final double MAX_SPEED  = Units.feetToMeters(14.5);
-    public static final double SHOOT_WHILE_MOVING_SPEED  = Units.feetToMeters(7);
     public static final double MAX_SPIN_SPEED_RADIANS_PER_SECOND = 4 * Math.PI;
     public static final double MAX_SPIN_ACCEL = 8 * Math.PI;
     public static final double WHEEL_LOCK_TIME = 10; //seconds
 
+    public static final double LOOKAHEAD = 0.1;
+    public static final double SHOOT_WHILE_MOVING_SPEED  = Units.feetToMeters(10);
+    public static final double SHOOT_WHILE_MOVE_ACCEL_LIMIT = 10;
     public static final ProfiledPIDController HEADING_CONTROLLER = new ProfiledPIDController(Math.PI,0,0.1,new Constraints(MAX_SPIN_SPEED_RADIANS_PER_SECOND, MAX_SPIN_ACCEL));
-    public static final ProfiledPIDController SHOOT_WHILE_MOVE_HEADING_CONTROLLER = new ProfiledPIDController(15,0,0,new Constraints(MAX_SPIN_SPEED_RADIANS_PER_SECOND, MAX_SPIN_ACCEL));
+    public static final ProfiledPIDController SHOOT_WHILE_MOVE_HEADING_CONTROLLER = new ProfiledPIDController(25,0,0,new Constraints(MAX_SPIN_SPEED_RADIANS_PER_SECOND, MAX_SPIN_ACCEL));
   }
 
   public static class OperatorConstants {
@@ -69,30 +73,28 @@ public final class Constants {
     public static final UnaryOperator<SmartMotorControllerConfig> APPLY_SMC_CONFIG = (SmartMotorControllerConfig config) -> {
       return config.withControlMode(ControlMode.CLOSED_LOOP)
                    .withClosedLoopController(1, 0, 0)
-                   .withSimClosedLoopController(50, 0, 0)
+                   .withSimClosedLoopController(1, 0, 0)
                    .withFeedforward(new SimpleMotorFeedforward(0, 0, 0))
                    .withSimFeedforward(new SimpleMotorFeedforward(0, 0, 0))
                    .withTelemetry("ShooterMotor", TelemetryVerbosity.HIGH)
-                   .withGearing(new MechanismGearing(GearBox.fromReductionStages(3, 4)))
+                   .withGearing(new MechanismGearing(GearBox.fromReductionStages(1)))
                    .withMotorInverted(false)
                    .withIdleMode(MotorMode.COAST)
                    .withStatorCurrentLimit(Amps.of(40));
     };
     public static final UnaryOperator<FlyWheelConfig> APPLY_FLYWHEEL_CONFIG = (FlyWheelConfig config) -> {
       return config.withDiameter(Inches.of(4))
-                   .withMass(Pounds.of(1))
+                   .withMass(Pounds.of(2.5))
                    .withUpperSoftLimit(RPM.of(1000))
                    .withTelemetry("ShooterMech", TelemetryVerbosity.HIGH);
     };
 
     // Aiming math
     public static final double PITCH = 1.2217304764;
-    public static final double LOOKAHEAD = 0.25;
+    public static final double LOOKAHEAD = 0.1;
     public static final double SHOTS_PER_SECOND = 2;
-    public static final double SHOT_SPEED_CONVERSION_FACTOR = 30;
+    public static final double SHOT_SPEED_CONVERSION_FACTOR = 187.978279242;
     public static final Vector3 SHOOTER_POSITION = new Vector3(0.2,0,0.4);
-    public static final double MAX_SHOT_SPEED = 20;
-    public static final double MIN_SHOOT_SPEED = 1;
     public static final int SEARCH_DEPTH = 5;
     public static final double GRAVITY = 9.81;
   }

@@ -2,7 +2,10 @@ package frc.robot.math;
 
 import java.math.BigDecimal;
 
-public class Vector3 {
+import edu.wpi.first.util.sendable.Sendable;
+import edu.wpi.first.util.sendable.SendableBuilder;
+
+public class Vector3 implements Sendable {
   public double x;
   public double y;
   public double z;
@@ -11,6 +14,14 @@ public class Vector3 {
     x = inputX;
     y = inputY;
     z = inputZ;
+  }
+
+  @Override
+  public void initSendable(SendableBuilder builder) {
+    builder.setSmartDashboardType("Vector3");
+    builder.addDoubleProperty("x", () -> x, (double input) -> x = input);
+    builder.addDoubleProperty("y", () -> y, (double input) -> y = input);
+    builder.addDoubleProperty("z", () -> z, (double input) -> z = input);
   }
   
   public static Vector3 origin() {
@@ -28,6 +39,10 @@ public class Vector3 {
   public static Vector3 scale(Vector3 vector, double scalar) {
     return new Vector3(vector.x*scalar, vector.y*scalar, vector.z*scalar);
   }
+
+  public static Vector3 normalize(Vector3 vector) {
+    return scale(vector, 1/vector.length());
+  }
   
   public static Vector3 rotate(Vector3 point, Vector3 pivot, double angle) {
     double x = pivot.x + (pivot.x-point.x)*Math.cos(angle) - (pivot.y-point.y)*Math.sin(angle);
@@ -43,16 +58,16 @@ public class Vector3 {
     return Math.acos(dotProduct(vector1, vector2) / (vector1.length() * vector2.length()));
   }
 
-  public double getAngle() {
-    return getAngle(new Vector3(1,0,0),this);
+  public static double getAngle(Vector3 vector) {
+    return getAngle(new Vector3(1,0,0),vector);
   }
   
-  public double getCounterclockwiseAngle() {
-    if (y < 0) {
-      return 2*Math.PI-getAngle();
+  public static double getCounterclockwiseAngle(Vector3 vector) {
+    if (vector.y < 0) {
+      return 2*Math.PI-getAngle(vector);
     }
     else {
-      return getAngle();
+      return getAngle(vector);
     }
   }
   

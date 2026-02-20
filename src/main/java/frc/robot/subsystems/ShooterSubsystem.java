@@ -9,6 +9,8 @@ import static edu.wpi.first.units.Units.Second;
 import static edu.wpi.first.units.Units.Seconds;
 import static edu.wpi.first.units.Units.Volts;
 
+import java.util.function.Supplier;
+
 import com.revrobotics.spark.SparkLowLevel.MotorType;
 import com.revrobotics.spark.SparkMax;
 
@@ -49,33 +51,15 @@ public class ShooterSubsystem extends SubsystemBase {
      * @param speed Speed to set.
      * @return {@link edu.wpi.first.wpilibj2.command.RunCommand}
      */
-    public Command setVelocity(AngularVelocity speed) {return shooter.setSpeed(speed);}
-
-    /**
-     * Set the shooter velocity to the high value.
-     * 
-     * @return {@link edu.wpi.first.wpilibj2.command.RunCommand}
-     */
-    public Command setHighVelocity() {
-      return setVelocity(RPM.of(ShooterConstants.SHOOTER_HIGH_SPEED));
-    }
-
-    /**
-     * Set the shooter velocity to the low value.
-     * 
-     * @return {@link edu.wpi.first.wpilibj2.command.RunCommand}
-     */
-    public Command setLowVelocity() {
-      return setVelocity(RPM.of(ShooterConstants.SHOOTER_LOW_SPEED));
-    }
+    public Command setVelocity(Supplier<AngularVelocity> speed) {return shooter.setSpeed(speed);}
 
     /**
      * Sets the shooter velocity to zero.
      * 
      * @return {@link edu.wpi.first.wpilibj2.command.runCommand}
      */
-    public Command setZeroVelocity() {
-      return setVelocity(RPM.of(0));
+    public Command stop() {
+      return setVelocity(() -> RPM.of(0));
     }
 
     /**
