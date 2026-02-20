@@ -106,7 +106,6 @@ public class RobotContainer {
     SmartDashboard.putData("Auto Chooser", autoChooser);
 
     shooter.setDefaultCommand(shooter.stop());
-    arm.setDefaultCommand(arm.setAngle(Degrees.of(0)));
     intake.setDefaultCommand(intake.stop());
   }
 
@@ -168,13 +167,13 @@ public class RobotContainer {
     // operatorController.rightTrigger().whileTrue(shooter.setHigh()).onFalse(shooter.setZero());
 
     
-    operatorController.rightBumper().whileTrue(arm.setAngle(ArmConstants.DOWN_ANGLE)).onFalse(arm.setAngle(ArmConstants.UP_ANGLE));
+    operatorController.rightBumper().whileTrue(arm.setAngle(ArmConstants.BOTTOM_ANGLE)).onFalse(arm.setAngle(ArmConstants.ZERO_ANGLE));
     operatorController.rightBumper().whileTrue(intake.set(1.)).onFalse(intake.stop());
     
     operatorController.leftTrigger().whileTrue(indexer.set(1.)).onFalse(indexer.stop());
     operatorController.rightTrigger().whileTrue(shooter.setHigh()).onFalse(shooter.setZero());
 
-    operatorController.leftBumper().whileTrue(intake.set(-1)).onFalse(intake.stop());
+    operatorController.leftBumper().whileTrue(intake.set(-1).alongWith(arm.setAngle(ArmConstants.ZERO_ANGLE))).onFalse(intake.stop());
   }
 
   /**

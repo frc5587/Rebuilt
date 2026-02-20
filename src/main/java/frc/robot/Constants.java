@@ -101,8 +101,9 @@ public final class Constants {
   public static class ArmConstants {
     public static final int LEFT_MOTOR_ID = 20;
     public static final int RIGHT_MOTOR_ID = 21;
-    public static final Angle UP_ANGLE = Degrees.of(98.);
-    public static final Angle DOWN_ANGLE = Degrees.of(-10.);
+    public static final Angle TOP_ANGLE = Degrees.of(98.);
+    public static final Angle BOTTOM_ANGLE = Degrees.of(-10.);
+    public static final Angle ZERO_ANGLE = Degrees.of(0);
     public static final UnaryOperator<SmartMotorControllerConfig> APPLY_SMC_CONFIG = (SmartMotorControllerConfig config) -> {
       return config.withControlMode(ControlMode.CLOSED_LOOP)
                    .withClosedLoopController(50, 0, 0, DegreesPerSecond.of(90), DegreesPerSecondPerSecond.of(45))
@@ -118,13 +119,13 @@ public final class Constants {
                    .withOpenLoopRampRate(Seconds.of(0.25));
     };
     public static final UnaryOperator<ArmConfig> APPLY_ARM_CONFIG = (ArmConfig config) -> {
-      return config.withSoftLimits(DOWN_ANGLE,UP_ANGLE)
-                   .withHardLimit(DOWN_ANGLE,UP_ANGLE)
+      return config.withSoftLimits(BOTTOM_ANGLE,TOP_ANGLE)
+                   .withHardLimit(BOTTOM_ANGLE,TOP_ANGLE)
                    .withStartingPosition(Degrees.of(-5))
                    .withLength(Inches.of(15.81))
                    .withMass(Pounds.of(2))
                    .withTelemetry("Arm", TelemetryVerbosity.HIGH)
-                   .withStartingPosition(UP_ANGLE);
+                   .withStartingPosition(TOP_ANGLE);
     };
   }
 
