@@ -9,10 +9,8 @@ import static edu.wpi.first.units.Units.Degrees;
 import static edu.wpi.first.units.Units.DegreesPerSecond;
 import static edu.wpi.first.units.Units.DegreesPerSecondPerSecond;
 import static edu.wpi.first.units.Units.Inches;
-import static edu.wpi.first.units.Units.MetersPerSecondPerSecond;
 import static edu.wpi.first.units.Units.Pounds;
 import static edu.wpi.first.units.Units.RPM;
-import static edu.wpi.first.units.Units.RotationsPerSecondPerSecond;
 import static edu.wpi.first.units.Units.Seconds;
 
 import java.util.function.UnaryOperator;
@@ -23,6 +21,7 @@ import edu.wpi.first.math.controller.SimpleMotorFeedforward;
 import edu.wpi.first.math.geometry.Translation3d;
 import edu.wpi.first.math.trajectory.TrapezoidProfile.Constraints;
 import edu.wpi.first.math.util.Units;
+import edu.wpi.first.units.measure.Angle;
 import frc.robot.math.Vector3;
 import swervelib.math.Matter;
 import yams.gearing.GearBox;
@@ -102,8 +101,8 @@ public final class Constants {
   public static class ArmConstants {
     public static final int LEFT_MOTOR_ID = 20;
     public static final int RIGHT_MOTOR_ID = 21;
-    public static final double ARM_UP_ANGLE = 135.0;
-    public static final double ARM_DOWN_ANGLE = 0;
+    public static final Angle UP_ANGLE = Degrees.of(98.);
+    public static final Angle DOWN_ANGLE = Degrees.of(-10.);
     public static final UnaryOperator<SmartMotorControllerConfig> APPLY_SMC_CONFIG = (SmartMotorControllerConfig config) -> {
       return config.withControlMode(ControlMode.CLOSED_LOOP)
                    .withClosedLoopController(50, 0, 0, DegreesPerSecond.of(90), DegreesPerSecondPerSecond.of(45))
@@ -119,12 +118,13 @@ public final class Constants {
                    .withOpenLoopRampRate(Seconds.of(0.25));
     };
     public static final UnaryOperator<ArmConfig> APPLY_ARM_CONFIG = (ArmConfig config) -> {
-      return config.withSoftLimits(Degrees.of(ARM_DOWN_ANGLE), Degrees.of(ARM_UP_ANGLE))
-                   .withHardLimit(Degrees.of(ARM_DOWN_ANGLE), Degrees.of(ARM_UP_ANGLE))
+      return config.withSoftLimits(DOWN_ANGLE,UP_ANGLE)
+                   .withHardLimit(DOWN_ANGLE,UP_ANGLE)
                    .withStartingPosition(Degrees.of(-5))
                    .withLength(Inches.of(15.81))
                    .withMass(Pounds.of(2))
-                   .withTelemetry("Arm", TelemetryVerbosity.HIGH);
+                   .withTelemetry("Arm", TelemetryVerbosity.HIGH)
+                   .withStartingPosition(UP_ANGLE);
     };
   }
 

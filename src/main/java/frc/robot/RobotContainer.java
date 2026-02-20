@@ -168,10 +168,10 @@ public class RobotContainer {
     // operatorController.rightTrigger().whileTrue(shooter.setHigh()).onFalse(shooter.setZero());
 
     
-    operatorController.rightBumper().whileTrue(arm.setAngle(Degrees.of(ArmConstants.ARM_DOWN_ANGLE))).onFalse(arm.setAngle(Degrees.of(ArmConstants.ARM_UP_ANGLE)));
-    operatorController.rightBumper().whileTrue(intake.set(1)).onFalse(intake.stop());
+    operatorController.rightBumper().whileTrue(arm.setAngle(ArmConstants.DOWN_ANGLE)).onFalse(arm.setAngle(ArmConstants.UP_ANGLE));
+    operatorController.rightBumper().whileTrue(intake.set(1.)).onFalse(intake.stop());
     
-    operatorController.leftTrigger().whileTrue(indexer.set(1)).onFalse(indexer.stop());
+    operatorController.leftTrigger().whileTrue(indexer.set(1.)).onFalse(indexer.stop());
     operatorController.rightTrigger().whileTrue(shooter.setHigh()).onFalse(shooter.setZero());
 
     operatorController.leftBumper().whileTrue(intake.set(-1)).onFalse(intake.stop());
