@@ -6,6 +6,7 @@ package frc.robot;
 
 import com.ctre.phoenix6.swerve.SwerveModule.DriveRequestType;
 
+import frc.robot.Constants.ArmConstants;
 import frc.robot.Constants.DrivebaseConstants;
 import frc.robot.Constants.ShooterConstants;
 import frc.robot.math.AimingMath;
@@ -166,10 +167,14 @@ public class RobotContainer {
     // operatorController.leftTrigger().whileTrue(shooter.setLow()).onFalse(shooter.setZero());
     // operatorController.rightTrigger().whileTrue(shooter.setHigh()).onFalse(shooter.setZero());
 
-    operatorController.rightBumper().whileTrue(arm.setAngle(Degrees.of(-10)));
+    
+    operatorController.rightBumper().whileTrue(arm.setAngle(Degrees.of(ArmConstants.ARM_DOWN_ANGLE))).onFalse(arm.setAngle(Degrees.of(ArmConstants.ARM_UP_ANGLE)));
     operatorController.rightBumper().whileTrue(intake.set(1)).onFalse(intake.stop());
+    
+    operatorController.leftTrigger().whileTrue(indexer.set(1)).onFalse(indexer.stop());
+    operatorController.rightTrigger().whileTrue(shooter.setHigh()).onFalse(shooter.setZero());
+
     operatorController.leftBumper().whileTrue(intake.set(-1)).onFalse(intake.stop());
-    operatorController.rightTrigger().whileTrue(indexer.set(1)).onFalse(indexer.stop());
   }
 
   /**
