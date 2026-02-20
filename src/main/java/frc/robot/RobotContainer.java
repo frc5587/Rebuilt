@@ -30,6 +30,7 @@ import edu.wpi.first.math.geometry.Pose2d;
 import edu.wpi.first.math.geometry.Rotation2d;
 import edu.wpi.first.math.kinematics.ChassisSpeeds;
 import edu.wpi.first.wpilibj.DriverStation;
+import edu.wpi.first.wpilibj.Timer;
 import edu.wpi.first.wpilibj.smartdashboard.SendableChooser;
 import edu.wpi.first.wpilibj.smartdashboard.SmartDashboard;
 
@@ -60,23 +61,31 @@ public class RobotContainer {
       .withDriveRequestType(DriveRequestType.OpenLoopVoltage)
       .withHeadingPID(DrivebaseConstants.SHOOT_WHILE_MOVE_HEADING_CONTROLLER.getP(), DrivebaseConstants.SHOOT_WHILE_MOVE_HEADING_CONTROLLER.getI(), DrivebaseConstants.SHOOT_WHILE_MOVE_HEADING_CONTROLLER.getD());
   private final SwerveRequest.SwerveDriveBrake brake = new SwerveRequest.SwerveDriveBrake();
-  
+
+  // Replace with CommandPS4Controller or CommandJoystick if needed
+  private final CommandXboxController driverController = new CommandXboxController(0);
+  private final CommandXboxController operatorController = new CommandXboxController(1);
+
+  private Vector3 shootWhileMovingVelocity = Vector3.origin();
+  private Vector3 shootWhileMovingCalculationVelocity = Vector3.origin();
+
   // Aiming math
-  Supplier<Vector3> velocity = () -> {
-    ChassisSpeeds velocity = drivebase.getState().Speeds;
-    return new Vector3(velocity.vxMetersPerSecond, velocity.vyMetersPerSecond, 0);
-  };
-  DoubleSupplier angularVelocity = () -> 0.;
   Supplier<Vector3> position = () -> {
     Pose2d position = drivebase.getState().Pose;
     return new Vector3(position.getX(), position.getY(), 0);
   };
   DoubleSupplier heading = () -> drivebase.getState().RawHeading.getRadians();
-  AimingMath aimingMath = new AimingMath(velocity, angularVelocity, position, heading, new Vector3(4.625626,4.0346315,1.8288));
-
-  // Replace with CommandPS4Controller or CommandJoystick if needed
-  private final CommandXboxController driverController = new CommandXboxController(0);
-  private final CommandXboxController operatorController = new CommandXboxController(1);
+  Supplier<Vector3> velocity = () -> {
+    ChassisSpeeds velocity = drivebase.getState().Speeds;
+    velocity = ChassisSpeeds.fromRobotRelativeSpeeds(velocity, drivebase.getState().Pose.getRotation());
+    return new Vector3(velocity.vxMetersPerSecond, velocity.vyMetersPerSecond, 0);
+  };
+  DoubleSupplier angularVelocity = () -> drivebase.getState().Speeds.omegaRadiansPerSecond;
+  Supplier<Vector3> inputVelocity = () -> {
+    return shootWhileMovingCalculationVelocity;
+  };
+  DoubleSupplier inputAngularVelocity = () -> 0.;
+  AimingMath aimingMath = new AimingMath(position, heading, velocity, angularVelocity, inputVelocity, inputAngularVelocity, () -> shooter.getVelocity().in(RPM), new Vector3(4.625626,4.0346315,1.8288));
 
   private final SendableChooser<Command> autoChooser;
 
@@ -95,7 +104,7 @@ public class RobotContainer {
     //Put the autoChooser on the SmartDashboard
     SmartDashboard.putData("Auto Chooser", autoChooser);
 
-    shooter.setDefaultCommand(shooter.set(0));
+    shooter.setDefaultCommand(shooter.stop());
     arm.setDefaultCommand(arm.setAngle(Degrees.of(0)));
     intake.setDefaultCommand(intake.stop());
   }
@@ -126,15 +135,30 @@ public class RobotContainer {
     driverController.rightTrigger().onTrue(Commands.runOnce(aimingMath::resetSim));
 
     // Shoot while move
-    driverController.x().whileTrue(drivebase.applyRequest(() -> driveFacingAngle.withVelocityX(-driverController.getLeftY() * DrivebaseConstants.SHOOT_WHILE_MOVING_SPEED)
-                                                                                .withVelocityY(-driverController.getLeftX() * DrivebaseConstants.SHOOT_WHILE_MOVING_SPEED)
-                                                                                .withTargetDirection(Rotation2d.fromRadians(aimingMath.getIdealHeading(aimingMath.getIdealShotSpeed(ShooterConstants.LOOKAHEAD),ShooterConstants.LOOKAHEAD))))
-                                   .alongWith(shooter.setVelocity(RPM.of(aimingMath.getIdealShotSpeed()*ShooterConstants.SHOT_SPEED_CONVERSION_FACTOR)))
-                                   .alongWith(Commands.run(() -> aimingMath.isShooting = false)))
-                       .onFalse(Commands.runOnce(() -> {aimingMath.isShooting = false;})
-                                .alongWith(shooter.setVelocity(RPM.of(0.))));
-    SmartDashboard.putData(DrivebaseConstants.SHOOT_WHILE_MOVE_HEADING_CONTROLLER);
-    driverController.b().whileTrue(shooter.setVelocity(RPM.of(300)));
+    driverController.x().onTrue(Commands.runOnce(() -> {
+                            shootWhileMovingVelocity = Vector3.origin();
+                        }))
+                        .whileTrue(drivebase.applyRequest(() -> driveFacingAngle.withVelocityX(shootWhileMovingVelocity.x)
+                                                                                .withVelocityY(shootWhileMovingVelocity.y)
+                                                                                .withTargetDirection(Rotation2d.fromRadians(aimingMath.getIdealHeading(aimingMath.getIdealShotSpeed(DrivebaseConstants.LOOKAHEAD),DrivebaseConstants.LOOKAHEAD))))
+                                   .alongWith(shooter.setVelocity(() -> RPM.of(aimingMath.getIdealShotSpeed(ShooterConstants.LOOKAHEAD)*ShooterConstants.SHOT_SPEED_CONVERSION_FACTOR)))
+                                   .alongWith(Commands.run(() -> {
+                                       aimingMath.isShooting = false;
+                                       Vector3 difference = Vector3.subtract(new Vector3(-driverController.getLeftY()*DrivebaseConstants.SHOOT_WHILE_MOVING_SPEED, 
+                                                                                         -driverController.getLeftX()*DrivebaseConstants.SHOOT_WHILE_MOVING_SPEED, 0),
+                                                                             shootWhileMovingVelocity);
+                                       if (difference.length() < 50.) {
+                                         shootWhileMovingCalculationVelocity = Vector3.add(shootWhileMovingVelocity, difference);
+                                       }
+                                       else {
+                                         shootWhileMovingCalculationVelocity = Vector3.add(shootWhileMovingVelocity, Vector3.scale(Vector3.normalize(difference), 50.));
+                                       }
+                                       shootWhileMovingVelocity = Vector3.add(shootWhileMovingVelocity, Vector3.scale(Vector3.normalize(difference), 
+                                                                                                                      0.02*DrivebaseConstants.SHOOT_WHILE_MOVE_ACCEL_LIMIT));
+                                   })))
+                        .onFalse(Commands.runOnce(() -> {aimingMath.isShooting = false;})
+                                 .alongWith(shooter.stop()));
+    driverController.b().whileTrue(shooter.setVelocity(() -> RPM.of(Timer.getFPGATimestamp()*10)));
 
     // Shooter sim stuff
     // operatorController.leftBumper().whileTrue(shooter.setLowVelocity()).onFalse(shooter.setZeroVelocity());
