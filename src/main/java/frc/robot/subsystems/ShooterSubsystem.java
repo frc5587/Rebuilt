@@ -14,12 +14,16 @@ import java.util.function.Supplier;
 import com.revrobotics.spark.SparkLowLevel.MotorType;
 import com.revrobotics.spark.SparkMax;
 
+import edu.wpi.first.math.geometry.Pose3d;
 import edu.wpi.first.math.system.plant.DCMotor;
+import edu.wpi.first.networktables.NetworkTableInstance;
+import edu.wpi.first.networktables.StructArrayPublisher;
 import edu.wpi.first.units.measure.AngularVelocity;
 import edu.wpi.first.wpilibj.smartdashboard.SmartDashboard;
 import edu.wpi.first.wpilibj2.command.Command;
 import edu.wpi.first.wpilibj2.command.SubsystemBase;
 import frc.robot.Constants.ShooterConstants;
+import swervelib.simulation.ironmaple.simulation.SimulatedArena;
 import yams.mechanisms.config.FlyWheelConfig;
 import yams.mechanisms.velocity.FlyWheel;
 import yams.motorcontrollers.SmartMotorController;
@@ -29,14 +33,14 @@ import yams.motorcontrollers.local.SparkWrapper;
 
 public class ShooterSubsystem extends SubsystemBase {
     private SmartMotorControllerConfig smcConfig = ShooterConstants.APPLY_SMC_CONFIG.apply(new SmartMotorControllerConfig(this));
-
     private SparkMax spark = new SparkMax(ShooterConstants.FLYWHEEL_ID, MotorType.kBrushless);
-
     private SmartMotorController sparkSmartMotorController = new SparkWrapper(spark, DCMotor.getNEO(1), smcConfig);
-
     private final FlyWheelConfig shooterConfig = ShooterConstants.APPLY_FLYWHEEL_CONFIG.apply(new FlyWheelConfig(sparkSmartMotorController));
-
     private FlyWheel shooter = new FlyWheel(shooterConfig);
+
+    private StructArrayPublisher<Pose3d> fuelPosePublisher = NetworkTableInstance.getDefault()
+      .getStructArrayTopic("MyPoseArray", Pose3d.struct)
+      .publish();
 
     /**
      * Gets the current velocity of the shooter.
@@ -119,6 +123,10 @@ public class ShooterSubsystem extends SubsystemBase {
     // catch(Exception e) {
     //   SmartDashboard.putNumber("flywheel setpoint", 0.);
     // }
+
+    Pose3d[] fuelPoses = SimulatedArena.getInstance()
+            .getGamePiecesArrayByType("Fuel");
+    fuelPosePublisher.accept(fuelPoses);
   }
 
   @Override

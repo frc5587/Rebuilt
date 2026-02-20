@@ -3,18 +3,15 @@ package frc.robot.math;
 import java.util.function.Supplier;
 
 import edu.wpi.first.math.geometry.Pose2d;
-import edu.wpi.first.math.geometry.Pose3d;
 import edu.wpi.first.math.geometry.Rotation2d;
 import edu.wpi.first.math.geometry.Translation2d;
 import edu.wpi.first.math.kinematics.ChassisSpeeds;
 import edu.wpi.first.networktables.NetworkTableInstance;
-import edu.wpi.first.networktables.StructArrayPublisher;
 import edu.wpi.first.networktables.StructPublisher;
 import edu.wpi.first.units.Units;
 import edu.wpi.first.units.measure.Angle;
 import edu.wpi.first.wpilibj.Timer;
 import edu.wpi.first.wpilibj.smartdashboard.SmartDashboard;
-import edu.wpi.first.wpilibj2.command.SubsystemBase;
 import frc.robot.Constants;
 import frc.robot.Constants.DrivebaseConstants;
 import frc.robot.Constants.ShooterConstants;
@@ -30,7 +27,7 @@ import static edu.wpi.first.units.Units.MetersPerSecond;
 import java.math.BigDecimal;
 import java.util.ArrayList;
 
-public class AimingMath extends SubsystemBase {
+public class AimingMath {
   private final Supplier<Vector3> robotPosition;
   private final DoubleSupplier headingRadians;
   private final Supplier<Vector3> robotVelocity;
@@ -49,12 +46,6 @@ public class AimingMath extends SubsystemBase {
   private ArrayList<Double> headings = new ArrayList<Double>();
   private ArrayList<Vector3> velocities = new ArrayList<Vector3>();
   private ArrayList<Double> angularVelocities = new ArrayList<Double>();
-
-  public boolean isShooting = false;
-  private ArrayList<Double> shotTimes = new ArrayList<Double>();
-  private StructArrayPublisher<Pose3d> fuelPosePublisher = NetworkTableInstance.getDefault()
-      .getStructArrayTopic("MyPoseArray", Pose3d.struct)
-      .publish();
 
   Function<String,StructPublisher<Pose2d>> publisher = (String name) -> NetworkTableInstance.getDefault()
                                                                                             .getStructTopic("aiming debug/"+name, Pose2d.struct).publish();
@@ -80,7 +71,6 @@ public class AimingMath extends SubsystemBase {
     flywheelRPM = _flywheelRPM;
 
     times.add(0.);
-    shotTimes.add(0.);
 
     SmartDashboard.putString("SimResults", simLog);
   }
@@ -183,28 +173,7 @@ public class AimingMath extends SubsystemBase {
                       Angle.ofRelativeUnits(ShooterConstants.PITCH,Units.Radian)));
   }
 
-  @Override
-  public void periodic() {
-    if (times.get(times.size()-1) < Timer.getFPGATimestamp() - 0.07) {
-      double shotSpeed = flywheelRPM.getAsDouble() / ShooterConstants.SHOT_SPEED_CONVERSION_FACTOR;
-      double angle = 0;
-      
-      times.add(Timer.getFPGATimestamp());
-      shotSpeeds.add(shotSpeed);
-      angles.add(angle);
-      positions.add(robotPosition.get());
-      headings.add(headingRadians.getAsDouble());
-      velocities.add(robotVelocity.get());
-      angularVelocities.add(angularVelocityRadians.getAsDouble());
-    }
-
-    if (isShooting  &&  shotTimes.get(shotTimes.size()-1) < Timer.getFPGATimestamp() - 1/ShooterConstants.SHOTS_PER_SECOND) {
-      double shotSpeed = flywheelRPM.getAsDouble() / ShooterConstants.SHOT_SPEED_CONVERSION_FACTOR;
-      shoot(shotSpeed);
-
-      shotTimes.add(Timer.getFPGATimestamp());
-    }
-
+  public void logAdvantagescopeStuff() {
     idealPosePublisher.accept(new Pose2d(new Translation2d(robotPosition.get().x, robotPosition.get().y), Rotation2d.fromRadians(getIdealHeading())));
     futurePosePublisher.accept(new Pose2d(new Translation2d(robotPosition.get().x + DrivebaseConstants.LOOKAHEAD*robotVelocity.get().x, 
                                                                              robotPosition.get().y + DrivebaseConstants.LOOKAHEAD*robotVelocity.get().y),
@@ -212,11 +181,6 @@ public class AimingMath extends SubsystemBase {
     SmartDashboard.putNumber("ideal heading", getIdealHeading());
     SmartDashboard.putString("SimResults", simLog);
     SmartDashboard.putNumber("ideal RPM", getIdealShotSpeed() * ShooterConstants.SHOT_SPEED_CONVERSION_FACTOR);
-
-    // Get the positions of the fuel (both on the field and in the air)
-      Pose3d[] fuelPoses = SimulatedArena.getInstance()
-            .getGamePiecesArrayByType("Fuel");
-      fuelPosePublisher.accept(fuelPoses);
   }
 
   public void resetSim() {
@@ -237,6 +201,19 @@ public class AimingMath extends SubsystemBase {
     angularVelocities.add(0.);
   }
   
+  public void addSimSnapshot() {
+    double shotSpeed = flywheelRPM.getAsDouble() / ShooterConstants.SHOT_SPEED_CONVERSION_FACTOR;
+    double angle = 0;
+      
+    times.add(Timer.getFPGATimestamp());
+    shotSpeeds.add(shotSpeed);
+    angles.add(angle);
+    positions.add(robotPosition.get());
+    headings.add(headingRadians.getAsDouble());
+    velocities.add(robotVelocity.get());
+    angularVelocities.add(angularVelocityRadians.getAsDouble());
+  }
+
   public void logSim() {
     simLog = "";
     simLog += parseList("t_list",times,(Double item) -> BigDecimal.valueOf(item).toPlainString());

@@ -92,6 +92,7 @@ public final class Constants {
     public static final double PITCH = 1.2217304764;
     public static final double LOOKAHEAD = 0.1;
     public static final double SHOTS_PER_SECOND = 2;
+    public static final double TIME_BETWEEN_LOG_TIMESTAMPS = 0.055;
     public static final double SHOT_SPEED_CONVERSION_FACTOR = 187.978279242;
     public static final Vector3 SHOOTER_POSITION = new Vector3(0.2,0,0.4);
     public static final int SEARCH_DEPTH = 5;
