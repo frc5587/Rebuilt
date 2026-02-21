@@ -6,8 +6,6 @@ package frc.robot;
 
 import static edu.wpi.first.units.Units.Amps;
 import static edu.wpi.first.units.Units.Degrees;
-import static edu.wpi.first.units.Units.DegreesPerSecond;
-import static edu.wpi.first.units.Units.DegreesPerSecondPerSecond;
 import static edu.wpi.first.units.Units.Inches;
 import static edu.wpi.first.units.Units.Pounds;
 import static edu.wpi.first.units.Units.RPM;
@@ -108,12 +106,12 @@ public final class Constants {
     public static final Angle ZERO_ANGLE = Degrees.of(0);
     public static final UnaryOperator<SmartMotorControllerConfig> APPLY_SMC_CONFIG = (SmartMotorControllerConfig config) -> {
       return config.withControlMode(ControlMode.CLOSED_LOOP)
-                   .withClosedLoopController(50, 0, 0, DegreesPerSecond.of(90), DegreesPerSecondPerSecond.of(45))
-                   .withSimClosedLoopController(50, 0, 0, DegreesPerSecond.of(90), DegreesPerSecondPerSecond.of(45))
+                   .withClosedLoopController(5, 0, 0)
+                   .withSimClosedLoopController(1, 0, 0)
                    .withFeedforward(new ArmFeedforward(0, 0, 0))
                    .withSimFeedforward(new ArmFeedforward(0, 0, 0))
                    .withTelemetry("ArmMotor", TelemetryVerbosity.HIGH)
-                   .withGearing(new MechanismGearing(GearBox.fromReductionStages(3,5))) //Can also use .withGearing(ratio)
+                   .withGearing(new MechanismGearing(GearBox.fromReductionStages(3,5)))
                    .withMotorInverted(false)
                    .withIdleMode(MotorMode.BRAKE)
                    .withStatorCurrentLimit(Amps.of(20))
@@ -123,7 +121,6 @@ public final class Constants {
     public static final UnaryOperator<ArmConfig> APPLY_ARM_CONFIG = (ArmConfig config) -> {
       return config.withSoftLimits(BOTTOM_ANGLE,TOP_ANGLE)
                    .withHardLimit(BOTTOM_ANGLE,TOP_ANGLE)
-                   .withStartingPosition(Degrees.of(-5))
                    .withLength(Inches.of(15.81))
                    .withMass(Pounds.of(2))
                    .withTelemetry("Arm", TelemetryVerbosity.HIGH)

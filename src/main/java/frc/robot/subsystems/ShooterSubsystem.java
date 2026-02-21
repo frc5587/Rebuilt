@@ -75,15 +75,6 @@ public class ShooterSubsystem extends SubsystemBase {
   public Command set(double dutyCycle) {return shooter.set(dutyCycle);}
 
   /**
-   * Set the dutycycle of the shooter to zero.
-   * 
-   * @return {@link edu.wpi.first.wpilibj2.command.RunCommand}
-   */
-  public Command setZero() {
-    return set(0);
-  }
-
-  /**
    * Run sysId on the {@link Shooter}
    */
   public Command sysID() {

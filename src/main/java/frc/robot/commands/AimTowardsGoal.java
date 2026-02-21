@@ -64,7 +64,7 @@ public class AimTowardsGoal extends Command {
   @Override
   public void initialize() {
     shootWhileMovingVelocity = Vector3.origin();
-    shooter.setZero();
+    shooter.set(0.);
   }
 
   @Override

@@ -68,6 +68,11 @@ public class RobotContainer {
 
   /** The container for the robot. Contains subsystems, OI devices, and commands. */
   public RobotContainer() {
+    shooter.setDefaultCommand(shooter.set(0.));
+    indexer.setDefaultCommand(indexer.stop());
+    intake.setDefaultCommand(intake.stop());
+    arm.setDefaultCommand(arm.setAngle(ArmConstants.TOP_ANGLE));
+
     // Configure the trigger bindings
     configureBindings();
     DriverStation.silenceJoystickConnectionWarning(true);
@@ -80,9 +85,6 @@ public class RobotContainer {
 
     //Put the autoChooser on the SmartDashboard
     SmartDashboard.putData("Auto Chooser", autoChooser);
-
-    shooter.setDefaultCommand(shooter.setZero());
-    intake.setDefaultCommand(intake.stop());
   }
 
   /**
@@ -127,16 +129,20 @@ public class RobotContainer {
     
     operatorController.rightBumper().whileTrue(arm.setAngle(ArmConstants.BOTTOM_ANGLE)
                                                .alongWith(intake.set(1.)))
-                                    .onFalse(arm.setAngle(ArmConstants.ZERO_ANGLE)
-                                             .alongWith(intake.stop()));
-    operatorController.leftBumper().whileTrue(intake.set(-1).alongWith(arm.setAngle(ArmConstants.ZERO_ANGLE))).onFalse(intake.stop());
+                                    .onFalse(intake.set(0.));
+    operatorController.leftBumper().whileTrue(intake.set(-1).alongWith(arm.setAngle(ArmConstants.ZERO_ANGLE))).onFalse(intake.set(0.));
     
-    operatorController.leftTrigger().whileTrue(indexer.set(1.)).onFalse(indexer.stop());
+    operatorController.leftTrigger().whileTrue(indexer.set(1.));
     operatorController.rightTrigger().whileTrue(Commands.run(() -> {
-        if (driverAllowIndexing) {
-          CommandScheduler.getInstance().schedule(indexer.set(1.));
-        }
-      }));
+          if (driverAllowIndexing) {
+            CommandScheduler.getInstance().schedule(indexer.set(1.));
+          }
+          else {
+            CommandScheduler.getInstance().schedule(indexer.getDefaultCommand());
+          }
+        }))
+                                     .onFalse(indexer.getDefaultCommand());
+
     operatorController.x().whileTrue(shooter.setVelocity(() -> RPM.of(ShooterConstants.SHOT_SPEED_CONVERSION_FACTOR * 
                                                                       AimingMath.getIdealShotSpeed(0, 
                                                                                                    new Vector3(drivebase.getState().Pose.getX(), drivebase.getState().Pose.getY(), 0), 
@@ -144,7 +150,7 @@ public class RobotContainer {
                                                                                                    Vector3.origin(), 
                                                                                                    0., 
                                                                                                    ShooterConstants.BLUE_ALLIANCE_GOAL))))
-                          .onFalse(shooter.setZero());
+                          .onFalse(shooter.set(0.));
   }
 
   /**
