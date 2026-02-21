@@ -8,7 +8,10 @@ import com.ctre.phoenix6.swerve.SwerveModule.DriveRequestType;
 
 import frc.robot.Constants.ArmConstants;
 import frc.robot.Constants.DrivebaseConstants;
+import frc.robot.Constants.ShooterConstants;
 import frc.robot.commands.AimTowardsGoal;
+import frc.robot.math.AimingMath;
+import frc.robot.math.Vector3;
 import frc.robot.subsystems.ShooterSubsystem;
 import frc.robot.subsystems.SwerveSubsystem;
 import frc.robot.subsystems.ArmSubsystem;
@@ -108,7 +111,8 @@ public class RobotContainer {
         aimingCommand = new AimTowardsGoal(() -> -driverController.getLeftY() * DrivebaseConstants.SHOOT_WHILE_MOVING_SPEED, 
                                            () -> -driverController.getLeftX() * DrivebaseConstants.SHOOT_WHILE_MOVING_SPEED, 
                                            shooter, 
-                                           drivebase);
+                                           drivebase,
+                                           ShooterConstants.BLUE_ALLIANCE_GOAL);
         CommandScheduler.getInstance().schedule(aimingCommand);}))
                         .onFalse(Commands.runOnce(() -> aimingCommand.cancel()));
     driverController.leftTrigger().onTrue(Commands.runOnce(() -> {if(aimingCommand != null) {aimingCommand.getMath().logSim();}}));
@@ -118,11 +122,17 @@ public class RobotContainer {
     
     operatorController.rightBumper().whileTrue(arm.setAngle(ArmConstants.BOTTOM_ANGLE)).onFalse(arm.setAngle(ArmConstants.ZERO_ANGLE));
     operatorController.rightBumper().whileTrue(intake.set(1.)).onFalse(intake.stop());
+    operatorController.leftBumper().whileTrue(intake.set(-1).alongWith(arm.setAngle(ArmConstants.ZERO_ANGLE))).onFalse(intake.stop());
     
     operatorController.leftTrigger().whileTrue(indexer.set(1.)).onFalse(indexer.stop());
-    operatorController.rightTrigger().whileTrue(shooter.setHigh()).onFalse(shooter.setZero());
 
-    operatorController.leftBumper().whileTrue(intake.set(-1).alongWith(arm.setAngle(ArmConstants.ZERO_ANGLE))).onFalse(intake.stop());
+    // operatorController.x().whileTrue(shooter.setVelocity(AimingMath.getIdealShotSpeed(0, 
+    //                                                                                   new Vector3(drivebase.getState().Pose.getX(), drivebase.getState().Pose.getY(), 0), 
+    //                                                                                   drivebase.getState().Pose.getRotation().getRadians(), 
+    //                                                                                   Vector3.origin(), 
+    //                                                                                   0., 
+    //                                                                                   new Vector3(0, 0, 0))))
+    //                       .onFalse(shooter.setZero());
   }
 
   /**

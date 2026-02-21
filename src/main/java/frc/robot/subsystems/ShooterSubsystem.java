@@ -32,81 +32,63 @@ import yams.motorcontrollers.local.SparkWrapper;
 
 
 public class ShooterSubsystem extends SubsystemBase {
-    private SmartMotorControllerConfig smcConfig = ShooterConstants.APPLY_SMC_CONFIG.apply(new SmartMotorControllerConfig(this));
-    private SparkMax spark = new SparkMax(ShooterConstants.FLYWHEEL_ID, MotorType.kBrushless);
-    private SmartMotorController sparkSmartMotorController = new SparkWrapper(spark, DCMotor.getNEO(1), smcConfig);
-    private final FlyWheelConfig shooterConfig = ShooterConstants.APPLY_FLYWHEEL_CONFIG.apply(new FlyWheelConfig(sparkSmartMotorController));
-    private FlyWheel shooter = new FlyWheel(shooterConfig);
+  private SmartMotorControllerConfig smcConfig = ShooterConstants.APPLY_SMC_CONFIG.apply(new SmartMotorControllerConfig(this));
+  private SparkMax spark = new SparkMax(ShooterConstants.FLYWHEEL_ID, MotorType.kBrushless);
+  private SmartMotorController sparkSmartMotorController = new SparkWrapper(spark, DCMotor.getNEO(1), smcConfig);
+  private final FlyWheelConfig shooterConfig = ShooterConstants.APPLY_FLYWHEEL_CONFIG.apply(new FlyWheelConfig(sparkSmartMotorController));
+  private FlyWheel shooter = new FlyWheel(shooterConfig);
 
-    private StructArrayPublisher<Pose3d> fuelPosePublisher = NetworkTableInstance.getDefault()
-      .getStructArrayTopic("MyPoseArray", Pose3d.struct)
-      .publish();
+  private StructArrayPublisher<Pose3d> fuelPosePublisher = NetworkTableInstance.getDefault()
+    .getStructArrayTopic("MyPoseArray", Pose3d.struct)
+    .publish();
 
-    /**
-     * Gets the current velocity of the shooter.
-     * 
-     * @return Shooter velocity.
-     */
-    public AngularVelocity getVelocity() {return shooter.getSpeed();}
+  /**
+   * Gets the current velocity of the shooter.
+   * 
+   * @return Shooter velocity.
+   */
+  public AngularVelocity getVelocity() {return shooter.getSpeed();}
 
-    /**
-     * Set the shooter velocity.
-     * 
-     * @param speed Speed to set.
-     * @return {@link edu.wpi.first.wpilibj2.command.RunCommand}
-     */
-    public Command setVelocity(Supplier<AngularVelocity> speed) {return shooter.setSpeed(speed);}
+  /**
+   * Set the shooter velocity.
+   * 
+   * @param speed Speed to set.
+   * @return {@link edu.wpi.first.wpilibj2.command.RunCommand}
+   */
+  public Command setVelocity(Supplier<AngularVelocity> speed) {return shooter.setSpeed(speed);}
 
-    /**
-     * Sets the shooter velocity to zero.
-     * 
-     * @return {@link edu.wpi.first.wpilibj2.command.runCommand}
-     */
-    public Command stop() {
-      return setVelocity(() -> RPM.of(0));
-    }
+  /**
+   * Sets the shooter velocity to zero.
+   * 
+   * @return {@link edu.wpi.first.wpilibj2.command.runCommand}
+   */
+  public Command stop() {
+    return setVelocity(() -> RPM.of(0));
+  }
 
-    /**
-     * Set the dutycycle of the shooter.
-     * 
-     * @param dutyCycle DutyCycle to set.
-     * @return {@link edu.wpi.first.wpilibj2.command.RunCommand}
-     */
-    public Command set(double dutyCycle) {return shooter.set(dutyCycle);}
+  /**
+   * Set the dutycycle of the shooter.
+   * 
+   * @param dutyCycle DutyCycle to set.
+   * @return {@link edu.wpi.first.wpilibj2.command.RunCommand}
+   */
+  public Command set(double dutyCycle) {return shooter.set(dutyCycle);}
 
-    /**
-     * Set the dutycycle of the shooter to the high value.
-     * 
-     * @return {@link edu.wpi.first.wpilibj2.command.RunCommand}
-     */
-    public Command setHigh() {
-      return set(ShooterConstants.HIGH_DUTY_CYCLE);
-    }
+  /**
+   * Set the dutycycle of the shooter to zero.
+   * 
+   * @return {@link edu.wpi.first.wpilibj2.command.RunCommand}
+   */
+  public Command setZero() {
+    return set(0);
+  }
 
-    /**
-     * Set the dutycycle of the shooter to the high value.
-     * 
-     * @return {@link edu.wpi.first.wpilibj2.command.RunCommand}
-     */
-    public Command setLow() {
-      return set(ShooterConstants.LOW_DUTY_CYCLE);
-    }
-
-    /**
-     * Set the dutycycle of the shooter to zero.
-     * 
-     * @return {@link edu.wpi.first.wpilibj2.command.RunCommand}
-     */
-    public Command setZero() {
-      return set(0);
-    }
-
-    /**
-     * Run sysId on the {@link Shooter}
-     */
-    public Command sysID() {
-      return shooter.sysId(Volts.of(7), Volts.of(2).per(Second), Seconds.of(4));
-    }
+  /**
+   * Run sysId on the {@link Shooter}
+   */
+  public Command sysID() {
+    return shooter.sysId(Volts.of(7), Volts.of(2).per(Second), Seconds.of(4));
+  }
 
 
   /** Creates a new ExampleSubsystem. */

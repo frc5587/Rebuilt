@@ -95,6 +95,7 @@ public final class Constants {
     public static final double TIME_BETWEEN_LOG_TIMESTAMPS = 0.055;
     public static final double SHOT_SPEED_CONVERSION_FACTOR = 187.978279242;
     public static final Vector3 SHOOTER_POSITION = new Vector3(0.2,0,0.4);
+    public static final Vector3 BLUE_ALLIANCE_GOAL = new Vector3(4.625626,4.0346315,1.8288);
     public static final int SEARCH_DEPTH = 5;
     public static final double GRAVITY = 9.81;
   }

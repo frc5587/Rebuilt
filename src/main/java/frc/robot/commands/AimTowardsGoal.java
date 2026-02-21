@@ -29,6 +29,7 @@ public class AimTowardsGoal extends Command {
   private double lastShotTimestamp = 0.;
   private ShooterSubsystem shooter;
   private SwerveSubsystem swerve;
+  private AimingMath aimingMath;
   private final SwerveRequest.FieldCentricFacingAngle driveFacingAngle = new SwerveRequest.FieldCentricFacingAngle()
       .withDeadband(DrivebaseConstants.MAX_SPEED * 0.1) // Add a 10% deadband
       .withMaxAbsRotationalRate(DrivebaseConstants.MAX_SPIN_SPEED_RADIANS_PER_SECOND)
@@ -50,13 +51,14 @@ public class AimTowardsGoal extends Command {
     return shootWhileMovingCalculationVelocity;
   };
   DoubleSupplier inputAngularVelocity = () -> 0.;
-  AimingMath aimingMath = new AimingMath(position, heading, velocity, angularVelocity, inputVelocity, inputAngularVelocity, () -> shooter.getVelocity().in(RPM), new Vector3(4.625626,4.0346315,1.8288));
+  Vector3 goal;
 
-  public AimTowardsGoal(DoubleSupplier _xVelocityInput, DoubleSupplier _yVelocityInput, ShooterSubsystem _shooter, SwerveSubsystem _swerve) {
+  public AimTowardsGoal(DoubleSupplier _xVelocityInput, DoubleSupplier _yVelocityInput, ShooterSubsystem _shooter, SwerveSubsystem _swerve, Vector3 _goalPosition) {
     xVelocityInput = _xVelocityInput;
     yVelocityInput = _yVelocityInput;
     shooter = _shooter;
     swerve = _swerve;
+    aimingMath = new AimingMath(position, heading, velocity, angularVelocity, inputVelocity, inputAngularVelocity, () -> shooter.getVelocity().in(RPM), _goalPosition);
   }
 
   @Override
