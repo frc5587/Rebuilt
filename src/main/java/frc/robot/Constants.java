@@ -102,8 +102,8 @@ public final class Constants {
     public static final int LEFT_MOTOR_ID = 20;
     public static final int RIGHT_MOTOR_ID = 21;
     public static final Angle TOP_ANGLE = Degrees.of(98.);
-    public static final Angle BOTTOM_ANGLE = Degrees.of(-10.);
-    public static final Angle ZERO_ANGLE = Degrees.of(0);
+    public static final Angle BOTTOM_ANGLE = Degrees.of(0.);
+    public static final Angle ZERO_ANGLE = Degrees.of(0.);
     public static final UnaryOperator<SmartMotorControllerConfig> APPLY_SMC_CONFIG = (SmartMotorControllerConfig config) -> {
       return config.withControlMode(ControlMode.CLOSED_LOOP)
                    .withClosedLoopController(5, 0, 0)

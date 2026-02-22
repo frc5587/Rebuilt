@@ -19,6 +19,7 @@ import edu.wpi.first.math.system.plant.DCMotor;
 import edu.wpi.first.networktables.NetworkTableInstance;
 import edu.wpi.first.networktables.StructArrayPublisher;
 import edu.wpi.first.units.measure.AngularVelocity;
+import edu.wpi.first.wpilibj.RobotBase;
 import edu.wpi.first.wpilibj.smartdashboard.SmartDashboard;
 import edu.wpi.first.wpilibj2.command.Command;
 import edu.wpi.first.wpilibj2.command.SubsystemBase;
@@ -37,7 +38,6 @@ public class ShooterSubsystem extends SubsystemBase {
   private SmartMotorController sparkSmartMotorController = new SparkWrapper(spark, DCMotor.getNEO(1), smcConfig);
   private final FlyWheelConfig shooterConfig = ShooterConstants.APPLY_FLYWHEEL_CONFIG.apply(new FlyWheelConfig(sparkSmartMotorController));
   private FlyWheel shooter = new FlyWheel(shooterConfig);
-
   private StructArrayPublisher<Pose3d> fuelPosePublisher = NetworkTableInstance.getDefault()
     .getStructArrayTopic("MyPoseArray", Pose3d.struct)
     .publish();
@@ -97,9 +97,11 @@ public class ShooterSubsystem extends SubsystemBase {
     //   SmartDashboard.putNumber("flywheel setpoint", 0.);
     // }
 
+    if (RobotBase.isSimulation()){
     Pose3d[] fuelPoses = SimulatedArena.getInstance()
-            .getGamePiecesArrayByType("Fuel");
+            .getGamePiecesArrayByType("Fuel");       
     fuelPosePublisher.accept(fuelPoses);
+    }
   }
 
   @Override
