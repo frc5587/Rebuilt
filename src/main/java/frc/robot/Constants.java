@@ -45,13 +45,13 @@ public final class Constants {
     public static final double ROBOT_MASS = (148 - 20.3) * 0.453592; // 32lbs * kg per pound
     public static final Matter CHASSIS    = new Matter(new Translation3d(0, 0, Units.inchesToMeters(8)), ROBOT_MASS);
     public static final double LOOP_TIME  = 0.13; //s, 20ms + 110ms sprk max velocity lag
-    public static final double MAX_SPEED  = Units.feetToMeters(14.5);
-    public static final double MAX_SPIN_SPEED_RADIANS_PER_SECOND = 4 * Math.PI;
-    public static final double MAX_SPIN_ACCEL = 8 * Math.PI;
+    public static final double MAX_SPEED  = Units.feetToMeters(8);
+    public static final double MAX_SPIN_SPEED_RADIANS_PER_SECOND = 2 * Math.PI;
+    public static final double MAX_SPIN_ACCEL = 4 * Math.PI;
     public static final double WHEEL_LOCK_TIME = 10; //seconds
 
     public static final double LOOKAHEAD = 0.1;
-    public static final double SHOOT_WHILE_MOVING_SPEED  = Units.feetToMeters(10);
+    public static final double SHOOT_WHILE_MOVING_SPEED  = Units.feetToMeters(4);
     public static final double SHOOT_WHILE_MOVE_ACCEL_LIMIT = 10;
     public static final ProfiledPIDController HEADING_CONTROLLER = new ProfiledPIDController(Math.PI,0,0.1,new Constraints(MAX_SPIN_SPEED_RADIANS_PER_SECOND, MAX_SPIN_ACCEL));
     public static final ProfiledPIDController SHOOT_WHILE_MOVE_HEADING_CONTROLLER = new ProfiledPIDController(25,0,0,new Constraints(MAX_SPIN_SPEED_RADIANS_PER_SECOND, MAX_SPIN_ACCEL));
@@ -106,12 +106,12 @@ public final class Constants {
     public static final Angle ZERO_ANGLE = Degrees.of(0.);
     public static final UnaryOperator<SmartMotorControllerConfig> APPLY_SMC_CONFIG = (SmartMotorControllerConfig config) -> {
       return config.withControlMode(ControlMode.CLOSED_LOOP)
-                   .withClosedLoopController(5, 0, 0)
+                   .withClosedLoopController(20, 0, 0)
                    .withSimClosedLoopController(1, 0, 0)
                    .withFeedforward(new ArmFeedforward(0, 0, 0))
                    .withSimFeedforward(new ArmFeedforward(0, 0, 0))
                    .withTelemetry("ArmMotor", TelemetryVerbosity.HIGH)
-                   .withGearing(new MechanismGearing(GearBox.fromReductionStages(3,5)))
+                   .withGearing(new MechanismGearing(GearBox.fromReductionStages(5)))
                    .withMotorInverted(false)
                    .withIdleMode(MotorMode.BRAKE)
                    .withStatorCurrentLimit(Amps.of(20))

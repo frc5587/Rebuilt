@@ -43,7 +43,7 @@ import edu.wpi.first.wpilibj2.command.button.Trigger;
 public class RobotContainer {
   private final ShooterSubsystem shooter = new ShooterSubsystem();
   private final SwerveSubsystem drivebase = TunerConstants.createDrivetrain();
-  private final ArmSubsystem arm = new ArmSubsystem();
+  // private final ArmSubsystem arm = new ArmSubsystem();
   private final IntakeSubsystem intake = new IntakeSubsystem();
   private final IndexerSubsystem indexer = new IndexerSubsystem();
 
@@ -71,7 +71,7 @@ public class RobotContainer {
     shooter.setDefaultCommand(shooter.set(0.));
     indexer.setDefaultCommand(indexer.stop());
     intake.setDefaultCommand(intake.stop());
-    arm.setDefaultCommand(arm.setAngle(ArmConstants.TOP_ANGLE));
+    // arm.setDefaultCommand(arm.setAngle(ArmConstants.TOP_ANGLE));
 
     // Configure the trigger bindings
     configureBindings();
@@ -127,11 +127,12 @@ public class RobotContainer {
 
     // Operator
     
-    operatorController.rightBumper().whileTrue(arm.setAngle(ArmConstants.BOTTOM_ANGLE)
-                                               .alongWith(intake.set(1.)))
-                                    .onFalse(intake.set(0.));
-    operatorController.leftBumper().whileTrue(intake.set(-1).alongWith(arm.setAngle(ArmConstants.ZERO_ANGLE))).onFalse(intake.set(0.));
+    // operatorController.rightBumper().whileTru1e(arm.setAngle(ArmConstants.BOTTOM_ANGLE)
+    //                                            .alongWith(intake.set(1.)))
+    //                                 .onFalse(intake.set(0.));
+    // operatorController.leftBumper().whileTrue(intake.set(-1).alongWith(arm.setAngle(ArmConstants.ZERO_ANGLE))).onFalse(intake.set(0.));
     
+      
     operatorController.leftTrigger().whileTrue(indexer.set(1.));
     operatorController.rightTrigger().whileTrue(Commands.run(() -> {
           if (driverAllowIndexing) {
@@ -143,7 +144,7 @@ public class RobotContainer {
         }))
                                      .onFalse(indexer.getDefaultCommand());
 
-    operatorController.x().whileTrue(shooter.setVelocity(() -> RPM.of(ShooterConstants.SHOT_SPEED_CONVERSION_FACTOR * 
+    operatorController.x().whileTrue(shooter.setAngularVelocity(() -> RPM.of(ShooterConstants.SHOT_SPEED_CONVERSION_FACTOR * 
                                                                       AimingMath.getIdealShotSpeed(0, 
                                                                                                    new Vector3(drivebase.getState().Pose.getX(), drivebase.getState().Pose.getY(), 0), 
                                                                                                    drivebase.getState().Pose.getRotation().getRadians(), 
@@ -151,6 +152,7 @@ public class RobotContainer {
                                                                                                    0., 
                                                                                                    ShooterConstants.BLUE_ALLIANCE_GOAL))))
                           .onFalse(shooter.set(0.));
+    operatorController.y().whileTrue(shooter.set(0.67));
   }
 
   /**

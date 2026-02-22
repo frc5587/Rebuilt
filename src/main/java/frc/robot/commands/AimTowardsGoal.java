@@ -82,7 +82,7 @@ public class AimTowardsGoal extends Command {
     CommandScheduler.getInstance().schedule(swerve.applyRequest(() -> driveFacingAngle.withVelocityX(shootWhileMovingVelocity.x)
                                                                                       .withVelocityY(shootWhileMovingVelocity.y)
                                                                                       .withTargetDirection(Rotation2d.fromRadians(aimingMath.getIdealHeading(aimingMath.getIdealShotSpeed(DrivebaseConstants.LOOKAHEAD),DrivebaseConstants.LOOKAHEAD)))));
-    CommandScheduler.getInstance().schedule(shooter.setVelocity(() -> RPM.of(aimingMath.getIdealShotSpeed(ShooterConstants.LOOKAHEAD)*ShooterConstants.SHOT_SPEED_CONVERSION_FACTOR)));
+    CommandScheduler.getInstance().schedule(shooter.setAngularVelocity(() -> RPM.of(aimingMath.getIdealShotSpeed(ShooterConstants.LOOKAHEAD)*ShooterConstants.SHOT_SPEED_CONVERSION_FACTOR)));
 
     if (lastLogTimestamp < Timer.getFPGATimestamp() - ShooterConstants.TIME_BETWEEN_LOG_TIMESTAMPS) {
       lastLogTimestamp = Timer.getFPGATimestamp();
