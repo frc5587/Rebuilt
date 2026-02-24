@@ -12,6 +12,7 @@ import edu.wpi.first.units.measure.Distance;
 import edu.wpi.first.wpilibj2.command.Command;
 import edu.wpi.first.wpilibj2.command.Commands;
 import edu.wpi.first.wpilibj2.command.SubsystemBase;
+import frc.robot.Constants.ClimbConstants;
 import frc.robot.Constants.ShooterConstants;
 import yams.motorcontrollers.SmartMotorController;
 import yams.motorcontrollers.SmartMotorControllerConfig;
@@ -19,7 +20,7 @@ import yams.motorcontrollers.local.SparkWrapper;
 
 public class ClimbSubsystem extends SubsystemBase {
   private SmartMotorControllerConfig smcConfig = ShooterConstants.APPLY_SMC_CONFIG.apply(new SmartMotorControllerConfig(this));
-  private SparkMax spark = new SparkMax(ShooterConstants.FLYWHEEL_ID, MotorType.kBrushless);
+  private SparkMax spark = new SparkMax(ClimbConstants.MOTOR_ID, MotorType.kBrushless);
   private SmartMotorController sparkSMC = new SparkWrapper(spark, DCMotor.getNEO(1), smcConfig);
 
   public ClimbSubsystem() {

@@ -24,7 +24,7 @@ public class Vector3 implements Sendable {
     builder.addDoubleProperty("z", () -> z, (double input) -> z = input);
   }
   
-  public static Vector3 origin() {
+  public static Vector3 getOrigin() {
     return new Vector3(0,0,0);
   }
 

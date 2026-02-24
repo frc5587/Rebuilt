@@ -98,11 +98,11 @@ public class AimingMath {
   public static double getIdealShotSpeed(double lookahead, Vector3 robotPosition, double heading, Vector3 robotVelocity, double angularVelocity, Vector3 goalPosition) {
     Vector3 position = Vector3.add(robotPosition,
                                    Vector3.rotate(ShooterConstants.SHOOTER_POSITION,
-                                                  Vector3.origin(),
+                                                  Vector3.getOrigin(),
                                                   heading));
     double turretDistance = ShooterConstants.SHOOTER_POSITION.get2D().length();
     Vector3 tangent = Vector3.scale(Vector3.rotate(ShooterConstants.SHOOTER_POSITION.get2D(),
-                                                   Vector3.origin(),
+                                                   Vector3.getOrigin(),
                                                    Math.PI/2 + heading),
                                     1.0/turretDistance);
     Vector3 velocity = Vector3.add(robotVelocity,
@@ -142,11 +142,11 @@ public class AimingMath {
   public static double getIdealHeading(double speed, double lookahead, Vector3 robotPosition, double heading, Vector3 robotVelocity, double angularVelocity, Vector3 goalPosition) {
     Vector3 position = Vector3.add(robotPosition,
                                    Vector3.rotate(ShooterConstants.SHOOTER_POSITION,
-                                                  Vector3.origin(),
+                                                  Vector3.getOrigin(),
                                                   heading));
     double turretDistance = ShooterConstants.SHOOTER_POSITION.get2D().length();
     Vector3 tangent = Vector3.scale(Vector3.rotate(ShooterConstants.SHOOTER_POSITION.get2D(),
-                                                   Vector3.origin(),
+                                                   Vector3.getOrigin(),
                                                    Math.PI/2 + heading),
                                     1.0/turretDistance);
     Vector3 velocity = Vector3.add(robotVelocity,
@@ -203,8 +203,8 @@ public class AimingMath {
     times.add(0.);
     shotSpeeds.add(0.);
     angles.add(0.);
-    positions.add(Vector3.origin());
-    velocities.add(Vector3.origin());
+    positions.add(Vector3.getOrigin());
+    velocities.add(Vector3.getOrigin());
     headings.add(0.);
     angularVelocities.add(0.);
   }

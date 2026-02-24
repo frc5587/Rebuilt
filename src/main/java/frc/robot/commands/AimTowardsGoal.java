@@ -23,8 +23,8 @@ import com.ctre.phoenix6.swerve.SwerveModule.DriveRequestType;
 import com.ctre.phoenix6.swerve.SwerveRequest;
 
 public class AimTowardsGoal extends Command {
-  private Vector3 shootWhileMovingVelocity = Vector3.origin();
-  private Vector3 shootWhileMovingCalculationVelocity = Vector3.origin();
+  private Vector3 shootWhileMovingVelocity = Vector3.getOrigin();
+  private Vector3 shootWhileMovingCalculationVelocity = Vector3.getOrigin();
   private Supplier<Vector3> inputTargetVelocity;
   private double lastLogTimestamp = 0.;
   private double lastShotTimestamp = 0.;
@@ -68,7 +68,7 @@ public class AimTowardsGoal extends Command {
 
   @Override
   public void initialize() {
-    shootWhileMovingVelocity = Vector3.origin();
+    shootWhileMovingVelocity = Vector3.getOrigin();
     shooter.set(0.);
   }
 

@@ -36,7 +36,7 @@ import yams.motorcontrollers.local.SparkWrapper;
 
 public class ShooterSubsystem extends SubsystemBase {
   private SmartMotorControllerConfig smcConfig = ShooterConstants.APPLY_SMC_CONFIG.apply(new SmartMotorControllerConfig(this));
-  private SparkMax spark = new SparkMax(ShooterConstants.FLYWHEEL_ID, MotorType.kBrushless);
+  private SparkMax spark = new SparkMax(ShooterConstants.MOTOR_ID, MotorType.kBrushless);
   private SmartMotorController sparkSmartMotorController = new SparkWrapper(spark, DCMotor.getNEO(1), smcConfig);
   private final FlyWheelConfig shooterConfig = ShooterConstants.APPLY_FLYWHEEL_CONFIG.apply(new FlyWheelConfig(sparkSmartMotorController));
   private FlyWheel shooter = new FlyWheel(shooterConfig);
