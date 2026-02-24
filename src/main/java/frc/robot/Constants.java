@@ -9,6 +9,7 @@ import static edu.wpi.first.units.Units.Degrees;
 import static edu.wpi.first.units.Units.Inches;
 import static edu.wpi.first.units.Units.Pounds;
 import static edu.wpi.first.units.Units.RPM;
+import static edu.wpi.first.units.Units.Radians;
 import static edu.wpi.first.units.Units.Seconds;
 
 import java.util.function.UnaryOperator;
@@ -83,7 +84,7 @@ public final class Constants {
       return config.withDiameter(Inches.of(4))
                    .withMass(Pounds.of(2.5))
                    .withUpperSoftLimit(RPM.of(1000))
-                   .withTelemetry("ShooterMech", TelemetryVerbosity.HIGH);
+                   .withTelemetry("Shooter", TelemetryVerbosity.HIGH);
     };
 
     // Aiming math
@@ -144,6 +145,7 @@ public final class Constants {
                    .withTelemetry("Intake", TelemetryVerbosity.LOW);
     };
   }
+  
   public static class IndexerConstants {
     public static final int MOTOR_ID = 23;
     public static final UnaryOperator<SmartMotorControllerConfig> APPLY_SMC_CONFIG = (SmartMotorControllerConfig config) -> {
@@ -158,6 +160,23 @@ public final class Constants {
       return config.withDiameter(Inches.of(1))
                    .withMass(Pounds.of(1))
                    .withTelemetry("Indexer", TelemetryVerbosity.LOW);
+    };
+  }
+
+  public static class ClimbConstants {
+    public static final Angle UP_ANGLE = Radians.of(20.);
+    public static final UnaryOperator<SmartMotorControllerConfig> APPLY_SMC_CONFIG = (SmartMotorControllerConfig config) -> {
+      return config.withControlMode(ControlMode.CLOSED_LOOP)
+                   .withClosedLoopController(1, 0, 0)
+                   .withSimClosedLoopController(1, 0, 0)
+                   .withFeedforward(new SimpleMotorFeedforward(0, 0, 0))
+                   .withSimFeedforward(new SimpleMotorFeedforward(0, 0, 0))
+                   .withTelemetry("ClimbMotor", TelemetryVerbosity.HIGH)
+                   .withGearing(new MechanismGearing(GearBox.fromReductionStages(5,4,4)))
+                   .withMotorInverted(false)
+                   .withIdleMode(MotorMode.BRAKE)
+                   .withStatorCurrentLimit(Amps.of(40))
+                   .withSoftLimit(Radians.of(0), UP_ANGLE);
     };
   }
 }
