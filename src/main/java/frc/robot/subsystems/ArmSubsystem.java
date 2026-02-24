@@ -35,7 +35,9 @@ public class ArmSubsystem extends SubsystemBase {
 
     private Arm arm = new Arm(armCfg);
     
-    public ArmSubsystem() {}
+    public ArmSubsystem() {
+        lSparkSmartMotorController.setEncoderPosition(ArmConstants.TOP_ANGLE);
+    }
 
     /**
      * Set the angle of the arm

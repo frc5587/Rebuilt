@@ -4,6 +4,7 @@
 
 package frc.robot.subsystems;
 
+import static edu.wpi.first.units.Units.MetersPerSecond;
 import static edu.wpi.first.units.Units.RPM;
 import static edu.wpi.first.units.Units.Second;
 import static edu.wpi.first.units.Units.Seconds;
@@ -19,6 +20,8 @@ import edu.wpi.first.math.system.plant.DCMotor;
 import edu.wpi.first.networktables.NetworkTableInstance;
 import edu.wpi.first.networktables.StructArrayPublisher;
 import edu.wpi.first.units.measure.AngularVelocity;
+import edu.wpi.first.units.measure.LinearVelocity;
+import edu.wpi.first.wpilibj.RobotBase;
 import edu.wpi.first.wpilibj.smartdashboard.SmartDashboard;
 import edu.wpi.first.wpilibj2.command.Command;
 import edu.wpi.first.wpilibj2.command.SubsystemBase;
@@ -37,7 +40,6 @@ public class ShooterSubsystem extends SubsystemBase {
   private SmartMotorController sparkSmartMotorController = new SparkWrapper(spark, DCMotor.getNEO(1), smcConfig);
   private final FlyWheelConfig shooterConfig = ShooterConstants.APPLY_FLYWHEEL_CONFIG.apply(new FlyWheelConfig(sparkSmartMotorController));
   private FlyWheel shooter = new FlyWheel(shooterConfig);
-
   private StructArrayPublisher<Pose3d> fuelPosePublisher = NetworkTableInstance.getDefault()
     .getStructArrayTopic("MyPoseArray", Pose3d.struct)
     .publish();
@@ -55,7 +57,17 @@ public class ShooterSubsystem extends SubsystemBase {
    * @param speed Speed to set.
    * @return {@link edu.wpi.first.wpilibj2.command.RunCommand}
    */
-  public Command setVelocity(Supplier<AngularVelocity> speed) {return shooter.setSpeed(speed);}
+  public Command setAngularVelocity(Supplier<AngularVelocity> speed) {return shooter.setSpeed(speed);}
+
+  /**
+   * Converts ball m/s to RPM and sets the flywheel velocity.
+   * 
+   * @param speed Ball speed to set.
+   * @return {@link edu.wpi.first.wpilibj2.command.RunCommand}
+   */
+  public Command setBallVelocity(Supplier<LinearVelocity> speed) {
+    return shooter.setSpeed(RPM.of(speed.get().in(MetersPerSecond) * ShooterConstants.SHOT_SPEED_CONVERSION_FACTOR));
+  }
 
   /**
    * Sets the shooter velocity to zero.
@@ -63,7 +75,7 @@ public class ShooterSubsystem extends SubsystemBase {
    * @return {@link edu.wpi.first.wpilibj2.command.runCommand}
    */
   public Command stop() {
-    return setVelocity(() -> RPM.of(0));
+    return setAngularVelocity(() -> RPM.of(0));
   }
 
   /**
@@ -97,9 +109,11 @@ public class ShooterSubsystem extends SubsystemBase {
     //   SmartDashboard.putNumber("flywheel setpoint", 0.);
     // }
 
+    if (RobotBase.isSimulation()){
     Pose3d[] fuelPoses = SimulatedArena.getInstance()
-            .getGamePiecesArrayByType("Fuel");
+            .getGamePiecesArrayByType("Fuel");       
     fuelPosePublisher.accept(fuelPoses);
+    }
   }
 
   @Override

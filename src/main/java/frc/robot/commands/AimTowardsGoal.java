@@ -8,6 +8,8 @@ import java.util.function.Supplier;
 import edu.wpi.first.math.geometry.Pose2d;
 import edu.wpi.first.math.geometry.Rotation2d;
 import edu.wpi.first.math.kinematics.ChassisSpeeds;
+import edu.wpi.first.wpilibj.DriverStation;
+import edu.wpi.first.wpilibj.DriverStation.Alliance;
 import edu.wpi.first.wpilibj.Timer;
 import edu.wpi.first.wpilibj2.command.Command;
 import edu.wpi.first.wpilibj2.command.CommandScheduler;
@@ -23,8 +25,7 @@ import com.ctre.phoenix6.swerve.SwerveRequest;
 public class AimTowardsGoal extends Command {
   private Vector3 shootWhileMovingVelocity = Vector3.origin();
   private Vector3 shootWhileMovingCalculationVelocity = Vector3.origin();
-  private DoubleSupplier xVelocityInput;
-  private DoubleSupplier yVelocityInput;
+  private Supplier<Vector3> inputTargetVelocity;
   private double lastLogTimestamp = 0.;
   private double lastShotTimestamp = 0.;
   private ShooterSubsystem shooter;
@@ -44,18 +45,22 @@ public class AimTowardsGoal extends Command {
   Supplier<Vector3> velocity = () -> {
     ChassisSpeeds velocity = swerve.getState().Speeds;
     velocity = ChassisSpeeds.fromRobotRelativeSpeeds(velocity, swerve.getState().Pose.getRotation());
-    return new Vector3(velocity.vxMetersPerSecond, velocity.vyMetersPerSecond, 0);
+    Vector3 input = new Vector3(velocity.vxMetersPerSecond, velocity.vyMetersPerSecond, 0);
+    return input;
   };
   DoubleSupplier angularVelocity = () -> swerve.getState().Speeds.omegaRadiansPerSecond;
   Supplier<Vector3> inputVelocity = () -> {
-    return shootWhileMovingCalculationVelocity;
+    Vector3 input = shootWhileMovingCalculationVelocity;
+    if (DriverStation.getAlliance().get() == Alliance.Red) {
+      input = Vector3.scale(input, -1.);
+    }
+    return input;
   };
   DoubleSupplier inputAngularVelocity = () -> 0.;
   Vector3 goal;
 
-  public AimTowardsGoal(DoubleSupplier _xVelocityInput, DoubleSupplier _yVelocityInput, ShooterSubsystem _shooter, SwerveSubsystem _swerve, Vector3 _goalPosition) {
-    xVelocityInput = _xVelocityInput;
-    yVelocityInput = _yVelocityInput;
+  public AimTowardsGoal(Supplier<Vector3> _inputTargetVelocity, ShooterSubsystem _shooter, SwerveSubsystem _swerve, Vector3 _goalPosition) {
+    inputTargetVelocity = _inputTargetVelocity;
     shooter = _shooter;
     swerve = _swerve;
     aimingMath = new AimingMath(position, heading, velocity, angularVelocity, inputVelocity, inputAngularVelocity, () -> shooter.getVelocity().in(RPM), _goalPosition);
@@ -69,7 +74,7 @@ public class AimTowardsGoal extends Command {
 
   @Override
   public void execute() {
-    Vector3 difference = Vector3.subtract(new Vector3(xVelocityInput.getAsDouble(), yVelocityInput.getAsDouble(), 0),
+    Vector3 difference = Vector3.subtract(inputTargetVelocity.get(),
                                           shootWhileMovingVelocity);
     // if (difference.length() < 50.) {
     //   shootWhileMovingCalculationVelocity = Vector3.add(shootWhileMovingVelocity, difference);
@@ -81,8 +86,8 @@ public class AimTowardsGoal extends Command {
     shootWhileMovingVelocity = Vector3.add(shootWhileMovingVelocity, Vector3.scale(Vector3.normalize(difference), 0.02*DrivebaseConstants.SHOOT_WHILE_MOVE_ACCEL_LIMIT));
     CommandScheduler.getInstance().schedule(swerve.applyRequest(() -> driveFacingAngle.withVelocityX(shootWhileMovingVelocity.x)
                                                                                       .withVelocityY(shootWhileMovingVelocity.y)
-                                                                                      .withTargetDirection(Rotation2d.fromRadians(aimingMath.getIdealHeading(aimingMath.getIdealShotSpeed(DrivebaseConstants.LOOKAHEAD),DrivebaseConstants.LOOKAHEAD)))));
-    CommandScheduler.getInstance().schedule(shooter.setVelocity(() -> RPM.of(aimingMath.getIdealShotSpeed(ShooterConstants.LOOKAHEAD)*ShooterConstants.SHOT_SPEED_CONVERSION_FACTOR)));
+                                                                                      .withTargetDirection(Rotation2d.fromRadians(aimingMath.getIdealHeading(aimingMath.getIdealShotSpeed(DrivebaseConstants.LOOKAHEAD),DrivebaseConstants.LOOKAHEAD) + (DriverStation.getAlliance().get() == Alliance.Blue ? 0. : Math.PI)))));
+    CommandScheduler.getInstance().schedule(shooter.setAngularVelocity(() -> RPM.of(aimingMath.getIdealShotSpeed(ShooterConstants.LOOKAHEAD)*ShooterConstants.SHOT_SPEED_CONVERSION_FACTOR)));
 
     if (lastLogTimestamp < Timer.getFPGATimestamp() - ShooterConstants.TIME_BETWEEN_LOG_TIMESTAMPS) {
       lastLogTimestamp = Timer.getFPGATimestamp();
@@ -98,6 +103,7 @@ public class AimTowardsGoal extends Command {
   @Override
   public void end(boolean interrupted) {
     swerve.getCurrentCommand().cancel();
+    shooter.getCurrentCommand().cancel();
   }
 
   public AimingMath getMath() {
