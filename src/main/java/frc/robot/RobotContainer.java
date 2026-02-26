@@ -118,7 +118,7 @@ public class RobotContainer {
     // Stuff
     driverController.start().onTrue((Commands.runOnce(drivebase::seedFieldCentric)));
 
-    // Sim stuff
+    // Sim/tuning stuff
     // driverController.leftTrigger().onTrue(Commands.runOnce(() -> {if(aimingCommand != null) {aimingCommand.getMath().logSim();}}));
     // driverController.rightTrigger().onTrue(Commands.runOnce(() -> {if(aimingCommand != null) {aimingCommand.getMath().resetSim();}}));
 
@@ -172,7 +172,7 @@ public class RobotContainer {
     operatorController.rightTrigger().whileTrue(arm.setAngle(ArmConstants.BOTTOM_ANGLE)
                                                .alongWith(intake.set(1.)))
                                     .onFalse(intake.set(0.));
-    operatorController.leftTrigger().whileTrue(intake.set(-1).alongWith(arm.setAngle(ArmConstants.ZERO_ANGLE))).onFalse(intake.set(0.));
+    operatorController.leftTrigger().whileTrue(arm.setAngle(ArmConstants.TOP_ANGLE));
     
     operatorController.rightBumper().whileTrue(Commands.run(() -> {
           if (driverAllowIndexing) {
@@ -185,7 +185,7 @@ public class RobotContainer {
                                      .onFalse(indexer.getDefaultCommand());
     operatorController.leftBumper().whileTrue(indexer.set(1.));
 
-    operatorController.x().whileTrue(shooter.set(0.67));
+    operatorController.x().whileTrue(shooter.set(0.67)).onFalse(shooter.getDefaultCommand());
 
     operatorController.y().onTrue(climb.setAngularPosition(ClimbConstants.UP_ANGLE));
     operatorController.a().onTrue(climb.setAngularPosition(Radians.of(0.)));

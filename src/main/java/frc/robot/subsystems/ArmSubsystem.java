@@ -28,7 +28,8 @@ public class ArmSubsystem extends SubsystemBase {
 
     private SmartMotorController lSparkSmartMotorController = new SparkWrapper(leftspark, DCMotor.getNEO(1), smcConfig);
 
-    private SmartMotorController rSparkSmartMotorController = new SparkWrapper(rightspark, DCMotor.getNEO(1), smcConfig.withLooselyCoupledFollowers(lSparkSmartMotorController));
+    private SmartMotorController rSparkSmartMotorController = new SparkWrapper(rightspark, DCMotor.getNEO(1), smcConfig.withMotorInverted(true)
+                                                                                                                                 .withLooselyCoupledFollowers(lSparkSmartMotorController));
 
     private ArmConfig armCfg = ArmConstants.APPLY_ARM_CONFIG.apply(new ArmConfig(rSparkSmartMotorController));
                                    

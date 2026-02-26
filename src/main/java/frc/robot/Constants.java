@@ -80,13 +80,9 @@ public final class Constants {
 
   public static class ShooterConstants {
     public static final int MOTOR_ID = 30;
-    public static final double SHOOTER_HIGH_SPEED = 300.0;
-    public static final double SHOOTER_LOW_SPEED = 60.0;
-    public static final double HIGH_DUTY_CYCLE = 0.6;
-    public static final double LOW_DUTY_CYCLE = 0.4;
     public static final UnaryOperator<SmartMotorControllerConfig> APPLY_SMC_CONFIG = (SmartMotorControllerConfig config) -> {
       return config.withControlMode(ControlMode.CLOSED_LOOP)
-                   .withClosedLoopController(1, 0, 0)
+                   .withClosedLoopController(0.05, 0, 0)
                    .withSimClosedLoopController(1, 0, 0)
                    .withFeedforward(new SimpleMotorFeedforward(0, 0, 0))
                    .withSimFeedforward(new SimpleMotorFeedforward(0, 0, 0))
@@ -130,7 +126,7 @@ public final class Constants {
     public static final Angle ZERO_ANGLE = Degrees.of(0.);
     public static final UnaryOperator<SmartMotorControllerConfig> APPLY_SMC_CONFIG = (SmartMotorControllerConfig config) -> {
       return config.withControlMode(ControlMode.CLOSED_LOOP)
-                   .withClosedLoopController(20, 0, 0)
+                   .withClosedLoopController(3, 0, 0)
                    .withSimClosedLoopController(1, 0, 0)
                    .withFeedforward(new ArmFeedforward(0, 0, 0))
                    .withSimFeedforward(new ArmFeedforward(0, 0, 0))
@@ -138,7 +134,7 @@ public final class Constants {
                    .withGearing(new MechanismGearing(GearBox.fromReductionStages(5)))
                    .withMotorInverted(false)
                    .withIdleMode(MotorMode.BRAKE)
-                   .withStatorCurrentLimit(Amps.of(20))
+                   .withStatorCurrentLimit(Amps.of(40))
                    .withClosedLoopRampRate(Seconds.of(0.25))
                    .withOpenLoopRampRate(Seconds.of(0.25));
     };
@@ -153,7 +149,7 @@ public final class Constants {
   }
 
   public static class IntakeConstants {
-    public static final double DUTY_CYCLE = 0.5;
+    public static final double DUTY_CYCLE = 0.2;
     public static final int MOTOR_ID = 22;
     public static final UnaryOperator<SmartMotorControllerConfig> APPLY_SMC_CONFIG = (SmartMotorControllerConfig config) -> {
       return config.withControlMode(ControlMode.OPEN_LOOP)
