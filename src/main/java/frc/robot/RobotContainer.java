@@ -103,6 +103,8 @@ public class RobotContainer {
    * joysticks}.
    */
   private void configureBindings() {
+    // Driver
+
     // Swerve
     drivebase.setDefaultCommand(drivebase.applyRequest(() -> {
         if (Math.hypot(driverController.getRightX(), driverController.getRightY()) > DrivebaseConstants.HEADING_DEADBAND) {
@@ -113,15 +115,14 @@ public class RobotContainer {
              .withTargetDirection(lastHeading); // Drive counterclockwise with negative X (left)
     }));
 
-    // Driver
-
     // Stuff
     driverController.start().onTrue((Commands.runOnce(drivebase::seedFieldCentric)));
 
-    // Sim/tuning stuff
+    // Sim stuff
     // driverController.leftTrigger().onTrue(Commands.runOnce(() -> {if(aimingCommand != null) {aimingCommand.getMath().logSim();}}));
     // driverController.rightTrigger().onTrue(Commands.runOnce(() -> {if(aimingCommand != null) {aimingCommand.getMath().resetSim();}}));
 
+    // Main controlls
     driverController.x().onTrue(Commands.runOnce(() -> {
         if (aimingCommand != null  &&  aimingCommand.isScheduled()) {
           aimingCommand.cancel();
@@ -169,11 +170,13 @@ public class RobotContainer {
 
     // Operator
     
+    // Arm
     operatorController.rightTrigger().whileTrue(arm.setAngle(ArmConstants.BOTTOM_ANGLE)
                                                .alongWith(intake.set(1.)))
                                     .onFalse(intake.set(0.));
-    operatorController.leftTrigger().whileTrue(arm.setAngle(ArmConstants.TOP_ANGLE));
+    operatorController.leftTrigger().whileTrue(intake.set(-1).alongWith(arm.setAngle(ArmConstants.ZERO_ANGLE))).onFalse(intake.set(0.));
     
+    // Indexer
     operatorController.rightBumper().whileTrue(Commands.run(() -> {
           if (driverAllowIndexing) {
             CommandScheduler.getInstance().schedule(indexer.set(1.));
@@ -185,8 +188,10 @@ public class RobotContainer {
                                      .onFalse(indexer.getDefaultCommand());
     operatorController.leftBumper().whileTrue(indexer.set(1.));
 
-    operatorController.x().whileTrue(shooter.set(0.67)).onFalse(shooter.getDefaultCommand());
+    // Silly shooter override (set this to shoot from an easy to drive to position, like in front of the hub)
+    operatorController.x().whileTrue(shooter.set(0.67));
 
+    // Climb
     operatorController.y().onTrue(climb.setAngularPosition(ClimbConstants.UP_ANGLE));
     operatorController.a().onTrue(climb.setAngularPosition(Radians.of(0.)));
   }

@@ -21,7 +21,6 @@ import edu.wpi.first.networktables.NetworkTableInstance;
 import edu.wpi.first.networktables.StructArrayPublisher;
 import edu.wpi.first.units.measure.AngularVelocity;
 import edu.wpi.first.units.measure.LinearVelocity;
-import edu.wpi.first.wpilibj.RobotBase;
 import edu.wpi.first.wpilibj.smartdashboard.SmartDashboard;
 import edu.wpi.first.wpilibj2.command.Command;
 import edu.wpi.first.wpilibj2.command.SubsystemBase;
@@ -102,23 +101,15 @@ public class ShooterSubsystem extends SubsystemBase {
     // This method will be called once per scheduler run
     shooter.updateTelemetry();
     SmartDashboard.putNumber("flywheel velocity", sparkSmartMotorController.getMechanismVelocity().in(RPM));
-    // try {
-    //   SmartDashboard.putNumber("flywheel setpoint", sparkSmartMotorController.get().get().in(RPM));
-    // }
-    // catch(Exception e) {
-    //   SmartDashboard.putNumber("flywheel setpoint", 0.);
-    // }
-
-    if (RobotBase.isSimulation()){
-    Pose3d[] fuelPoses = SimulatedArena.getInstance()
-            .getGamePiecesArrayByType("Fuel");       
-    fuelPosePublisher.accept(fuelPoses);
-    }
   }
 
   @Override
   public void simulationPeriodic() {
     // This method will be called once per scheduler run during simulation
     shooter.simIterate();
+
+    Pose3d[] fuelPoses = SimulatedArena.getInstance()
+                                       .getGamePiecesArrayByType("Fuel");       
+    fuelPosePublisher.accept(fuelPoses);
   }
 }
