@@ -171,7 +171,7 @@ public final class Constants {
     public static final UnaryOperator<SmartMotorControllerConfig> APPLY_SMC_CONFIG = (SmartMotorControllerConfig config) -> {
       return config.withControlMode(ControlMode.OPEN_LOOP)
              .withTelemetry("IndexerMotor", TelemetryVerbosity.LOW)
-             .withGearing(new MechanismGearing(GearBox.fromReductionStages(4)))
+             .withGearing(new MechanismGearing(GearBox.fromReductionStages(3)))
              .withMotorInverted(false)
              .withIdleMode(MotorMode.COAST)
              .withStatorCurrentLimit(Amps.of(20));  
