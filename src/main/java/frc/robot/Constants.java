@@ -9,7 +9,6 @@ import static edu.wpi.first.units.Units.Degrees;
 import static edu.wpi.first.units.Units.Inches;
 import static edu.wpi.first.units.Units.Pounds;
 import static edu.wpi.first.units.Units.RPM;
-import static edu.wpi.first.units.Units.Radians;
 import static edu.wpi.first.units.Units.Rotations;
 import static edu.wpi.first.units.Units.Seconds;
 
@@ -118,7 +117,8 @@ public final class Constants {
                    .withGearing(new MechanismGearing(GearBox.fromReductionStages(5)))
                    .withMotorInverted(false)
                    .withIdleMode(MotorMode.BRAKE)
-                   .withStatorCurrentLimit(Amps.of(40))
+                   .withStatorCurrentLimit(Amps.of(60))
+
                    .withClosedLoopRampRate(Seconds.of(0.25))
                    .withOpenLoopRampRate(Seconds.of(0.25));
     };
@@ -143,7 +143,10 @@ public final class Constants {
              .withIdleMode(MotorMode.COAST)
              .withStatorCurrentLimit(Amps.of(20));  
     };
-    public static final UnaryOperator<FlyWheelConfig> APPLY_INTAKE_CONFIG = (FlyWheelConfig config) -> {
+    
+    
+    public static
+     final UnaryOperator<FlyWheelConfig> APPLY_INTAKE_CONFIG = (FlyWheelConfig config) -> {
       return config.withDiameter(Inches.of(2))
                    .withMass(Pounds.of(1))
                    .withTelemetry("Intake", TelemetryVerbosity.LOW);
@@ -164,6 +167,7 @@ public final class Constants {
     public static final UnaryOperator<FlyWheelConfig> APPLY_INDEXER_CONFIG = (FlyWheelConfig config) -> {
       return config.withDiameter(Inches.of(1))
                    .withMass(Pounds.of(1))
+    
                    .withTelemetry("Indexer", TelemetryVerbosity.LOW);
     };
   }

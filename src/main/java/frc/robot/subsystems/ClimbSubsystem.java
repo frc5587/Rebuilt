@@ -24,6 +24,7 @@ public class ClimbSubsystem extends SubsystemBase {
   private SmartMotorControllerConfig smcConfig = ShooterConstants.APPLY_SMC_CONFIG.apply(new SmartMotorControllerConfig(this));
   private SparkMax spark = new SparkMax(ClimbConstants.MOTOR_ID, MotorType.kBrushless);
   private SmartMotorController sparkSmartMotorController = new SparkWrapper(spark, DCMotor.getNEO(1), smcConfig);
+  private final boolean hasLimitSwitch = false;
   private DigitalInput limitSwitch = new DigitalInput(ClimbConstants.LIMIT_SWITCH_ID);
 
   public ClimbSubsystem() {
@@ -51,8 +52,15 @@ public class ClimbSubsystem extends SubsystemBase {
     return Commands.run(() -> sparkSmartMotorController.setPosition(distance));
   }
 
-  public DigitalInput getLimitSwitch() {
-    return limitSwitch;
+  public boolean getLimitSwitch() throws Exception {
+    if (!hasLimitSwitch) {
+      throw new Exception("No limit switch");
+    }
+    return limitSwitch.get();
+  }
+
+  public boolean hasLimitSwitch() {
+    return hasLimitSwitch;
   }
 
   @Override
@@ -60,6 +68,9 @@ public class ClimbSubsystem extends SubsystemBase {
     SmartDashboard.putNumber("climb position", sparkSmartMotorController.getMechanismPosition().in(Radians));
     if (sparkSmartMotorController.getMechanismPositionSetpoint().isPresent()) {
       SmartDashboard.putNumber("climb setpoint", sparkSmartMotorController.getMechanismPositionSetpoint().get().in(Radians));
+    }
+    if (hasLimitSwitch  &&  limitSwitch.get()) {
+      sparkSmartMotorController.setEncoderPosition(Radians.of(0.));
     }
   }
 }

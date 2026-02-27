@@ -1,16 +1,13 @@
 package frc.robot.commands;
 
-import edu.wpi.first.wpilibj.DigitalInput;
 import edu.wpi.first.wpilibj2.command.Command;
 import frc.robot.subsystems.ClimbSubsystem;
 
 public class HomeClimb extends Command {
   private final ClimbSubsystem climb;
-  private final DigitalInput limitSwitch;
 
   public HomeClimb(ClimbSubsystem _climb) {
     climb = _climb;
-    limitSwitch = climb.getLimitSwitch();
   }
 
   @Override
@@ -20,6 +17,12 @@ public class HomeClimb extends Command {
 
   @Override
   public boolean isFinished() {
-    return limitSwitch.get();
+    if (!climb.hasLimitSwitch()) {
+      return true;
+    }
+    try {
+      return climb.getLimitSwitch();
+    } catch (Exception e) { }
+    return true;
   }
 }
