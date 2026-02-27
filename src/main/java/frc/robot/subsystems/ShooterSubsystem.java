@@ -101,6 +101,9 @@ public class ShooterSubsystem extends SubsystemBase {
     // This method will be called once per scheduler run
     shooter.updateTelemetry();
     SmartDashboard.putNumber("flywheel velocity", sparkSmartMotorController.getMechanismVelocity().in(RPM));
+    if (sparkSmartMotorController.getMechanismSetpointVelocity().isPresent()) {
+      SmartDashboard.putNumber("flywheel setpoint", sparkSmartMotorController.getMechanismSetpointVelocity().get().in(RPM));
+    }
   }
 
   @Override
