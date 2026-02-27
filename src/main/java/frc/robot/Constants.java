@@ -127,9 +127,9 @@ public final class Constants {
     public static final Angle ZERO_ANGLE = Degrees.of(0.);
     public static final UnaryOperator<SmartMotorControllerConfig> APPLY_SMC_CONFIG = (SmartMotorControllerConfig config) -> {
       return config.withControlMode(ControlMode.CLOSED_LOOP)
-                   .withClosedLoopController(2, 0, 0)
+                   .withClosedLoopController(5, 0, 0)
                    .withSimClosedLoopController(1, 0, 0)
-                   .withFeedforward(new ArmFeedforward(0,5., 0))
+                   .withFeedforward(new ArmFeedforward(0,0.3, 0))
                    .withSimFeedforward(new ArmFeedforward(0, 0, 0))
                    .withTelemetry("ArmMotor", TelemetryVerbosity.HIGH)
                    .withGearing(new MechanismGearing(GearBox.fromReductionStages(5)))

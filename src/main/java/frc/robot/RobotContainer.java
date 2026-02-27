@@ -76,7 +76,6 @@ public class RobotContainer {
     shooter.setDefaultCommand(shooter.set(0.));
     indexer.setDefaultCommand(indexer.stop());
     intake.setDefaultCommand(intake.stop());
-    arm.setDefaultCommand(arm.setAngle(ArmConstants.TOP_ANGLE));
 
     // Configure the trigger bindings
     configureBindings();
