@@ -1,6 +1,6 @@
 package frc.robot.subsystems;
 
-import static edu.wpi.first.units.Units.RPM;
+import static edu.wpi.first.units.Units.Radians;
 import static edu.wpi.first.units.Units.Second;
 import static edu.wpi.first.units.Units.Seconds;
 import static edu.wpi.first.units.Units.Volts;
@@ -75,14 +75,14 @@ public class ArmSubsystem extends SubsystemBase {
     return arm.sysId(Volts.of(7), Volts.of(2).per(Second), Seconds.of(4));
   }
 
-  @Override
-  public void periodic() {
-    arm.updateTelemetry();
-    SmartDashboard.putNumber("arm velocity", rSparkSmartMotorController.getMechanismVelocity().in(RPM));
-    if (rSparkSmartMotorController.getMechanismSetpointVelocity().isPresent()) {
-      SmartDashboard.putNumber("arm setpoint", rSparkSmartMotorController.getMechanismSetpointVelocity().get().in(RPM));
+    @Override
+    public void periodic() {
+        arm.updateTelemetry();
+        SmartDashboard.putNumber("arm position", rSparkSmartMotorController.getMechanismPosition().in(Radians));
+        if (rSparkSmartMotorController.getMechanismPositionSetpoint().isPresent()) {
+            SmartDashboard.putNumber("arm setpoint", rSparkSmartMotorController.getMechanismPositionSetpoint().get().in(Radians));
+        }
     }
-  }
 
   @Override
   public void simulationPeriodic() {
