@@ -173,7 +173,7 @@ public class RobotContainer {
     // Arm
     operatorController.rightTrigger().whileTrue(arm.setAngle(ArmConstants.BOTTOM_ANGLE)
                                                .alongWith(intake.set(IntakeConstants.DUTY_CYCLE)))
-                                    .onFalse(intake.set(0.));
+                                                .onFalse(intake.set(0.));
     operatorController.leftTrigger().whileTrue(arm.setAngle(ArmConstants.TOP_ANGLE));
     
     // Indexer

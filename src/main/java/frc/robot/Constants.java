@@ -121,13 +121,13 @@ public final class Constants {
 
   public static class ArmConstants {
     public static final int LEFT_MOTOR_ID = 20;
-    public static final int RIGHT_MOTOR_ID = 21;
+    public static final int RIGHT_MOTOR_ID = 25;
     public static final Angle TOP_ANGLE = Degrees.of(98.);
     public static final Angle BOTTOM_ANGLE = Degrees.of(0.);
     public static final Angle ZERO_ANGLE = Degrees.of(0.);
     public static final UnaryOperator<SmartMotorControllerConfig> APPLY_SMC_CONFIG = (SmartMotorControllerConfig config) -> {
       return config.withControlMode(ControlMode.CLOSED_LOOP)
-                   .withClosedLoopController(1, 0, 0)
+                   .withClosedLoopController(2, 0, 0)
                    .withSimClosedLoopController(1, 0, 0)
                    .withFeedforward(new ArmFeedforward(0,5., 0))
                    .withSimFeedforward(new ArmFeedforward(0, 0, 0))
