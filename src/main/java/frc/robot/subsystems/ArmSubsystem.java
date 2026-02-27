@@ -21,50 +21,57 @@ import yams.motorcontrollers.SmartMotorControllerConfig;
 import yams.motorcontrollers.local.SparkWrapper;
 
 public class ArmSubsystem extends SubsystemBase {
-    
-    private SmartMotorControllerConfig smcConfig = ArmConstants.APPLY_SMC_CONFIG.apply(new SmartMotorControllerConfig(this));
 
-    private SparkMax leftspark = new SparkMax(ArmConstants.LEFT_MOTOR_ID, MotorType.kBrushless);
+  private SmartMotorControllerConfig leftSMCConfig = ArmConstants.APPLY_SMC_CONFIG
+      .apply(new SmartMotorControllerConfig(this));
 
-    private SparkMax rightspark = new SparkMax(ArmConstants.RIGHT_MOTOR_ID, MotorType.kBrushless);
+  private SmartMotorControllerConfig rightSMCConfig = ArmConstants.APPLY_SMC_CONFIG
+      .apply(new SmartMotorControllerConfig(this));
 
-    private SmartMotorController lSparkSmartMotorController = new SparkWrapper(leftspark, DCMotor.getNEO(1), smcConfig);
+  private SparkMax leftSpark = new SparkMax(ArmConstants.LEFT_MOTOR_ID, MotorType.kBrushless);
+  private SparkMax rightSpark = new SparkMax(ArmConstants.RIGHT_MOTOR_ID, MotorType.kBrushless);
 
-    private SmartMotorController rSparkSmartMotorController = new SparkWrapper(rightspark, DCMotor.getNEO(1), smcConfig.withMotorInverted(true)
-                                                                                                                                 .withLooselyCoupledFollowers(lSparkSmartMotorController));
+  private SmartMotorController lSparkSmartMotorController = new SparkWrapper(leftSpark, DCMotor.getNEO(1),
+      leftSMCConfig);
+  private SmartMotorController rSparkSmartMotorController = new SparkWrapper(rightSpark, DCMotor.getNEO(1),
+      rightSMCConfig.withMotorInverted(true)
+                    .withLooselyCoupledFollowers(lSparkSmartMotorController));
 
-    private ArmConfig armCfg = ArmConstants.APPLY_ARM_CONFIG.apply(new ArmConfig(rSparkSmartMotorController));
-                                   
+  private ArmConfig rightArmConfig = ArmConstants.APPLY_ARM_CONFIG.apply(new ArmConfig(rSparkSmartMotorController));
+  private ArmConfig leftArmCfg = ArmConstants.APPLY_ARM_CONFIG.apply(new ArmConfig(lSparkSmartMotorController));
 
-    private Arm arm = new Arm(armCfg);
-    
-    public ArmSubsystem() {
-        lSparkSmartMotorController.setEncoderPosition(ArmConstants.TOP_ANGLE);
-    }
+  private Arm arm = new Arm(rightArmConfig);
 
-    /**
-     * Set the angle of the arm
-     * @param angle Angle to go to.
-     * @return A command.
-     */
-    public Command setAngle(Angle angle) {
-        return arm.setAngle(angle);
-    }
+  public ArmSubsystem() {
+    leftArmCfg.applyConfig();
+  }
 
-    /**
-     * Move the arm up and down.
-     * @param dutycycle [-1, 1] speed to set the arm to.
-     */
-    public Command set(double dutycycle) {
-        return arm.set(dutycycle);
-    }
+  /**
+   * Set the angle of the arm
+   * 
+   * @param angle Angle to go to.
+   * @return A command.
+   */
+  public Command setAngle(Angle angle) {
+    return arm.setAngle(angle);
+  }
 
-    /**
-     * Run sysId on the {@link Arm}
-     */
-    public Command sysId() {
-        return arm.sysId(Volts.of(7), Volts.of(2).per(Second), Seconds.of(4));
-    }
+  /**
+   * Move the arm up and down.
+   * 
+   * @param dutycycle [-1, 1] speed to set the arm to.
+   */
+  public Command set(double dutycycle) {
+    return arm.set(dutycycle);
+  }
+  
+
+  /**
+   * Run sysId on the {@link Arm}
+   */
+  public Command sysId() {
+    return arm.sysId(Volts.of(7), Volts.of(2).per(Second), Seconds.of(4));
+  }
 
     @Override
     public void periodic() {
@@ -75,8 +82,8 @@ public class ArmSubsystem extends SubsystemBase {
         }
     }
 
-    @Override
-    public void simulationPeriodic() {
-        arm.simIterate();
-    }
+  @Override
+  public void simulationPeriodic() {
+    arm.simIterate();
+  }
 }
