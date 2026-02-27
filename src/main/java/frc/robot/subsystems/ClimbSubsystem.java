@@ -1,6 +1,5 @@
 package frc.robot.subsystems;
 
-import static edu.wpi.first.units.Units.RPM;
 import static edu.wpi.first.units.Units.Radians;
 import static edu.wpi.first.units.Units.Volts;
 
@@ -10,6 +9,7 @@ import com.revrobotics.spark.SparkMax;
 import edu.wpi.first.math.system.plant.DCMotor;
 import edu.wpi.first.units.measure.Angle;
 import edu.wpi.first.units.measure.Distance;
+import edu.wpi.first.wpilibj.DigitalInput;
 import edu.wpi.first.wpilibj.smartdashboard.SmartDashboard;
 import edu.wpi.first.wpilibj2.command.Command;
 import edu.wpi.first.wpilibj2.command.Commands;
@@ -24,16 +24,17 @@ public class ClimbSubsystem extends SubsystemBase {
   private SmartMotorControllerConfig smcConfig = ShooterConstants.APPLY_SMC_CONFIG.apply(new SmartMotorControllerConfig(this));
   private SparkMax spark = new SparkMax(ClimbConstants.MOTOR_ID, MotorType.kBrushless);
   private SmartMotorController sparkSmartMotorController = new SparkWrapper(spark, DCMotor.getNEO(1), smcConfig);
+  private DigitalInput limitSwitch = new DigitalInput(ClimbConstants.LIMIT_SWITCH_ID);
 
   public ClimbSubsystem() {
     sparkSmartMotorController.setEncoderPosition(Radians.of(0));
   }
 
-   /**
-     * Sets the dutycycle of the intake.
-     * @param dutyCycle Dutycycle to set.
-     * @return A command to set the dutycycle.
-     */
+  /**
+    * Sets the dutycycle of the intake.
+    * @param dutyCycle Dutycycle to set.
+    * @return A command to set the dutycycle.
+    */
   public Command set(double dutyCycle) {
       return Commands.run(() -> sparkSmartMotorController.setDutyCycle(dutyCycle));
   }
@@ -50,11 +51,15 @@ public class ClimbSubsystem extends SubsystemBase {
     return Commands.run(() -> sparkSmartMotorController.setPosition(distance));
   }
 
+  public DigitalInput getLimitSwitch() {
+    return limitSwitch;
+  }
+
   @Override
   public void periodic() {
-    SmartDashboard.putNumber("climb velocity", sparkSmartMotorController.getMechanismVelocity().in(RPM));
-    if (sparkSmartMotorController.getMechanismSetpointVelocity().isPresent()) {
-      SmartDashboard.putNumber("climb setpoint", sparkSmartMotorController.getMechanismSetpointVelocity().get().in(RPM));
+    SmartDashboard.putNumber("climb position", sparkSmartMotorController.getMechanismPosition().in(Radians));
+    if (sparkSmartMotorController.getMechanismPositionSetpoint().isPresent()) {
+      SmartDashboard.putNumber("climb setpoint", sparkSmartMotorController.getMechanismPositionSetpoint().get().in(Radians));
     }
   }
 }

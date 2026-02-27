@@ -61,23 +61,6 @@ public final class Constants {
     public static final ProfiledPIDController SHOOT_WHILE_MOVE_HEADING_CONTROLLER = new ProfiledPIDController(25,0,0,new Constraints(MAX_SPIN_SPEED_RADIANS_PER_SECOND, MAX_SPIN_ACCEL));
   }
 
-  // Sim
-  // public static class DrivebaseConstants {
-  //   public static final double ROBOT_MASS = (148 - 20.3) * 0.453592; // 32lbs * kg per pound
-  //   public static final Matter CHASSIS    = new Matter(new Translation3d(0, 0, Units.inchesToMeters(8)), ROBOT_MASS);
-  //   public static final double LOOP_TIME  = 0.13; //s, 20ms + 110ms sprk max velocity lag
-  //   public static final double MAX_SPEED  = Units.feetToMeters(15);
-  //   public static final double MAX_SPIN_SPEED_RADIANS_PER_SECOND = 4 * Math.PI;
-  //   public static final double MAX_SPIN_ACCEL = 4 * Math.PI;
-  //   public static final double WHEEL_LOCK_TIME = 10; //seconds
-
-  //   public static final double LOOKAHEAD = 0.1;
-  //   public static final double SHOOT_WHILE_MOVING_SPEED  = Units.feetToMeters(7.5);
-  //   public static final double SHOOT_WHILE_MOVE_ACCEL_LIMIT = 10;
-  //   public static final ProfiledPIDController HEADING_CONTROLLER = new ProfiledPIDController(10,0,0.1,new Constraints(MAX_SPIN_SPEED_RADIANS_PER_SECOND, MAX_SPIN_ACCEL));
-  //   public static final ProfiledPIDController SHOOT_WHILE_MOVE_HEADING_CONTROLLER = new ProfiledPIDController(25,0,0,new Constraints(MAX_SPIN_SPEED_RADIANS_PER_SECOND, MAX_SPIN_ACCEL));
-  // }
-
   public static class ShooterConstants {
     public static final int MOTOR_ID = 30;
     public static final UnaryOperator<SmartMotorControllerConfig> APPLY_SMC_CONFIG = (SmartMotorControllerConfig config) -> {
@@ -186,6 +169,7 @@ public final class Constants {
   public static class ClimbConstants {
     public static final Angle UP_ANGLE = Radians.of(20.);
     public static final int MOTOR_ID = 40;
+    public static final int LIMIT_SWITCH_ID = 0; //TODO set actual id
     public static final UnaryOperator<SmartMotorControllerConfig> APPLY_SMC_CONFIG = (SmartMotorControllerConfig config) -> {
       return config.withControlMode(ControlMode.CLOSED_LOOP)
                    .withClosedLoopController(1, 0, 0)
