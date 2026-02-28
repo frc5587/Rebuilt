@@ -71,7 +71,6 @@ public class ClimbSubsystem extends SubsystemBase {
       SmartDashboard.putNumber("climb setpoint", sparkSmartMotorController.getMechanismPositionSetpoint().get().in(Rotations));
     }
 
-    sparkSmartMotorController.getDutyCycle();
     if (hasLimitSwitch  &&  limitSwitch.get()) {
       sparkSmartMotorController.setEncoderPosition(Radians.of(0.));
     }

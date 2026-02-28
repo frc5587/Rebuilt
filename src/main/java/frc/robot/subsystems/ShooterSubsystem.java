@@ -104,6 +104,7 @@ public class ShooterSubsystem extends SubsystemBase {
     if (sparkSmartMotorController.getMechanismSetpointVelocity().isPresent()) {
       SmartDashboard.putNumber("flywheel setpoint", sparkSmartMotorController.getMechanismSetpointVelocity().get().in(RPM));
     }
+    SmartDashboard.putNumber("flywheel dutycycle", sparkSmartMotorController.getDutyCycle());
   }
 
   @Override

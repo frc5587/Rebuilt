@@ -52,7 +52,8 @@ public final class Constants {
     public static final double MAX_SPEED  = Units.feetToMeters(8);
     public static final double MAX_SPIN_SPEED_RADIANS_PER_SECOND = 2 * Math.PI;
     public static final double MAX_SPIN_ACCEL = 4 * Math.PI;
-    public static final double HEADING_DEADBAND = 0.25;
+    public static final double HEADING_DEADBAND = 0.3;
+    public static final double INTAKE_HEADING_DEADBAND = 0.1;
     public static final ProfiledPIDController HEADING_CONTROLLER = new ProfiledPIDController(10,0,0.1,new Constraints(MAX_SPIN_SPEED_RADIANS_PER_SECOND, MAX_SPIN_ACCEL));
 
     public static final double LOOKAHEAD = 0.1;
@@ -78,7 +79,7 @@ public final class Constants {
     public static final UnaryOperator<FlyWheelConfig> APPLY_FLYWHEEL_CONFIG = (FlyWheelConfig config) -> {
       return config.withDiameter(Inches.of(4))
                    .withMass(Pounds.of(2.5))
-                   .withUpperSoftLimit(RPM.of(1000))
+                   .withUpperSoftLimit(RPM.of(5000))
                    .withTelemetry("Shooter", TelemetryVerbosity.HIGH);
     };
 
@@ -87,7 +88,7 @@ public final class Constants {
     public static final double LOOKAHEAD = 0.1;
     public static final double SHOTS_PER_SECOND = 2;
     public static final double TIME_BETWEEN_LOG_TIMESTAMPS = 0.055;
-    public static final double SHOT_SPEED_CONVERSION_FACTOR = 187.978279242;
+    public static final double SHOT_SPEED_CONVERSION_FACTOR = 700;  // 187.978279242
     public static final Vector3 SHOOTER_POSITION = new Vector3(0.2,0,0.4);
     public static final Vector3 BLUE_ALLIANCE_GOAL = new Vector3(4.625626,4.0346315,1.8288);
     public static final Vector3 RED_ALLIANCE_GOAL = new Vector3(11.915426,4.0346315,1.8288);
@@ -111,10 +112,10 @@ public final class Constants {
       return config.withControlMode(ControlMode.CLOSED_LOOP)
                    .withClosedLoopController(3, 0, 0)
                    .withSimClosedLoopController(1, 0, 0)
-                   .withFeedforward(new ArmFeedforward(0,0.3, 0))
+                   .withFeedforward(new ArmFeedforward(0,0.15, 0))
                    .withSimFeedforward(new ArmFeedforward(0, 0, 0))
                    .withTelemetry("ArmMotor", TelemetryVerbosity.HIGH)
-                   .withGearing(new MechanismGearing(GearBox.fromReductionStages(5.,24./18.)))
+                   .withGearing(new MechanismGearing(GearBox.fromReductionStages(5.,32./18.)))
                    .withMotorInverted(false)
                    .withIdleMode(MotorMode.BRAKE)
                    .withStatorCurrentLimit(Amps.of(40))
@@ -132,7 +133,7 @@ public final class Constants {
   }
 
   public static class IntakeConstants {
-    public static final double DUTY_CYCLE = 0.5;
+    public static final double DUTY_CYCLE = 0.7;
     public static final int MOTOR_ID = 22;
     public static final UnaryOperator<SmartMotorControllerConfig> APPLY_SMC_CONFIG = (SmartMotorControllerConfig config) -> {
       return config.withControlMode(ControlMode.OPEN_LOOP)
