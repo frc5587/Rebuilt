@@ -1,6 +1,7 @@
 package frc.robot.subsystems;
 
 import static edu.wpi.first.units.Units.Radians;
+import static edu.wpi.first.units.Units.Rotations;
 import static edu.wpi.first.units.Units.Volts;
 
 import com.revrobotics.spark.SparkLowLevel.MotorType;
@@ -65,10 +66,12 @@ public class ClimbSubsystem extends SubsystemBase {
 
   @Override
   public void periodic() {
-    SmartDashboard.putNumber("climb position", sparkSmartMotorController.getMechanismPosition().in(Radians));
+    SmartDashboard.putNumber("climb position", sparkSmartMotorController.getMechanismPosition().in(Rotations));
     if (sparkSmartMotorController.getMechanismPositionSetpoint().isPresent()) {
-      SmartDashboard.putNumber("climb setpoint", sparkSmartMotorController.getMechanismPositionSetpoint().get().in(Radians));
+      SmartDashboard.putNumber("climb setpoint", sparkSmartMotorController.getMechanismPositionSetpoint().get().in(Rotations));
     }
+
+    sparkSmartMotorController.getDutyCycle();
     if (hasLimitSwitch  &&  limitSwitch.get()) {
       sparkSmartMotorController.setEncoderPosition(Radians.of(0.));
     }
