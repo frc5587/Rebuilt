@@ -102,6 +102,34 @@ public class RobotContainer {
    * joysticks}.
    */
   private void configureBindings() {
+  /**
+   *      Driver Controls
+   * Left Stick: Drive (Field Oriented)
+   * Right Stick: Rotate Robot
+   * 
+   * Start: Zero Robot Gyro (use if field oriented feels off)
+   * 
+   * Right Bumper: Together Indexer
+   * 
+   * X: Shoot while moving swerve
+   * Y: ???
+   * A: ???
+   * Left Bumper: ???
+   * 
+   *      Operator Controls
+   * Right Bumper: Together Indexer
+   * Left Bumper: Override Indexer
+   * 
+   * Right Trigger: Arm Down + Intake Forward
+   * Left Trigger: Arm Up
+   * 
+   * X: Shooter Override (Constant Speed)
+   * B (not implemented yet): Position Dependent Shooter
+   * 
+   * Y: Climb Top
+   * A: Climb Bottom
+   */
+
     // Driver
 
     // Swerve
@@ -114,7 +142,7 @@ public class RobotContainer {
              .withTargetDirection(lastHeading); // Drive counterclockwise with negative X (left)
     }));
 
-    // Stuff
+    // Zero Gyro
     driverController.start().onTrue((Commands.runOnce(drivebase::seedFieldCentric)));
 
     // Sim stuff
@@ -189,6 +217,7 @@ public class RobotContainer {
 
     // Silly shooter override (set this to shoot from an easy to drive to position, like in front of the hub)
     operatorController.x().whileTrue(shooter.set(0.67));
+    // TODO can we get a position based standstill shooter speed button for operator?
 
     // Climb
     operatorController.y().onTrue(climb.setAngularPosition(ClimbConstants.UP_ANGLE));

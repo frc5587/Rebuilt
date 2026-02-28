@@ -105,11 +105,11 @@ public final class Constants {
     public static final int LEFT_MOTOR_ID = 20;
     public static final int RIGHT_MOTOR_ID = 21;
     public static final Angle TOP_ANGLE = Degrees.of(100.);
-    public static final Angle BOTTOM_ANGLE = Degrees.of(-5.);
+    public static final Angle BOTTOM_ANGLE = Degrees.of(0.);
     public static final Angle ZERO_ANGLE = Degrees.of(0.);
     public static final UnaryOperator<SmartMotorControllerConfig> APPLY_SMC_CONFIG = (SmartMotorControllerConfig config) -> {
       return config.withControlMode(ControlMode.CLOSED_LOOP)
-                   .withClosedLoopController(5, 0, 0)
+                   .withClosedLoopController(3, 0, 0)
                    .withSimClosedLoopController(1, 0, 0)
                    .withFeedforward(new ArmFeedforward(0,0.3, 0))
                    .withSimFeedforward(new ArmFeedforward(0, 0, 0))
@@ -118,7 +118,6 @@ public final class Constants {
                    .withMotorInverted(false)
                    .withIdleMode(MotorMode.BRAKE)
                    .withStatorCurrentLimit(Amps.of(40))
-
                    .withClosedLoopRampRate(Seconds.of(0.25))
                    .withOpenLoopRampRate(Seconds.of(0.25));
     };
