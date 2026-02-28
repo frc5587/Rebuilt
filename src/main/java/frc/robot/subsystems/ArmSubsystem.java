@@ -22,7 +22,6 @@ import yams.motorcontrollers.SmartMotorControllerConfig;
 import yams.motorcontrollers.local.SparkWrapper;
 
 public class ArmSubsystem extends SubsystemBase {
-
   private SmartMotorControllerConfig leftSMCConfig = ArmConstants.APPLY_SMC_CONFIG
       .apply(new SmartMotorControllerConfig(this));
 

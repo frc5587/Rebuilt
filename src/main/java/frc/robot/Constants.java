@@ -103,9 +103,9 @@ public final class Constants {
 
   public static class ArmConstants {
     public static final int LEFT_MOTOR_ID = 20;
-    public static final int RIGHT_MOTOR_ID = 25;
-    public static final Angle TOP_ANGLE = Degrees.of(98.);
-    public static final Angle BOTTOM_ANGLE = Degrees.of(0.);
+    public static final int RIGHT_MOTOR_ID = 21;
+    public static final Angle TOP_ANGLE = Degrees.of(100.);
+    public static final Angle BOTTOM_ANGLE = Degrees.of(-5.);
     public static final Angle ZERO_ANGLE = Degrees.of(0.);
     public static final UnaryOperator<SmartMotorControllerConfig> APPLY_SMC_CONFIG = (SmartMotorControllerConfig config) -> {
       return config.withControlMode(ControlMode.CLOSED_LOOP)
@@ -114,10 +114,10 @@ public final class Constants {
                    .withFeedforward(new ArmFeedforward(0,0.3, 0))
                    .withSimFeedforward(new ArmFeedforward(0, 0, 0))
                    .withTelemetry("ArmMotor", TelemetryVerbosity.HIGH)
-                   .withGearing(new MechanismGearing(GearBox.fromReductionStages(5)))
+                   .withGearing(new MechanismGearing(GearBox.fromReductionStages(5.,24./18.)))
                    .withMotorInverted(false)
                    .withIdleMode(MotorMode.BRAKE)
-                   .withStatorCurrentLimit(Amps.of(60))
+                   .withStatorCurrentLimit(Amps.of(40))
 
                    .withClosedLoopRampRate(Seconds.of(0.25))
                    .withOpenLoopRampRate(Seconds.of(0.25));
