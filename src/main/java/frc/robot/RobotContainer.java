@@ -4,6 +4,7 @@
 
 package frc.robot;
 
+import static edu.wpi.first.units.Units.Degrees;
 import static edu.wpi.first.units.Units.Radians;
 
 import com.ctre.phoenix6.swerve.SwerveModule.DriveRequestType;
@@ -17,6 +18,7 @@ import frc.robot.commands.AimTowardsGoal;
 import frc.robot.math.Vector3;
 import frc.robot.subsystems.ShooterSubsystem;
 import frc.robot.subsystems.SwerveSubsystem;
+import frc.robot.subsystems.Vision;
 import frc.robot.subsystems.ArmSubsystem;
 import frc.robot.subsystems.ClimbSubsystem;
 import frc.robot.subsystems.IndexerSubsystem;
@@ -104,12 +106,12 @@ public class RobotContainer {
   private void configureBindings() {
   /**
    *      Driver Controls
-   * Left Stick: Drive (Field Oriented)
-   * Right Stick: Rotate Robot (heading controll)
+   * Left Stick: Drive (field oriented)
+   * Right Stick: Rotate robot (heading control)
    * 
-   * Start: Zero Robot Gyro (use if field oriented feels off)
+   * Start: Zero robot gyro (use if field oriented feels off)
    * 
-   * Right Bumper: Together Indexer
+   * Right Bumper: Together indexer
    * 
    * X: Shoot while moving swerve
    * Y: Point forward and arm down (for trench)
@@ -117,19 +119,21 @@ public class RobotContainer {
    * Left Bumper: Alternate shoot on the move control
    * 
    *      Operator Controls
-   * Right Bumper: Together Indexer
-   * Left Bumper: Override Indexer
+   * Right Bumper: Together indexer
+   * Left Bumper: Override indexer
    * 
-   * Right Trigger: Arm Down + Intake Forward
-   * Left Trigger: Arm Up
+   * Right Trigger: Arm down + intake forward
+   * Left Trigger: Arm up
    * 
-   * X: Shooter Override (Constant Speed)
-   * B (not implemented yet): Position Dependent Shooter
+   * X: Shooter override (constant speed)
+   * B (not implemented yet): Position dependent shooter
    * 
-   * Y: Climb Top
-   * A: Climb Bottom
+   * Y: Climb top
+   * A: Climb bottom
    * 
-   * POV Up (100% Intake Speed)
+   * POV Up: 100% intake speed
+   * POV Right: Reverse indexer and shooter
+   * POV Down: Reverse intake
    */
 
     // Driver
@@ -233,8 +237,11 @@ public class RobotContainer {
 
     // Utils
     operatorController.povUp().whileTrue(intake.set(1.));
-    operatorController.povRight().whileTrue(indexer.set(-0.5));
-    operatorController.povLeft().whileTrue(shooter.set(-0.3));
+    operatorController.povRight().whileTrue(indexer.set(-1.).alongWith(shooter.set(-0.3)));
+    operatorController.povDown().whileTrue(intake.set(-1.));
+    operatorController.povLeft().whileTrue(arm.set(1.));
+
+    operatorController.start().onTrue(arm.resetAngle(Degrees.of(0.)));
   }
 
   /**

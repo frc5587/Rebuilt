@@ -27,7 +27,6 @@ import java.awt.Desktop;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Optional;
-import java.util.function.Supplier;
 import org.photonvision.EstimatedRobotPose;
 import org.photonvision.PhotonCamera;
 import org.photonvision.PhotonPoseEstimator;
@@ -38,8 +37,6 @@ import org.photonvision.simulation.SimCameraProperties;
 import org.photonvision.simulation.VisionSystemSim;
 import org.photonvision.targeting.PhotonPipelineResult;
 import org.photonvision.targeting.PhotonTrackedTarget;
-import swervelib.SwerveDrive;
-import swervelib.telemetry.SwerveDriveTelemetry;
 
 /**
  * Example PhotonVision class to aid in the pursuit of accurate odometry. Taken
@@ -72,11 +69,7 @@ public class Vision {
   /**
    * Current pose from the pose estimator using wheel odometry.
    */
-  private Supplier<Pose2d> currentPose;
-  /**
-   * Field from {@link swervelib.SwerveDrive#field}
-   */
-  private Field2d field2d;
+  private Pose2d currentPose;
 
   /**
    * Constructor for the Vision class.
@@ -85,9 +78,8 @@ public class Vision {
    *                    {@link SwerveDrive#getPose()}
    * @param field       Current field, should be {@link SwerveDrive#field}
    */
-  public Vision(Supplier<Pose2d> currentPose, Field2d field) {
+  public Vision(Pose2d currentPose) {
     this.currentPose = currentPose;
-    this.field2d = field;
 
     if (Robot.isSimulation()) {
       visionSim = new VisionSystemSim("Vision");
@@ -126,20 +118,20 @@ public class Vision {
    *
    * @param swerveDrive {@link SwerveDrive} instance.
    */
-  public void updatePoseEstimation(SwerveDrive swerveDrive) {
-    if (SwerveDriveTelemetry.isSimulation && swerveDrive.getSimulationDriveTrainPose().isPresent()) {
-      /*
-       * In the maple-sim, odometry is simulated using encoder values, accounting for
-       * factors like skidding and drifting.
-       * As a result, the odometry may not always be 100% accurate.
-       * However, the vision system should be able to provide a reasonably accurate
-       * pose estimation, even when odometry is incorrect.
-       * (This is why teams implement vision system to correct odometry.)
-       * Therefore, we must ensure that the actual robot pose is provided in the
-       * simulator when updating the vision simulation during the simulation.
-       */
-      visionSim.update(swerveDrive.getSimulationDriveTrainPose().get());
-    }
+  public void updatePoseEstimation(SwerveSubsystem swerveDrive) {
+    // if (SwerveDriveTelemetry.isSimulation && swerveDrive.getSimulationDriveTrainPose().isPresent()) {
+    //   /*
+    //    * In the maple-sim, odometry is simulated using encoder values, accounting for
+    //    * factors like skidding and drifting.
+    //    * As a result, the odometry may not always be 100% accurate.
+    //    * However, the vision system should be able to provide a reasonably accurate
+    //    * pose estimation, even when odometry is incorrect.
+    //    * (This is why teams implement vision system to correct odometry.)
+    //    * Therefore, we must ensure that the actual robot pose is provided in the
+    //    * simulator when updating the vision simulation during the simulation.
+    //    */
+    //   visionSim.update(swerveDrive.getSimulationDriveTrainPose().get());
+    // }
     for (Cameras camera : Cameras.values()) {
       Optional<EstimatedRobotPose> poseEst = getEstimatedGlobalPose(camera);
       if (poseEst.isPresent()) {
@@ -186,7 +178,7 @@ public class Vision {
    */
   public double getDistanceFromAprilTag(int id) {
     Optional<Pose3d> tag = fieldLayout.getTagPose(id);
-    return tag.map(pose3d -> PhotonUtils.getDistanceToPose(currentPose.get(), pose3d.toPose2d())).orElse(-1.0);
+    return tag.map(pose3d -> PhotonUtils.getDistanceToPose(currentPose, pose3d.toPose2d())).orElse(-1.0);
   }
 
   /**
@@ -241,28 +233,28 @@ public class Vision {
   /**
    * Update the {@link Field2d} to include tracked targets/
    */
-  public void updateVisionField() {
+  // public void updateVisionField() {
 
-    List<PhotonTrackedTarget> targets = new ArrayList<PhotonTrackedTarget>();
-    for (Cameras c : Cameras.values()) {
-      if (!c.resultsList.isEmpty()) {
-        PhotonPipelineResult latest = c.resultsList.get(0);
-        if (latest.hasTargets()) {
-          targets.addAll(latest.targets);
-        }
-      }
-    }
+  //   List<PhotonTrackedTarget> targets = new ArrayList<PhotonTrackedTarget>();
+  //   for (Cameras c : Cameras.values()) {
+  //     if (!c.resultsList.isEmpty()) {
+  //       PhotonPipelineResult latest = c.resultsList.get(0);
+  //       if (latest.hasTargets()) {
+  //         targets.addAll(latest.targets);
+  //       }
+  //     }
+  //   }
 
-    List<Pose2d> poses = new ArrayList<>();
-    for (PhotonTrackedTarget target : targets) {
-      if (fieldLayout.getTagPose(target.getFiducialId()).isPresent()) {
-        Pose2d targetPose = fieldLayout.getTagPose(target.getFiducialId()).get().toPose2d();
-        poses.add(targetPose);
-      }
-    }
+  //   List<Pose2d> poses = new ArrayList<>();
+  //   for (PhotonTrackedTarget target : targets) {
+  //     if (fieldLayout.getTagPose(target.getFiducialId()).isPresent()) {
+  //       Pose2d targetPose = fieldLayout.getTagPose(target.getFiducialId()).get().toPose2d();
+  //       poses.add(targetPose);
+  //     }
+  //   }
 
-    field2d.getObject("tracked targets").setPoses(poses);
-  }
+  //   field2d.getObject("tracked targets").setPoses(poses);
+  // }
 
   /**
    * Camera Enum to select each camera

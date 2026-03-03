@@ -1,6 +1,6 @@
 package frc.robot.subsystems;
 
-import static edu.wpi.first.units.Units.Radians;
+import static edu.wpi.first.units.Units.Rotations;
 import static edu.wpi.first.units.Units.Second;
 import static edu.wpi.first.units.Units.Seconds;
 import static edu.wpi.first.units.Units.Volts;
@@ -65,7 +65,6 @@ public class ArmSubsystem extends SubsystemBase {
   public Command set(double dutycycle) {
     return arm.set(dutycycle);
   }
-  
 
   /**
    * Run sysId on the {@link Arm}
@@ -74,14 +73,31 @@ public class ArmSubsystem extends SubsystemBase {
     return arm.sysId(Volts.of(7), Volts.of(2).per(Second), Seconds.of(4));
   }
 
-    @Override
-    public void periodic() {
-        arm.updateTelemetry();
-        SmartDashboard.putNumber("arm position", rSparkSmartMotorController.getMechanismPosition().in(Radians));
-        if (rSparkSmartMotorController.getMechanismPositionSetpoint().isPresent()) {
-            SmartDashboard.putNumber("arm setpoint", rSparkSmartMotorController.getMechanismPositionSetpoint().get().in(Radians));
-        }
+  /*
+   * Resets angle
+   */
+  public Command resetAngle(Angle _angle) {
+    return run(() -> {
+      lSparkSmartMotorController.setEncoderPosition(_angle);
+      rSparkSmartMotorController.setEncoderPosition(_angle);
+    });
+  }
+
+  @Override
+  public void periodic() {
+    arm.updateTelemetry();
+    SmartDashboard.putNumber("right arm position", rSparkSmartMotorController.getMechanismPosition().in(Rotations));
+    if (rSparkSmartMotorController.getMechanismPositionSetpoint().isPresent()) {
+      SmartDashboard.putNumber("right arm setpoint", rSparkSmartMotorController.getMechanismPositionSetpoint().get().in(Rotations));
     }
+    SmartDashboard.putNumber("right dutycycle", rSparkSmartMotorController.getDutyCycle());
+
+    SmartDashboard.putNumber("left arm position", lSparkSmartMotorController.getMechanismPosition().in(Rotations));
+    if (rSparkSmartMotorController.getMechanismPositionSetpoint().isPresent()) {
+      SmartDashboard.putNumber("left arm setpoint", lSparkSmartMotorController.getMechanismPositionSetpoint().get().in(Rotations));
+    }
+    SmartDashboard.putNumber("left dutycycle", lSparkSmartMotorController.getDutyCycle());
+  }
 
   @Override
   public void simulationPeriodic() {
