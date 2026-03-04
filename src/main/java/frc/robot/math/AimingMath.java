@@ -188,7 +188,6 @@ public class AimingMath {
                                                                              Rotation2d.fromRadians(getIdealHeading(getIdealShotSpeed(DrivebaseConstants.LOOKAHEAD),DrivebaseConstants.LOOKAHEAD,robotPosition.get(),headingRadians.getAsDouble(),robotVelocity.get(),angularVelocityRadians.getAsDouble()))));
     SmartDashboard.putNumber("ideal heading", getIdealHeading());
     SmartDashboard.putString("SimResults", simLog);
-    SmartDashboard.putNumber("ideal RPM", getIdealShotSpeed() * ShooterConstants.SHOT_SPEED_CONVERSION_FACTOR);
   }
 
   public void resetSim() {
@@ -210,7 +209,7 @@ public class AimingMath {
   }
   
   public void addSimSnapshot() {
-    double shotSpeed = flywheelRPM.getAsDouble() / ShooterConstants.SHOT_SPEED_CONVERSION_FACTOR;
+    double shotSpeed = flywheelRPM.getAsDouble() * 500.;
     double angle = 0;
       
     times.add(Timer.getFPGATimestamp());

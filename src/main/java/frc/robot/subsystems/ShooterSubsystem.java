@@ -75,6 +75,10 @@ public class ShooterSubsystem extends SubsystemBase {
     return shooter.setSpeed(RPM.of(ballSpeedToRPM.get(speed.get().in(MetersPerSecond))));
   }
 
+  public double ballSpeedToRPM(double ballSpeed) {
+    return ballSpeedToRPM.get(ballSpeed);
+  }
+
   /**
    * Sets the shooter velocity to zero.
    * 

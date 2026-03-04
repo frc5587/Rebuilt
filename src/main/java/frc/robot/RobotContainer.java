@@ -5,6 +5,7 @@
 package frc.robot;
 
 import static edu.wpi.first.units.Units.Degrees;
+import static edu.wpi.first.units.Units.MetersPerSecond;
 import static edu.wpi.first.units.Units.Radians;
 
 import com.ctre.phoenix6.swerve.SwerveModule.DriveRequestType;
@@ -80,7 +81,7 @@ public class RobotContainer {
     // PLEASE DON'T SET DEFAULT COMMANDS UP HERE!! USE TELEOPINIT() AT BOTTOM OF FILE
     indexer.setDefaultCommand(indexer.set(0.));
 
-    // SmartDashboard.putNumber("flywheel speed", 0.);
+    SmartDashboard.putNumber("flywheel speed", 2000.);
 
     // Configure the trigger bindings
     configureBindings();
@@ -249,7 +250,7 @@ public class RobotContainer {
     operatorController.leftBumper().whileTrue(indexer.set(IndexerConstants.DUTY_CYCLE));
 
     // Silly shooter override (set this to shoot from an easy to drive to position, like in front of the hub)
-    operatorController.x().whileTrue(shooter.set(0.6));
+    operatorController.x().whileTrue(shooter.setBallVelocity(() -> MetersPerSecond.of(SmartDashboard.getNumber("flywheel speed", 0))));
     // TODO can we get a position based standstill shooter speed button for operator?
 
     // Climb
