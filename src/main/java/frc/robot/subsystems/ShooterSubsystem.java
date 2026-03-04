@@ -92,8 +92,6 @@ public class ShooterSubsystem extends SubsystemBase {
     return shooter.sysId(Volts.of(7), Volts.of(2).per(Second), Seconds.of(4));
   }
 
-
-  /** Creates a new ExampleSubsystem. */
   public ShooterSubsystem() {}
 
   @Override
@@ -116,4 +114,5 @@ public class ShooterSubsystem extends SubsystemBase {
                                        .getGamePiecesArrayByType("Fuel");       
     fuelPosePublisher.accept(fuelPoses);
   }
+
 }
