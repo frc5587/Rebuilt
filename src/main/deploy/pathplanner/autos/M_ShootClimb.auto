@@ -7,37 +7,31 @@
         {
           "type": "path",
           "data": {
-            "pathName": null
-          }
-        },
-        {
-          "type": "wait",
-          "data": {
-            "waitTime": 0.8
+            "pathName": "M_ShootClimb1"
           }
         },
         {
           "type": "path",
           "data": {
-            "pathName": null
+            "pathName": "M_ShootClimb2"
           }
         },
         {
-          "type": "deadline",
+          "type": "path",
           "data": {
-            "commands": []
+            "pathName": "M_ShootClimb3"
           }
         },
         {
-          "type": "parallel",
+          "type": "path",
           "data": {
-            "commands": []
+            "pathName": "M_ShootClimb4"
           }
         }
       ]
     }
   },
   "resetOdom": true,
-  "folder": null,
+  "folder": "middle",
   "choreoAuto": false
 }

@@ -3,29 +3,29 @@
   "waypoints": [
     {
       "anchor": {
-        "x": 3.223899821109123,
-        "y": 4.8706082289803225
+        "x": 2.265080857047677,
+        "y": 4.043836582019173
       },
       "prevControl": null,
       "nextControl": {
-        "x": 2.185474060822898,
-        "y": 4.8706082289803225
+        "x": 2.164532910433219,
+        "y": 4.915010662389976
       },
       "isLocked": false,
-      "linkedName": "shootTop"
+      "linkedName": "Middle Shoot Position"
     },
     {
       "anchor": {
-        "x": 1.3255277280858673,
-        "y": 4.8706082289803225
+        "x": 0.8585320411940278,
+        "y": 4.8985889452697675
       },
       "prevControl": {
-        "x": 2.477531305903399,
-        "y": 4.886833631484794
+        "x": 1.5525731691860398,
+        "y": 4.887901734772995
       },
       "nextControl": null,
       "isLocked": false,
-      "linkedName": null
+      "linkedName": "[1] Right Side Climb Lineup"
     }
   ],
   "rotationTargets": [],
@@ -42,13 +42,13 @@
   },
   "goalEndState": {
     "velocity": 0,
-    "rotation": 0.0
+    "rotation": 90.0
   },
   "reversed": false,
-  "folder": null,
+  "folder": "middle",
   "idealStartingState": {
     "velocity": 0,
-    "rotation": -29.999999999999996
+    "rotation": 0.0
   },
   "useDefaultConstraints": true
 }

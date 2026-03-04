@@ -107,7 +107,7 @@ public final class Constants {
     public static final int RIGHT_MOTOR_ID = 21;
     public static final Angle TOP_ANGLE = Degrees.of(100.);
     public static final Angle BOTTOM_ANGLE = Degrees.of(0.);
-    public static final Angle ZERO_ANGLE = Degrees.of(0.);
+    public static final Angle MIDDLE_ANGLE = Degrees.of(45.);
     public static final UnaryOperator<SmartMotorControllerConfig> APPLY_SMC_CONFIG = (SmartMotorControllerConfig config) -> {
       return config.withControlMode(ControlMode.CLOSED_LOOP)
                    .withClosedLoopController(3, 0, 0)
@@ -155,6 +155,7 @@ public final class Constants {
   
   public static class IndexerConstants {
     public static final int MOTOR_ID = 23;
+    public static final double DUTY_CYCLE = 1.;
     public static final UnaryOperator<SmartMotorControllerConfig> APPLY_SMC_CONFIG = (SmartMotorControllerConfig config) -> {
       return config.withControlMode(ControlMode.OPEN_LOOP)
              .withTelemetry("IndexerMotor", TelemetryVerbosity.LOW)
