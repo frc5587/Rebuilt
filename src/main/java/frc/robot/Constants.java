@@ -50,8 +50,8 @@ public final class Constants {
     public static final double WHEEL_LOCK_TIME = 10; //seconds
 
     public static final double MAX_SPEED  = Units.feetToMeters(8);
-    public static final double MAX_SPIN_SPEED_RADIANS_PER_SECOND = 2 * Math.PI;
-    public static final double MAX_SPIN_ACCEL = 4 * Math.PI;
+    public static final double MAX_SPIN_SPEED_RADIANS_PER_SECOND = Math.PI;
+    public static final double MAX_SPIN_ACCEL = 2 * Math.PI;
     public static final double HEADING_DEADBAND = 0.3;
     public static final double INTAKE_HEADING_DEADBAND = 0.1;
     public static final ProfiledPIDController HEADING_CONTROLLER = new ProfiledPIDController(10,0,0.1,new Constraints(MAX_SPIN_SPEED_RADIANS_PER_SECOND, MAX_SPIN_ACCEL));
