@@ -1,5 +1,6 @@
 package frc.robot.commands;
 
+import static edu.wpi.first.units.Units.MetersPerSecond;
 import static edu.wpi.first.units.Units.RPM;
 
 import java.util.function.DoubleSupplier;
@@ -10,6 +11,7 @@ import edu.wpi.first.math.geometry.Rotation2d;
 import edu.wpi.first.math.kinematics.ChassisSpeeds;
 import edu.wpi.first.wpilibj.DriverStation;
 import edu.wpi.first.wpilibj.DriverStation.Alliance;
+import edu.wpi.first.wpilibj.smartdashboard.SmartDashboard;
 import edu.wpi.first.wpilibj.Timer;
 import edu.wpi.first.wpilibj2.command.Command;
 import edu.wpi.first.wpilibj2.command.CommandScheduler;
@@ -88,7 +90,9 @@ public class AimTowardsGoal extends Command {
     CommandScheduler.getInstance().schedule(swerve.applyRequest(() -> driveFacingAngle.withVelocityX(shootWhileMovingVelocity.x)
                                                                                       .withVelocityY(shootWhileMovingVelocity.y)
                                                                                       .withTargetDirection(Rotation2d.fromRadians(aimingMath.getIdealHeading(aimingMath.getIdealShotSpeed(DrivebaseConstants.LOOKAHEAD),DrivebaseConstants.LOOKAHEAD) + (DriverStation.getAlliance().get() == Alliance.Blue ? 0. : Math.PI)))));
-    CommandScheduler.getInstance().schedule(shooter.setAngularVelocity(() -> RPM.of(aimingMath.getIdealShotSpeed(ShooterConstants.LOOKAHEAD)*ShooterConstants.SHOT_SPEED_CONVERSION_FACTOR)));
+    double idealBallSpeed = aimingMath.getIdealShotSpeed(ShooterConstants.LOOKAHEAD);
+    CommandScheduler.getInstance().schedule(shooter.setBallVelocity(() -> MetersPerSecond.of(idealBallSpeed)));
+    SmartDashboard.putNumber("Ideal ball speed", idealBallSpeed);
 
     if (lastLogTimestamp < Timer.getFPGATimestamp() - ShooterConstants.TIME_BETWEEN_LOG_TIMESTAMPS) {
       lastLogTimestamp = Timer.getFPGATimestamp();

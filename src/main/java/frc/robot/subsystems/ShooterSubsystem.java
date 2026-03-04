@@ -16,6 +16,7 @@ import com.revrobotics.spark.SparkLowLevel.MotorType;
 import com.revrobotics.spark.SparkMax;
 
 import edu.wpi.first.math.geometry.Pose3d;
+import edu.wpi.first.math.interpolation.InterpolatingDoubleTreeMap;
 import edu.wpi.first.math.system.plant.DCMotor;
 import edu.wpi.first.networktables.NetworkTableInstance;
 import edu.wpi.first.networktables.StructArrayPublisher;
@@ -40,9 +41,15 @@ public class ShooterSubsystem extends SubsystemBase {
   private final FlyWheelConfig shooterConfig = ShooterConstants.APPLY_FLYWHEEL_CONFIG.apply(new FlyWheelConfig(sparkSmartMotorController));
   private FlyWheel shooter = new FlyWheel(shooterConfig);
   private StructArrayPublisher<Pose3d> fuelPosePublisher = NetworkTableInstance.getDefault()
-    .getStructArrayTopic("MyPoseArray", Pose3d.struct)
+    .getStructArrayTopic("Fuel", Pose3d.struct)
     .publish();
+  private InterpolatingDoubleTreeMap ballSpeedToRPM = new InterpolatingDoubleTreeMap();
 
+  public ShooterSubsystem() {
+    ballSpeedToRPM.put(1.,500.);
+    ballSpeedToRPM.put(20., 10000.);
+  }
+    
   /**
    * Gets the current velocity of the shooter.
    * 
@@ -65,7 +72,7 @@ public class ShooterSubsystem extends SubsystemBase {
    * @return {@link edu.wpi.first.wpilibj2.command.RunCommand}
    */
   public Command setBallVelocity(Supplier<LinearVelocity> speed) {
-    return shooter.setSpeed(RPM.of(speed.get().in(MetersPerSecond) * ShooterConstants.SHOT_SPEED_CONVERSION_FACTOR));
+    return shooter.setSpeed(RPM.of(ballSpeedToRPM.get(speed.get().in(MetersPerSecond))));
   }
 
   /**
@@ -91,8 +98,6 @@ public class ShooterSubsystem extends SubsystemBase {
   public Command sysID() {
     return shooter.sysId(Volts.of(7), Volts.of(2).per(Second), Seconds.of(4));
   }
-
-  public ShooterSubsystem() {}
 
   @Override
   public void periodic() {

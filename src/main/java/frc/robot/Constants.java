@@ -50,11 +50,11 @@ public final class Constants {
     public static final double WHEEL_LOCK_TIME = 10; //seconds
 
     public static final double MAX_SPEED  = Units.feetToMeters(8);
-    public static final double MAX_SPIN_SPEED_RADIANS_PER_SECOND = Math.PI;
+    public static final double MAX_SPIN_SPEED_RADIANS_PER_SECOND = 1.5 * Math.PI;
     public static final double MAX_SPIN_ACCEL = 2 * Math.PI;
     public static final double HEADING_DEADBAND = 0.3;
     public static final double INTAKE_HEADING_DEADBAND = 0.1;
-    public static final ProfiledPIDController HEADING_CONTROLLER = new ProfiledPIDController(10,0,0.1,new Constraints(MAX_SPIN_SPEED_RADIANS_PER_SECOND, MAX_SPIN_ACCEL));
+    public static final ProfiledPIDController HEADING_CONTROLLER = new ProfiledPIDController(8,0,0.1,new Constraints(MAX_SPIN_SPEED_RADIANS_PER_SECOND, MAX_SPIN_ACCEL));
 
     public static final double LOOKAHEAD = 0.1;
     public static final double SHOOT_WHILE_MOVING_SPEED  = Units.feetToMeters(4);
@@ -88,7 +88,6 @@ public final class Constants {
     public static final double LOOKAHEAD = 0.1;
     public static final double SHOTS_PER_SECOND = 2;
     public static final double TIME_BETWEEN_LOG_TIMESTAMPS = 0.055;
-    public static final double SHOT_SPEED_CONVERSION_FACTOR = 700;  // 187.978279242
     public static final Vector3 SHOOTER_POSITION = new Vector3(0.2,0,0.4);
     public static final Vector3 BLUE_ALLIANCE_GOAL = new Vector3(4.625626,4.0346315,1.8288);
     public static final Vector3 RED_ALLIANCE_GOAL = new Vector3(11.915426,4.0346315,1.8288);
@@ -110,7 +109,7 @@ public final class Constants {
     public static final Angle MIDDLE_ANGLE = Degrees.of(45.);
     public static final UnaryOperator<SmartMotorControllerConfig> APPLY_SMC_CONFIG = (SmartMotorControllerConfig config) -> {
       return config.withControlMode(ControlMode.CLOSED_LOOP)
-                   .withClosedLoopController(3, 0, 0)
+                   .withClosedLoopController(1, 0, 0)
                    .withSimClosedLoopController(1, 0, 0)
                    .withFeedforward(new ArmFeedforward(0,0.15, 0))
                    .withSimFeedforward(new ArmFeedforward(0, 0, 0))

@@ -5,7 +5,6 @@
 package frc.robot;
 
 import static edu.wpi.first.units.Units.Degrees;
-import static edu.wpi.first.units.Units.RPM;
 import static edu.wpi.first.units.Units.Radians;
 
 import com.ctre.phoenix6.swerve.SwerveModule.DriveRequestType;
@@ -21,7 +20,6 @@ import frc.robot.math.AimingMath;
 import frc.robot.math.Vector3;
 import frc.robot.subsystems.ShooterSubsystem;
 import frc.robot.subsystems.SwerveSubsystem;
-import yams.mechanisms.config.ArmConfig;
 import frc.robot.subsystems.ArmSubsystem;
 import frc.robot.subsystems.ClimbSubsystem;
 import frc.robot.subsystems.IndexerSubsystem;
@@ -41,7 +39,6 @@ import edu.wpi.first.wpilibj.smartdashboard.SmartDashboard;
 import edu.wpi.first.wpilibj2.command.Command;
 import edu.wpi.first.wpilibj2.command.CommandScheduler;
 import edu.wpi.first.wpilibj2.command.Commands;
-import edu.wpi.first.wpilibj2.command.SequentialCommandGroup;
 import edu.wpi.first.wpilibj2.command.button.CommandXboxController;
 import edu.wpi.first.wpilibj2.command.button.Trigger;
 
@@ -81,6 +78,9 @@ public class RobotContainer {
   /** The container for the robot. Contains subsystems, OI devices, and commands. */
   public RobotContainer() {
     // PLEASE DON'T SET DEFAULT COMMANDS UP HERE!! USE TELEOPINIT() AT BOTTOM OF FILE
+    indexer.setDefaultCommand(indexer.set(0.));
+
+    // SmartDashboard.putNumber("flywheel speed", 0.);
 
     // Configure the trigger bindings
     configureBindings();
@@ -195,7 +195,8 @@ public class RobotContainer {
                                            drivebase,
                                            ShooterConstants.getGoal(DriverStation.getAlliance().get()));
         CommandScheduler.getInstance().schedule(aimingCommand);}))
-                        .onFalse(Commands.runOnce(() -> aimingCommand.cancel()));
+                        .onFalse(Commands.runOnce(() -> aimingCommand.cancel())
+                                 .alongWith(Commands.runOnce(() -> {lastHeading = drivebase.getState().Pose.getRotation();})));
     driverController.y().whileTrue(arm.setAngle(ArmConstants.BOTTOM_ANGLE)
                                    .alongWith(drivebase.applyRequest(() -> driveFacingAngle.withVelocityX(-driverController.getLeftY() * DrivebaseConstants.MAX_SPEED) // Drive forward with negative Y (forward)
                                                                                            .withVelocityY(-driverController.getLeftX() * DrivebaseConstants.MAX_SPEED)
@@ -262,7 +263,7 @@ public class RobotContainer {
     operatorController.povLeft().whileTrue(arm.set(1.));
 
     // Reset Arm Gyro
-    operatorController.start().onTrue(arm.resetAngle(Degrees.of(0.)));
+    operatorController.start().onTrue(arm.resetAngle(ArmConstants.BOTTOM_ANGLE));
   }
 
   /**
