@@ -5,6 +5,7 @@
 package frc.robot;
 
 import static edu.wpi.first.units.Units.Degrees;
+import static edu.wpi.first.units.Units.RPM;
 import static edu.wpi.first.units.Units.Radians;
 
 import com.ctre.phoenix6.swerve.SwerveModule.DriveRequestType;
@@ -12,12 +13,15 @@ import com.ctre.phoenix6.swerve.SwerveModule.DriveRequestType;
 import frc.robot.Constants.ArmConstants;
 import frc.robot.Constants.ClimbConstants;
 import frc.robot.Constants.DrivebaseConstants;
+import frc.robot.Constants.IndexerConstants;
 import frc.robot.Constants.IntakeConstants;
 import frc.robot.Constants.ShooterConstants;
 import frc.robot.commands.AimTowardsGoal;
+import frc.robot.math.AimingMath;
 import frc.robot.math.Vector3;
 import frc.robot.subsystems.ShooterSubsystem;
 import frc.robot.subsystems.SwerveSubsystem;
+import yams.mechanisms.config.ArmConfig;
 import frc.robot.subsystems.ArmSubsystem;
 import frc.robot.subsystems.ClimbSubsystem;
 import frc.robot.subsystems.IndexerSubsystem;
@@ -37,6 +41,7 @@ import edu.wpi.first.wpilibj.smartdashboard.SmartDashboard;
 import edu.wpi.first.wpilibj2.command.Command;
 import edu.wpi.first.wpilibj2.command.CommandScheduler;
 import edu.wpi.first.wpilibj2.command.Commands;
+import edu.wpi.first.wpilibj2.command.SequentialCommandGroup;
 import edu.wpi.first.wpilibj2.command.button.CommandXboxController;
 import edu.wpi.first.wpilibj2.command.button.Trigger;
 
@@ -61,6 +66,7 @@ public class RobotContainer {
       .withHeadingPID(DrivebaseConstants.HEADING_CONTROLLER.getP(), DrivebaseConstants.HEADING_CONTROLLER.getI(), DrivebaseConstants.HEADING_CONTROLLER.getD());
   private final SwerveRequest.SwerveDriveBrake brake = new SwerveRequest.SwerveDriveBrake();
   private AimTowardsGoal aimingCommand = null;
+  private AimingMath aimingMath;
 
   private boolean driverAllowIndexing = false;
   private Rotation2d lastHeading = Rotation2d.kZero;
@@ -74,9 +80,7 @@ public class RobotContainer {
 
   /** The container for the robot. Contains subsystems, OI devices, and commands. */
   public RobotContainer() {
-    shooter.setDefaultCommand(shooter.set(0.));
-    indexer.setDefaultCommand(indexer.stop());
-    intake.setDefaultCommand(intake.stop());
+    // PLEASE DON'T SET DEFAULT COMMANDS UP HERE!! USE TELEOPINIT() AT BOTTOM OF FILE
 
     // Configure the trigger bindings
     configureBindings();
@@ -84,6 +88,19 @@ public class RobotContainer {
     
     //Create the NamedCommands that will be used in PathPlanner
     NamedCommands.registerCommand("test", Commands.print("I EXIST"));
+
+    NamedCommands.registerCommand("Arm Up", arm.setAngle(ArmConstants.TOP_ANGLE));
+    NamedCommands.registerCommand("Arm Down", arm.setAngle(ArmConstants.BOTTOM_ANGLE));
+    NamedCommands.registerCommand("Arm Middle", arm.setAngle(ArmConstants.MIDDLE_ANGLE));
+
+    NamedCommands.registerCommand("Intake Forward", intake.set(IntakeConstants.DUTY_CYCLE));
+    NamedCommands.registerCommand("Intake Stop", intake.set(0));
+
+    NamedCommands.registerCommand("Indexer Forward", indexer.set(IndexerConstants.DUTY_CYCLE));
+
+    // NamedCommands.registerCommand("Shoot", new SequentialCommandGroup(shooter.setAngularVelocity(() -> RPM.of(aimingMath.getIdealShotSpeed(ShooterConstants.LOOKAHEAD)*ShooterConstants.SHOT_SPEED_CONVERSION_FACTOR)))
+    //                                                    .until(shooter.
+    //                                                    ));
 
     //Have the autoChooser pull in all PathPlanner autos as options
     autoChooser = AutoBuilder.buildAutoChooser();
@@ -123,9 +140,9 @@ public class RobotContainer {
    * 
    * Right Trigger: Arm down + intake forward
    * Left Trigger: Arm up
+   * B: Arm angled (for shooting)
    * 
    * X: Shooter override (constant speed)
-   * B (not implemented yet): Position dependent shooter
    * 
    * Y: Climb top
    * A: Climb bottom
@@ -133,6 +150,9 @@ public class RobotContainer {
    * POV Up: 100% intake speed
    * POV Right: Reverse indexer and shooter
    * POV Down: Reverse intake
+   * POV Left: Arm 100% dutycycle
+   * 
+   * Start: reset arm position to top
    */
 
     // Driver
@@ -213,21 +233,22 @@ public class RobotContainer {
                                                .alongWith(intake.set(IntakeConstants.DUTY_CYCLE)))
                                                 .onFalse(intake.set(0.));
     operatorController.leftTrigger().whileTrue(arm.setAngle(ArmConstants.TOP_ANGLE));
+    operatorController.b().whileTrue(arm.setAngle(ArmConstants.MIDDLE_ANGLE));
     
     // Indexer
     operatorController.rightBumper().whileTrue(Commands.run(() -> {
           if (driverAllowIndexing) {
-            CommandScheduler.getInstance().schedule(indexer.set(1.));
+            CommandScheduler.getInstance().schedule(indexer.set(IndexerConstants.DUTY_CYCLE));
           }
           else {
             CommandScheduler.getInstance().schedule(indexer.getDefaultCommand());
           }
         }))
                                      .onFalse(indexer.getDefaultCommand());
-    operatorController.leftBumper().whileTrue(indexer.set(1.));
+    operatorController.leftBumper().whileTrue(indexer.set(IndexerConstants.DUTY_CYCLE));
 
     // Silly shooter override (set this to shoot from an easy to drive to position, like in front of the hub)
-    operatorController.x().whileTrue(shooter.set(0.67));
+    operatorController.x().whileTrue(shooter.set(0.6));
     // TODO can we get a position based standstill shooter speed button for operator?
 
     // Climb
@@ -236,10 +257,11 @@ public class RobotContainer {
 
     // Utils
     operatorController.povUp().whileTrue(intake.set(1.));
-    operatorController.povRight().whileTrue(indexer.set(-1.).alongWith(shooter.set(-0.3)));
+    operatorController.povRight().whileTrue(indexer.set(-0.5).alongWith(shooter.set(-0.3)));
     operatorController.povDown().whileTrue(intake.set(-1.));
     operatorController.povLeft().whileTrue(arm.set(1.));
 
+    // Reset Arm Gyro
     operatorController.start().onTrue(arm.resetAngle(Degrees.of(0.)));
   }
 
@@ -254,5 +276,11 @@ public class RobotContainer {
 
   public void setMotorBrake(boolean brakee) {
     if(brakee) {drivebase.applyRequest(() -> brake);}
+  }
+
+  public void teleopInit() {
+    shooter.setDefaultCommand(shooter.set(0.));
+    indexer.setDefaultCommand(indexer.stop());
+    intake.setDefaultCommand(intake.stop());
   }
 }

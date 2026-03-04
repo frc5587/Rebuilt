@@ -7,19 +7,19 @@
         {
           "type": "path",
           "data": {
-            "pathName": "toptooutpost"
+            "pathName": null
           }
         },
         {
           "type": "path",
           "data": {
-            "pathName": "outposttoshoot"
+            "pathName": null
           }
         },
         {
           "type": "path",
           "data": {
-            "pathName": "shoottoclimb"
+            "pathName": null
           }
         }
       ]
