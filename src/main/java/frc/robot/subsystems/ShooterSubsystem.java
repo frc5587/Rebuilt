@@ -79,6 +79,10 @@ public class ShooterSubsystem extends SubsystemBase {
     return ballSpeedToRPM.get(ballSpeed);
   }
 
+  public Command useManualSpeed() {
+    return setAngularVelocity(() -> RPM.of(SmartDashboard.getNumber("manual flywheel speed", 0)));
+  }
+
   /**
    * Sets the shooter velocity to zero.
    * 
