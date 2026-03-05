@@ -12,7 +12,6 @@ import edu.wpi.first.units.Units;
 import edu.wpi.first.units.measure.Angle;
 import edu.wpi.first.wpilibj.Timer;
 import edu.wpi.first.wpilibj.smartdashboard.SmartDashboard;
-import frc.robot.Constants;
 import frc.robot.Constants.DrivebaseConstants;
 import frc.robot.Constants.ShooterConstants;
 import swervelib.simulation.ironmaple.simulation.SimulatedArena;
@@ -111,12 +110,12 @@ public class AimingMath {
 
     double speed = 0;
     Vector3 adjustedGoalPosition = new Vector3(goalPosition.x, goalPosition.y, goalPosition.z);
-    for (int i = 0; i < Constants.ShooterConstants.SEARCH_DEPTH; i++) {
+    for (int i = 0; i < ShooterConstants.SEARCH_DEPTH; i++) {
       Vector3 idealVector = Vector3.subtract(adjustedGoalPosition, position).get2D();
       double distance = idealVector.get2D().length();
-      speed = ((distance*Math.sqrt(Constants.ShooterConstants.GRAVITY))/Math.cos(Constants.ShooterConstants.PITCH)) /
-              (Math.sqrt(2.)*Math.sqrt(Math.abs(adjustedGoalPosition.z-position.z-(distance*Math.tan(Constants.ShooterConstants.PITCH)))));
-      double time = distance/(speed*Math.cos(Constants.ShooterConstants.PITCH));
+      speed = ((distance*Math.sqrt(ShooterConstants.GRAVITY))/Math.cos(ShooterConstants.PITCH)) /
+              (Math.sqrt(2.)*Math.sqrt(Math.abs(adjustedGoalPosition.z-position.z-(distance*Math.tan(ShooterConstants.PITCH)))));
+      double time = distance/(speed*Math.cos(ShooterConstants.PITCH));
 
       adjustedGoalPosition = Vector3.subtract(goalPosition,Vector3.scale(velocity, time));
     }

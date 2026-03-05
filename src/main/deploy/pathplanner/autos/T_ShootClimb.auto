@@ -7,37 +7,37 @@
         {
           "type": "path",
           "data": {
-            "pathName": null
-          }
-        },
-        {
-          "type": "wait",
-          "data": {
-            "waitTime": 0.8
+            "pathName": "T_ShootClimb1"
           }
         },
         {
           "type": "path",
           "data": {
-            "pathName": null
+            "pathName": "TShootClimb2"
           }
         },
         {
-          "type": "deadline",
+          "type": "path",
           "data": {
-            "commands": []
+            "pathName": "T_ShootClimb3"
           }
         },
         {
-          "type": "parallel",
+          "type": "path",
           "data": {
-            "commands": []
+            "pathName": "T_ShootClimb4"
+          }
+        },
+        {
+          "type": "named",
+          "data": {
+            "name": "Arm Down"
           }
         }
       ]
     }
   },
   "resetOdom": true,
-  "folder": null,
+  "folder": "top",
   "choreoAuto": false
 }

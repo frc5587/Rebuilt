@@ -7,7 +7,7 @@
         {
           "type": "path",
           "data": {
-            "pathName": null
+            "pathName": "T_ShootClimb1"
           }
         },
         {
@@ -19,13 +19,13 @@
         {
           "type": "path",
           "data": {
-            "pathName": null
+            "pathName": "T_MiddleShoot1"
           }
         }
       ]
     }
   },
   "resetOdom": true,
-  "folder": null,
+  "folder": "top",
   "choreoAuto": false
 }

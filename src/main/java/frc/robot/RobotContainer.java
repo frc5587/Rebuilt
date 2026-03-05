@@ -6,6 +6,7 @@ package frc.robot;
 
 import static edu.wpi.first.units.Units.Degrees;
 import static edu.wpi.first.units.Units.MetersPerSecond;
+import static edu.wpi.first.units.Units.RPM;
 import static edu.wpi.first.units.Units.Radians;
 
 import com.ctre.phoenix6.swerve.SwerveModule.DriveRequestType;
@@ -40,6 +41,8 @@ import edu.wpi.first.wpilibj.smartdashboard.SmartDashboard;
 import edu.wpi.first.wpilibj2.command.Command;
 import edu.wpi.first.wpilibj2.command.CommandScheduler;
 import edu.wpi.first.wpilibj2.command.Commands;
+import edu.wpi.first.wpilibj2.command.SequentialCommandGroup;
+import edu.wpi.first.wpilibj2.command.WaitCommand;
 import edu.wpi.first.wpilibj2.command.button.CommandXboxController;
 import edu.wpi.first.wpilibj2.command.button.Trigger;
 
@@ -97,11 +100,23 @@ public class RobotContainer {
     NamedCommands.registerCommand("Intake Forward", intake.set(IntakeConstants.DUTY_CYCLE));
     NamedCommands.registerCommand("Intake Stop", intake.set(0));
 
-    NamedCommands.registerCommand("Indexer Forward", indexer.set(IndexerConstants.DUTY_CYCLE));
+    NamedCommands.registerCommand("Shoot Preload",
+        new SequentialCommandGroup(shooter.setBallVelocity(() -> MetersPerSecond.of(aimingMath.getIdealShotSpeed())))
+            .until(shooter::atGoal)
+            .raceWith(new WaitCommand(ShooterConstants.SPIN_UP_TIME))
+            .andThen(indexer.set(IndexerConstants.DUTY_CYCLE))
+            .andThen(new WaitCommand(8.0 / ShooterConstants.SHOTS_PER_SECOND))
+            .andThen(indexer.set(0)));
+    NamedCommands.registerCommand("Shoot Hopper",
+        new SequentialCommandGroup(shooter.setBallVelocity(() -> MetersPerSecond.of(aimingMath.getIdealShotSpeed())))
+            .until(shooter::atGoal)
+            .raceWith(new WaitCommand(ShooterConstants.SPIN_UP_TIME))
+            .andThen(indexer.set(IndexerConstants.DUTY_CYCLE))
+            .andThen(new WaitCommand(25. / ShooterConstants.SHOTS_PER_SECOND))
+            .andThen(indexer.set(0)));
 
-    // NamedCommands.registerCommand("Shoot", new SequentialCommandGroup(shooter.setAngularVelocity(() -> RPM.of(aimingMath.getIdealShotSpeed(ShooterConstants.LOOKAHEAD)*ShooterConstants.SHOT_SPEED_CONVERSION_FACTOR)))
-    //                                                    .until(shooter.
-    //                                                    ));
+    NamedCommands.registerCommand("Climb Up", climb.setAngularPosition(ClimbConstants.UP_ANGLE));
+    NamedCommands.registerCommand("Climb Down", climb.setAngularPosition(ClimbConstants.DOWN_ANGLE));
 
     //Have the autoChooser pull in all PathPlanner autos as options
     autoChooser = AutoBuilder.buildAutoChooser();
@@ -243,10 +258,10 @@ public class RobotContainer {
             CommandScheduler.getInstance().schedule(indexer.set(IndexerConstants.DUTY_CYCLE));
           }
           else {
-            CommandScheduler.getInstance().schedule(indexer.getDefaultCommand());
+            CommandScheduler.getInstance().schedule(indexer.set(0));
           }
         }))
-                                     .onFalse(indexer.getDefaultCommand());
+                                     .onFalse(indexer.set(0));
     operatorController.leftBumper().whileTrue(indexer.set(IndexerConstants.DUTY_CYCLE));
 
     // Silly shooter override (set this to shoot from an easy to drive to position, like in front of the hub)

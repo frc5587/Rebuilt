@@ -1,0 +1,49 @@
+{
+  "version": "2025.0",
+  "command": {
+    "type": "sequential",
+    "data": {
+      "commands": [
+        {
+          "type": "path",
+          "data": {
+            "pathName": "B_MiddleShoot1"
+          }
+        },
+        {
+          "type": "named",
+          "data": {
+            "name": "Arm Middle"
+          }
+        },
+        {
+          "type": "named",
+          "data": {
+            "name": "Shoot Hopper"
+          }
+        },
+        {
+          "type": "path",
+          "data": {
+            "pathName": "B_ShootClimb2"
+          }
+        },
+        {
+          "type": "path",
+          "data": {
+            "pathName": "B_ShootClimb3"
+          }
+        },
+        {
+          "type": "path",
+          "data": {
+            "pathName": "B_ShootClimb4"
+          }
+        }
+      ]
+    }
+  },
+  "resetOdom": true,
+  "folder": "bottom",
+  "choreoAuto": false
+}

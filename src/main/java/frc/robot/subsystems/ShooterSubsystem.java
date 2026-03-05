@@ -128,4 +128,8 @@ public class ShooterSubsystem extends SubsystemBase {
     fuelPosePublisher.accept(fuelPoses);
   }
 
+    public boolean atGoal() {
+    return ((sparkSmartMotorController.getMechanismSetpointVelocity().get().in(RPM)*0.95) <= sparkSmartMotorController.getMechanismVelocity().in(RPM));
+  }
+
 }
