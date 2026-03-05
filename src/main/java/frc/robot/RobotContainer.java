@@ -107,6 +107,13 @@ public class RobotContainer {
             .andThen(indexer.set(IndexerConstants.DUTY_CYCLE))
             .andThen(new WaitCommand(8.0 / ShooterConstants.SHOTS_PER_SECOND))
             .andThen(indexer.set(0)));
+    NamedCommands.registerCommand("Shoot Hopper",
+        new SequentialCommandGroup(shooter.setBallVelocity(() -> MetersPerSecond.of(aimingMath.getIdealShotSpeed())))
+            .until(shooter::atGoal)
+            .raceWith(new WaitCommand(ShooterConstants.SPIN_UP_TIME))
+            .andThen(indexer.set(IndexerConstants.DUTY_CYCLE))
+            .andThen(new WaitCommand(25. / ShooterConstants.SHOTS_PER_SECOND))
+            .andThen(indexer.set(0)));
 
     NamedCommands.registerCommand("Climb Up", climb.setAngularPosition(ClimbConstants.UP_ANGLE));
     NamedCommands.registerCommand("Climb Down", climb.setAngularPosition(ClimbConstants.DOWN_ANGLE));

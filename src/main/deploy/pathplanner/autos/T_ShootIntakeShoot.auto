@@ -13,13 +13,13 @@
         {
           "type": "path",
           "data": {
-            "pathName": "T_ShootIntakeShoot2"
+            "pathName": null
           }
         },
         {
           "type": "path",
           "data": {
-            "pathName": "T_ShootIntakeShoot3"
+            "pathName": "T_MiddleShoot1"
           }
         }
       ]

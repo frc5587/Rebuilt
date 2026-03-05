@@ -7,37 +7,43 @@
         {
           "type": "path",
           "data": {
-            "pathName": null
+            "pathName": "B_MiddleShoot1"
           }
         },
         {
-          "type": "wait",
+          "type": "named",
           "data": {
-            "waitTime": 0.8
+            "name": "Arm Middle"
+          }
+        },
+        {
+          "type": "named",
+          "data": {
+            "name": "Shoot Hopper"
           }
         },
         {
           "type": "path",
           "data": {
-            "pathName": null
+            "pathName": "B_ShootClimb2"
           }
         },
         {
-          "type": "deadline",
+          "type": "path",
           "data": {
-            "commands": []
+            "pathName": "B_ShootClimb3"
           }
         },
         {
-          "type": "parallel",
+          "type": "path",
           "data": {
-            "commands": []
+            "pathName": "B_ShootClimb4"
           }
         }
       ]
     }
   },
   "resetOdom": true,
-  "folder": null,
+  "folder": "bottom",
   "choreoAuto": false
 }
