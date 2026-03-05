@@ -104,7 +104,7 @@ public class RobotContainer {
     // PLEASE DON'T SET DEFAULT COMMANDS UP HERE!! USE TELEOPINIT() AT BOTTOM OF FILE
     indexer.setDefaultCommand(indexer.set(0.));
 
-    SmartDashboard.putNumber("flywheel speed", 2000.);
+    SmartDashboard.putNumber("manual flywheel speed", 2000.);
 
     // Configure the trigger bindings
     configureBindings();
@@ -285,7 +285,7 @@ public class RobotContainer {
     operatorController.leftBumper().whileTrue(indexer.set(IndexerConstants.DUTY_CYCLE));
 
     // Silly shooter override (set this to shoot from an easy to drive to position, like in front of the hub)
-    operatorController.x().whileTrue(shooter.setBallVelocity(() -> MetersPerSecond.of(SmartDashboard.getNumber("flywheel speed", 0))));
+    operatorController.x().whileTrue(shooter.useManualSpeed());
     // TODO can we get a position based standstill shooter speed button for operator?
 
     // Climb
@@ -296,7 +296,6 @@ public class RobotContainer {
     operatorController.povUp().whileTrue(intake.set(1.));
     operatorController.povRight().whileTrue(indexer.set(-0.5).alongWith(shooter.set(-0.3)));
     operatorController.povDown().whileTrue(intake.set(-1.));
-    operatorController.povLeft().whileTrue(arm.set(1.));
 
     // Reset Arm Gyro
     operatorController.start().onTrue(arm.resetAngle(ArmConstants.BOTTOM_ANGLE));
