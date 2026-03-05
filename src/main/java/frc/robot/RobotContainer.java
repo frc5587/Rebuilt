@@ -4,10 +4,12 @@
 
 package frc.robot;
 
-import static edu.wpi.first.units.Units.Degrees;
 import static edu.wpi.first.units.Units.MetersPerSecond;
 import static edu.wpi.first.units.Units.RPM;
 import static edu.wpi.first.units.Units.Radians;
+
+import java.util.function.DoubleSupplier;
+import java.util.function.Supplier;
 
 import com.ctre.phoenix6.swerve.SwerveModule.DriveRequestType;
 
@@ -31,7 +33,9 @@ import com.ctre.phoenix6.swerve.SwerveRequest;
 import com.pathplanner.lib.auto.AutoBuilder;
 import com.pathplanner.lib.auto.NamedCommands;
 
+import edu.wpi.first.math.geometry.Pose2d;
 import edu.wpi.first.math.geometry.Rotation2d;
+import edu.wpi.first.math.kinematics.ChassisSpeeds;
 import edu.wpi.first.wpilibj.DriverStation;
 import edu.wpi.first.wpilibj.PowerDistribution;
 import edu.wpi.first.wpilibj.DriverStation.Alliance;
@@ -67,6 +71,20 @@ public class RobotContainer {
       .withHeadingPID(DrivebaseConstants.HEADING_CONTROLLER.getP(), DrivebaseConstants.HEADING_CONTROLLER.getI(), DrivebaseConstants.HEADING_CONTROLLER.getD());
   private final SwerveRequest.SwerveDriveBrake brake = new SwerveRequest.SwerveDriveBrake();
   private AimTowardsGoal aimingCommand = null;
+  Supplier<Vector3> position = () -> {
+    Pose2d position = drivebase.getState().Pose;
+    return new Vector3(position.getX(), position.getY(), 0);
+  };
+  DoubleSupplier heading = () -> drivebase.getState().RawHeading.getRadians();
+  Supplier<Vector3> velocity = () -> {
+    ChassisSpeeds velocity = drivebase.getState().Speeds;
+    velocity = ChassisSpeeds.fromRobotRelativeSpeeds(velocity, drivebase.getState().Pose.getRotation());
+    Vector3 input = new Vector3(velocity.vxMetersPerSecond, velocity.vyMetersPerSecond, 0);
+    return input;
+  };
+  DoubleSupplier angularVelocity = () -> drivebase.getState().Speeds.omegaRadiansPerSecond;
+  Supplier<Vector3> inputVelocity = () -> Vector3.getOrigin();
+  DoubleSupplier inputAngularVelocity = () -> 0.;
   private AimingMath aimingMath;
 
   private boolean driverAllowIndexing = false;
@@ -81,10 +99,12 @@ public class RobotContainer {
 
   /** The container for the robot. Contains subsystems, OI devices, and commands. */
   public RobotContainer() {
+    aimingMath = new AimingMath(position, heading, velocity, angularVelocity, inputVelocity, inputAngularVelocity, () -> shooter.getVelocity().in(RPM), ShooterConstants.getGoal(DriverStation.getAlliance().get()));
+
     // PLEASE DON'T SET DEFAULT COMMANDS UP HERE!! USE TELEOPINIT() AT BOTTOM OF FILE
     indexer.setDefaultCommand(indexer.set(0.));
 
-    SmartDashboard.putNumber("flywheel speed", 2000.);
+    SmartDashboard.putNumber("manual flywheel speed", 2000.);
 
     // Configure the trigger bindings
     configureBindings();
@@ -265,7 +285,7 @@ public class RobotContainer {
     operatorController.leftBumper().whileTrue(indexer.set(IndexerConstants.DUTY_CYCLE));
 
     // Silly shooter override (set this to shoot from an easy to drive to position, like in front of the hub)
-    operatorController.x().whileTrue(shooter.setBallVelocity(() -> MetersPerSecond.of(SmartDashboard.getNumber("flywheel speed", 0))));
+    operatorController.x().whileTrue(shooter.useManualSpeed());
     // TODO can we get a position based standstill shooter speed button for operator?
 
     // Climb
@@ -276,7 +296,6 @@ public class RobotContainer {
     operatorController.povUp().whileTrue(intake.set(1.));
     operatorController.povRight().whileTrue(indexer.set(-0.5).alongWith(shooter.set(-0.3)));
     operatorController.povDown().whileTrue(intake.set(-1.));
-    operatorController.povLeft().whileTrue(arm.set(1.));
 
     // Reset Arm Gyro
     operatorController.start().onTrue(arm.resetAngle(ArmConstants.BOTTOM_ANGLE));
