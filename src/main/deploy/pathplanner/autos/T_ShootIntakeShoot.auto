@@ -3,7 +3,26 @@
   "command": {
     "type": "sequential",
     "data": {
-      "commands": []
+      "commands": [
+        {
+          "type": "path",
+          "data": {
+            "pathName": "T_ShootClimb1"
+          }
+        },
+        {
+          "type": "path",
+          "data": {
+            "pathName": "T_ShootIntakeShoot2"
+          }
+        },
+        {
+          "type": "path",
+          "data": {
+            "pathName": "T_ShootIntakeShoot3"
+          }
+        }
+      ]
     }
   },
   "resetOdom": true,

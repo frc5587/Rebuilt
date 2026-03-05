@@ -87,6 +87,7 @@ public final class Constants {
     public static final double PITCH = 1.2217304764;
     public static final double LOOKAHEAD = 0.1;
     public static final double SHOTS_PER_SECOND = 2;
+    public static final double SPIN_UP_TIME = 1; // TODO set
     public static final double TIME_BETWEEN_LOG_TIMESTAMPS = 0.055;
     public static final Vector3 SHOOTER_POSITION = new Vector3(0.2,0,0.4);
     public static final Vector3 BLUE_ALLIANCE_GOAL = new Vector3(4.625626,4.0346315,1.8288);
@@ -174,6 +175,7 @@ public final class Constants {
 
   public static class ClimbConstants {
     public static final Angle UP_ANGLE = Rotations.of(77);
+    public static final Angle DOWN_ANGLE = Rotations.of(0);
     public static final int MOTOR_ID = 40;
     public static final int LIMIT_SWITCH_ID = 0; //TODO set actual id
     public static final UnaryOperator<SmartMotorControllerConfig> APPLY_SMC_CONFIG = (SmartMotorControllerConfig config) -> {
