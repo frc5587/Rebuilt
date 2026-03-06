@@ -7,25 +7,25 @@
         {
           "type": "path",
           "data": {
-            "pathName": "T_ShootClimb1"
+            "pathName": "B_ShootClimb1"
           }
         },
         {
-          "type": "path",
+          "type": "named",
           "data": {
-            "pathName": null
+            "name": "Arm Middle"
           }
         },
         {
-          "type": "path",
+          "type": "named",
           "data": {
-            "pathName": "T_MiddleShoot1"
+            "name": "Shoot Preload"
           }
         }
       ]
     }
   },
   "resetOdom": true,
-  "folder": "top",
+  "folder": "bottom",
   "choreoAuto": false
 }

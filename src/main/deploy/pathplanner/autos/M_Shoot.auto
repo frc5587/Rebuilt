@@ -7,7 +7,7 @@
         {
           "type": "path",
           "data": {
-            "pathName": "B_ShootClimb1"
+            "pathName": "M_ShootClimb1"
           }
         },
         {
@@ -17,33 +17,21 @@
           }
         },
         {
+          "type": "wait",
+          "data": {
+            "waitTime": 1.0
+          }
+        },
+        {
           "type": "named",
           "data": {
             "name": "Shoot Preload"
-          }
-        },
-        {
-          "type": "path",
-          "data": {
-            "pathName": "B_ShootClimb2"
-          }
-        },
-        {
-          "type": "path",
-          "data": {
-            "pathName": "B_ShootClimb3"
-          }
-        },
-        {
-          "type": "path",
-          "data": {
-            "pathName": "B_ShootClimb4"
           }
         }
       ]
     }
   },
   "resetOdom": true,
-  "folder": "bottom",
+  "folder": "middle",
   "choreoAuto": false
 }

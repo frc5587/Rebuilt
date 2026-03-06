@@ -11,27 +11,21 @@
           }
         },
         {
-          "type": "path",
+          "type": "named",
           "data": {
-            "pathName": "TShootClimb2"
+            "name": "Arm Middle"
           }
         },
         {
-          "type": "path",
+          "type": "wait",
           "data": {
-            "pathName": "T_ShootClimb3"
-          }
-        },
-        {
-          "type": "path",
-          "data": {
-            "pathName": "T_ShootClimb4"
+            "waitTime": 1.0
           }
         },
         {
           "type": "named",
           "data": {
-            "name": "Arm Down"
+            "name": "Shoot Preload"
           }
         }
       ]

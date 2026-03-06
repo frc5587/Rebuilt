@@ -33,24 +33,6 @@
           "data": {
             "name": "Shoot Hopper"
           }
-        },
-        {
-          "type": "path",
-          "data": {
-            "pathName": "B_ShootClimb2"
-          }
-        },
-        {
-          "type": "path",
-          "data": {
-            "pathName": "B_ShootClimb3"
-          }
-        },
-        {
-          "type": "path",
-          "data": {
-            "pathName": "B_ShootClimb4"
-          }
         }
       ]
     }
