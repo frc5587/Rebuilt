@@ -113,19 +113,19 @@ public class RobotContainer {
     //Create the NamedCommands that will be used in PathPlanner
     NamedCommands.registerCommand("test", Commands.print("I EXIST"));
 
-    NamedCommands.registerCommand("Arm Up", arm.setAngle(ArmConstants.TOP_ANGLE));
-    NamedCommands.registerCommand("Arm Down", arm.setAngle(ArmConstants.BOTTOM_ANGLE));
-    NamedCommands.registerCommand("Arm Middle", arm.setAngle(ArmConstants.MIDDLE_ANGLE));
+    NamedCommands.registerCommand("Arm Up", Commands.runOnce(() -> arm.setAngle(ArmConstants.TOP_ANGLE).schedule()));
+    NamedCommands.registerCommand("Arm Down", Commands.runOnce(() -> arm.setAngle(ArmConstants.BOTTOM_ANGLE).schedule()));
+    NamedCommands.registerCommand("Arm Middle", Commands.runOnce(() -> arm.setAngle(ArmConstants.MIDDLE_ANGLE).schedule()));
 
-    NamedCommands.registerCommand("Intake Forward", intake.set(IntakeConstants.DUTY_CYCLE));
-    NamedCommands.registerCommand("Intake Stop", intake.set(0));
+    NamedCommands.registerCommand("Intake Forward", Commands.runOnce(() -> intake.set(IntakeConstants.DUTY_CYCLE).schedule()));
+    NamedCommands.registerCommand("Intake Stop", Commands.runOnce(() -> intake.set(0).schedule()));
 
     NamedCommands.registerCommand("Shoot Preload",
         new SequentialCommandGroup(shooter.setBallVelocity(() -> MetersPerSecond.of(aimingMath.getIdealShotSpeed())))
             .until(shooter::atGoal)
             .raceWith(new WaitCommand(ShooterConstants.SPIN_UP_TIME))
             .andThen(indexer.set(IndexerConstants.DUTY_CYCLE))
-            .andThen(new WaitCommand(8.0 / ShooterConstants.SHOTS_PER_SECOND))
+            .andThen(new WaitCommand(6.))
             .andThen(indexer.set(0)));
     NamedCommands.registerCommand("Shoot Hopper",
         new SequentialCommandGroup(shooter.setBallVelocity(() -> MetersPerSecond.of(aimingMath.getIdealShotSpeed())))
