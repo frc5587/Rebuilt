@@ -15,6 +15,7 @@ import edu.wpi.first.wpilibj.smartdashboard.SmartDashboard;
 import edu.wpi.first.wpilibj2.command.Command;
 import edu.wpi.first.wpilibj2.command.Commands;
 import edu.wpi.first.wpilibj2.command.SubsystemBase;
+import frc.robot.Constants.ArmConstants;
 import frc.robot.Constants.ClimbConstants;
 import frc.robot.Constants.ShooterConstants;
 import yams.motorcontrollers.SmartMotorController;
@@ -30,6 +31,7 @@ public class ClimbSubsystem extends SubsystemBase {
 
   public ClimbSubsystem() {
     sparkSmartMotorController.setEncoderPosition(Radians.of(0));
+    SmartDashboard.putBoolean("climb resetencoder", false);
   }
 
   /**
@@ -70,6 +72,11 @@ public class ClimbSubsystem extends SubsystemBase {
     if (sparkSmartMotorController.getMechanismPositionSetpoint().isPresent()) {
       SmartDashboard.putNumber("climb setpoint", sparkSmartMotorController.getMechanismPositionSetpoint().get().in(Rotations));
     }
+
+    if (SmartDashboard.getBoolean("climb resetencoder", false)) {
+      sparkSmartMotorController.setEncoderPosition(ClimbConstants.DOWN_ANGLE);
+    }
+    SmartDashboard.putBoolean("climb resetencoder", false);
 
     if (hasLimitSwitch  &&  limitSwitch.get()) {
       sparkSmartMotorController.setEncoderPosition(Radians.of(0.));
