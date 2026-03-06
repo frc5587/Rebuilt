@@ -186,7 +186,7 @@ public final class Constants {
                    .withSimFeedforward(new SimpleMotorFeedforward(0, 0, 0))
                    .withTelemetry("ClimbMotor", TelemetryVerbosity.HIGH)
                    .withGearing(new MechanismGearing(GearBox.fromReductionStages(5,4,4)))
-                   .withMotorInverted(false)
+                   .withMotorInverted(true)
                    .withIdleMode(MotorMode.BRAKE)
                    .withStatorCurrentLimit(Amps.of(40))
                    .withSoftLimit(Rotations.of(0), Rotations.of(77.0));
