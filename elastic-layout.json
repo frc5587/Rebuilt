@@ -145,7 +145,7 @@
           },
           {
             "title": "intake velocity",
-            "x": 768.0,
+            "x": 896.0,
             "y": 0.0,
             "width": 256.0,
             "height": 256.0,
@@ -205,7 +205,7 @@
           },
           {
             "title": "intake velocity",
-            "x": 768.0,
+            "x": 896.0,
             "y": 256.0,
             "width": 256.0,
             "height": 256.0,
@@ -223,6 +223,40 @@
               "show_pointer": true,
               "show_ticks": true
             }
+          },
+          {
+            "title": "bottom arm resetencoders",
+            "x": 640.0,
+            "y": 0.0,
+            "width": 128.0,
+            "height": 128.0,
+            "type": "Boolean Box",
+            "properties": {
+              "topic": "/SmartDashboard/bottom arm resetencoders",
+              "period": 0.06,
+              "data_type": "boolean",
+              "true_color": 4283215696,
+              "false_color": 4294198070,
+              "true_icon": "None",
+              "false_icon": "None"
+            }
+          },
+          {
+            "title": "top arm resetencoders",
+            "x": 640.0,
+            "y": 128.0,
+            "width": 128.0,
+            "height": 128.0,
+            "type": "Boolean Box",
+            "properties": {
+              "topic": "/SmartDashboard/top arm resetencoders",
+              "period": 0.06,
+              "data_type": "boolean",
+              "true_color": 4283215696,
+              "false_color": 4294198070,
+              "true_icon": "None",
+              "false_icon": "None"
+            }
           }
         ]
       }
@@ -234,7 +268,7 @@
         "containers": [
           {
             "title": "Measured indexer velocity",
-            "x": 768.0,
+            "x": 896.0,
             "y": 0.0,
             "width": 256.0,
             "height": 256.0,
@@ -252,7 +286,7 @@
           },
           {
             "title": "Measured mechanism velocity",
-            "x": 768.0,
+            "x": 896.0,
             "y": 256.0,
             "width": 256.0,
             "height": 256.0,
@@ -284,9 +318,97 @@
               "data_type": "double",
               "time_displayed": 5.0,
               "min_value": 0.0,
-              "max_value": 5000.0,
+              "max_value": 6000.0,
               "color": 4278238420,
               "line_width": 2.0
+            }
+          },
+          {
+            "title": "flywheel speed",
+            "x": 640.0,
+            "y": 128.0,
+            "width": 128.0,
+            "height": 128.0,
+            "type": "Text Display",
+            "properties": {
+              "topic": "/SmartDashboard/flywheel speed",
+              "period": 0.06,
+              "data_type": "double",
+              "show_submit_button": true
+            }
+          },
+          {
+            "title": "Ideal ball speed",
+            "x": 640.0,
+            "y": 0.0,
+            "width": 128.0,
+            "height": 128.0,
+            "type": "Text Display",
+            "properties": {
+              "topic": "/SmartDashboard/Ideal ball speed",
+              "period": 0.06,
+              "data_type": "double",
+              "show_submit_button": false
+            }
+          },
+          {
+            "title": "flywheel setpoint",
+            "x": 384.0,
+            "y": 0.0,
+            "width": 256.0,
+            "height": 256.0,
+            "type": "Graph",
+            "properties": {
+              "topic": "/SmartDashboard/flywheel setpoint",
+              "period": 0.033,
+              "data_type": "double",
+              "time_displayed": 5.0,
+              "min_value": 0.0,
+              "max_value": 6000.0,
+              "color": 4278238420,
+              "line_width": 2.0
+            }
+          },
+          {
+            "title": "flywheel setpoint",
+            "x": 384.0,
+            "y": 256.0,
+            "width": 256.0,
+            "height": 256.0,
+            "type": "Radial Gauge",
+            "properties": {
+              "topic": "/SmartDashboard/flywheel setpoint",
+              "period": 0.033,
+              "data_type": "double",
+              "start_angle": -140.0,
+              "end_angle": 140.0,
+              "min_value": 0.0,
+              "max_value": 6000.0,
+              "number_of_labels": 8,
+              "wrap_value": false,
+              "show_pointer": true,
+              "show_ticks": true
+            }
+          },
+          {
+            "title": "flywheel velocity",
+            "x": 128.0,
+            "y": 256.0,
+            "width": 256.0,
+            "height": 256.0,
+            "type": "Radial Gauge",
+            "properties": {
+              "topic": "/SmartDashboard/flywheel velocity",
+              "period": 0.033,
+              "data_type": "double",
+              "start_angle": -140.0,
+              "end_angle": 140.0,
+              "min_value": 0.0,
+              "max_value": 6000.0,
+              "number_of_labels": 8,
+              "wrap_value": false,
+              "show_pointer": true,
+              "show_ticks": true
             }
           }
         ]
@@ -317,7 +439,7 @@
           },
           {
             "title": "climb setpoint",
-            "x": 512.0,
+            "x": 384.0,
             "y": 0.0,
             "width": 256.0,
             "height": 256.0,
@@ -348,7 +470,7 @@
           },
           {
             "title": "climb setpoint",
-            "x": 512.0,
+            "x": 384.0,
             "y": 256.0,
             "width": 256.0,
             "height": 256.0,
@@ -357,6 +479,23 @@
               "topic": "/SmartDashboard/climb setpoint",
               "period": 0.033,
               "data_type": "double"
+            }
+          },
+          {
+            "title": "climb resetencoder",
+            "x": 640.0,
+            "y": 0.0,
+            "width": 128.0,
+            "height": 128.0,
+            "type": "Boolean Box",
+            "properties": {
+              "topic": "/SmartDashboard/climb resetencoder",
+              "period": 0.06,
+              "data_type": "boolean",
+              "true_color": 4283215696,
+              "false_color": 4294198070,
+              "true_icon": "None",
+              "false_icon": "None"
             }
           }
         ]

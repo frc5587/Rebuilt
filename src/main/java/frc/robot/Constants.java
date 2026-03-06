@@ -113,7 +113,7 @@ public final class Constants {
                    .withClosedLoopController(0.8, 0, 0)
                    .withSimClosedLoopController(1, 0, 0)
                    .withClosedLoopTolerance(Degrees.of(1.))
-                   .withFeedforward(new ArmFeedforward(0,1, 0))
+                   .withFeedforward(new ArmFeedforward(0,0.5, 0))
                    .withSimFeedforward(new ArmFeedforward(0, 0, 0))
                    .withTelemetry("ArmMotor", TelemetryVerbosity.HIGH)
                    .withGearing(new MechanismGearing(GearBox.fromReductionStages(5.,32./18.)))
