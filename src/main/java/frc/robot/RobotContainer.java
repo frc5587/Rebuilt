@@ -200,7 +200,7 @@ public class RobotContainer {
         }
         return driveFacingAngle.withVelocityX(-driverController.getLeftY() * DrivebaseConstants.MAX_SPEED) // Drive forward with negative Y (forward)
              .withVelocityY(-driverController.getLeftX() * DrivebaseConstants.MAX_SPEED) // Drive left with negative X (left)
-             .withTargetDirection(lastHeading); // Drive counterclockwise with negative X (left)
+             .withTargetDirection(lastHeading); // Point in joystick direction
     }));
 
     // Zero Gyro
