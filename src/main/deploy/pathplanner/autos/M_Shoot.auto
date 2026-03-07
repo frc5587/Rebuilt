@@ -27,24 +27,6 @@
           "data": {
             "name": "Shoot Preload"
           }
-        },
-        {
-          "type": "path",
-          "data": {
-            "pathName": "M_ShootClimb2"
-          }
-        },
-        {
-          "type": "path",
-          "data": {
-            "pathName": "M_ShootClimb3"
-          }
-        },
-        {
-          "type": "path",
-          "data": {
-            "pathName": "M_ShootClimb4"
-          }
         }
       ]
     }

@@ -66,7 +66,7 @@ public final class Constants {
     public static final int MOTOR_ID = 30;
     public static final UnaryOperator<SmartMotorControllerConfig> APPLY_SMC_CONFIG = (SmartMotorControllerConfig config) -> {
       return config.withControlMode(ControlMode.CLOSED_LOOP)
-                   .withClosedLoopController(0.05, 0, 0)
+                   .withClosedLoopController(0.05, 0, 0.7)
                    .withSimClosedLoopController(1, 0, 0)
                    .withFeedforward(new SimpleMotorFeedforward(0, 0, 0))
                    .withSimFeedforward(new SimpleMotorFeedforward(0, 0, 0))
@@ -87,6 +87,7 @@ public final class Constants {
     public static final double PITCH = 1.2217304764;
     public static final double LOOKAHEAD = 0.1;
     public static final double SHOTS_PER_SECOND = 2;
+    public static final double SPIN_UP_TIME = 2.0; // TODO set
     public static final double TIME_BETWEEN_LOG_TIMESTAMPS = 0.055;
     public static final Vector3 SHOOTER_POSITION = new Vector3(0.2,0,0.4);
     public static final Vector3 BLUE_ALLIANCE_GOAL = new Vector3(4.625626,4.0346315,1.8288);
@@ -109,9 +110,10 @@ public final class Constants {
     public static final Angle MIDDLE_ANGLE = Degrees.of(45.);
     public static final UnaryOperator<SmartMotorControllerConfig> APPLY_SMC_CONFIG = (SmartMotorControllerConfig config) -> {
       return config.withControlMode(ControlMode.CLOSED_LOOP)
-                   .withClosedLoopController(1, 0, 0)
+                   .withClosedLoopController(0.8, 0, 0)
                    .withSimClosedLoopController(1, 0, 0)
-                   .withFeedforward(new ArmFeedforward(0,0.15, 0))
+                   .withClosedLoopTolerance(Degrees.of(1.))
+                   .withFeedforward(new ArmFeedforward(0,0.5, 0))
                    .withSimFeedforward(new ArmFeedforward(0, 0, 0))
                    .withTelemetry("ArmMotor", TelemetryVerbosity.HIGH)
                    .withGearing(new MechanismGearing(GearBox.fromReductionStages(5.,32./18.)))
@@ -132,7 +134,7 @@ public final class Constants {
   }
 
   public static class IntakeConstants {
-    public static final double DUTY_CYCLE = 0.7;
+    public static final double DUTY_CYCLE = 0.5;
     public static final int MOTOR_ID = 22;
     public static final UnaryOperator<SmartMotorControllerConfig> APPLY_SMC_CONFIG = (SmartMotorControllerConfig config) -> {
       return config.withControlMode(ControlMode.OPEN_LOOP)
@@ -140,7 +142,7 @@ public final class Constants {
              .withGearing(new MechanismGearing(GearBox.fromReductionStages(3)))
              .withMotorInverted(false)
              .withIdleMode(MotorMode.COAST)
-             .withStatorCurrentLimit(Amps.of(20));  
+             .withStatorCurrentLimit(Amps.of(20));
     };
     
     
@@ -174,6 +176,7 @@ public final class Constants {
 
   public static class ClimbConstants {
     public static final Angle UP_ANGLE = Rotations.of(77);
+    public static final Angle DOWN_ANGLE = Rotations.of(0);
     public static final int MOTOR_ID = 40;
     public static final int LIMIT_SWITCH_ID = 0; //TODO set actual id
     public static final UnaryOperator<SmartMotorControllerConfig> APPLY_SMC_CONFIG = (SmartMotorControllerConfig config) -> {
@@ -184,7 +187,7 @@ public final class Constants {
                    .withSimFeedforward(new SimpleMotorFeedforward(0, 0, 0))
                    .withTelemetry("ClimbMotor", TelemetryVerbosity.HIGH)
                    .withGearing(new MechanismGearing(GearBox.fromReductionStages(5,4,4)))
-                   .withMotorInverted(false)
+                   .withMotorInverted(true)
                    .withIdleMode(MotorMode.BRAKE)
                    .withStatorCurrentLimit(Amps.of(40))
                    .withSoftLimit(Rotations.of(0), Rotations.of(77.0));

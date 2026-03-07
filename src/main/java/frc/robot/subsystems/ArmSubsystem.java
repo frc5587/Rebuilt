@@ -45,6 +45,8 @@ public class ArmSubsystem extends SubsystemBase {
   public ArmSubsystem() {
     CommandScheduler.getInstance().schedule(arm.setAngle(ArmConstants.TOP_ANGLE));
     leftArmCfg.applyConfig();
+    SmartDashboard.putBoolean("top arm resetencoders", false);
+    SmartDashboard.putBoolean("bottom arm resetencoders", false);
   }
 
   /**
@@ -97,6 +99,16 @@ public class ArmSubsystem extends SubsystemBase {
       SmartDashboard.putNumber("left arm setpoint", lSparkSmartMotorController.getMechanismPositionSetpoint().get().in(Rotations));
     }
     SmartDashboard.putNumber("left dutycycle", lSparkSmartMotorController.getDutyCycle());
+
+    if (SmartDashboard.getBoolean("top arm resetencoders", false)) {
+      resetAngle(ArmConstants.TOP_ANGLE);
+    }
+    SmartDashboard.putBoolean("top arm resetencoders", false);
+
+    if (SmartDashboard.getBoolean("bottom arm resetencoders", false)) {
+      resetAngle(ArmConstants.BOTTOM_ANGLE);
+    }
+    SmartDashboard.putBoolean("bottom arm resetencoders", false);
   }
 
   @Override

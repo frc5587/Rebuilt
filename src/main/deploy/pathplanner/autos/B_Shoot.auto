@@ -7,25 +7,25 @@
         {
           "type": "path",
           "data": {
-            "pathName": "toptooutpost"
+            "pathName": "B_ShootClimb1"
           }
         },
         {
-          "type": "path",
+          "type": "named",
           "data": {
-            "pathName": "outposttoshoot"
+            "name": "Arm Middle"
           }
         },
         {
-          "type": "path",
+          "type": "named",
           "data": {
-            "pathName": "shoottoclimb"
+            "name": "Shoot Preload"
           }
         }
       ]
     }
   },
   "resetOdom": true,
-  "folder": null,
+  "folder": "bottom",
   "choreoAuto": false
 }

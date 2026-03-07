@@ -7,37 +7,31 @@
         {
           "type": "path",
           "data": {
-            "pathName": "path1"
+            "pathName": "T_ShootClimb1"
+          }
+        },
+        {
+          "type": "named",
+          "data": {
+            "name": "Arm Middle"
           }
         },
         {
           "type": "wait",
           "data": {
-            "waitTime": 0.8
+            "waitTime": 1.0
           }
         },
         {
-          "type": "path",
+          "type": "named",
           "data": {
-            "pathName": "path2"
-          }
-        },
-        {
-          "type": "deadline",
-          "data": {
-            "commands": []
-          }
-        },
-        {
-          "type": "parallel",
-          "data": {
-            "commands": []
+            "name": "Shoot Preload"
           }
         }
       ]
     }
   },
   "resetOdom": true,
-  "folder": null,
+  "folder": "top",
   "choreoAuto": false
 }

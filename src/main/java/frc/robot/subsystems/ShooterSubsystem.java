@@ -75,6 +75,14 @@ public class ShooterSubsystem extends SubsystemBase {
     return shooter.setSpeed(RPM.of(ballSpeedToRPM.get(speed.get().in(MetersPerSecond))));
   }
 
+  public double ballSpeedToRPM(double ballSpeed) {
+    return ballSpeedToRPM.get(ballSpeed);
+  }
+
+  public Command useManualSpeed() {
+    return setAngularVelocity(() -> RPM.of(SmartDashboard.getNumber("manual flywheel speed", 0)));
+  }
+
   /**
    * Sets the shooter velocity to zero.
    * 
@@ -118,6 +126,10 @@ public class ShooterSubsystem extends SubsystemBase {
     Pose3d[] fuelPoses = SimulatedArena.getInstance()
                                        .getGamePiecesArrayByType("Fuel");       
     fuelPosePublisher.accept(fuelPoses);
+  }
+
+    public boolean atGoal() {
+    return ((sparkSmartMotorController.getMechanismSetpointVelocity().get().in(RPM)*0.95) <= sparkSmartMotorController.getMechanismVelocity().in(RPM));
   }
 
 }

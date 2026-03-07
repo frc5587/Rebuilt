@@ -4,8 +4,12 @@
 
 package frc.robot;
 
-import static edu.wpi.first.units.Units.Degrees;
+import static edu.wpi.first.units.Units.MetersPerSecond;
+import static edu.wpi.first.units.Units.RPM;
 import static edu.wpi.first.units.Units.Radians;
+
+import java.util.function.DoubleSupplier;
+import java.util.function.Supplier;
 
 import com.ctre.phoenix6.swerve.SwerveModule.DriveRequestType;
 
@@ -29,7 +33,9 @@ import com.ctre.phoenix6.swerve.SwerveRequest;
 import com.pathplanner.lib.auto.AutoBuilder;
 import com.pathplanner.lib.auto.NamedCommands;
 
+import edu.wpi.first.math.geometry.Pose2d;
 import edu.wpi.first.math.geometry.Rotation2d;
+import edu.wpi.first.math.kinematics.ChassisSpeeds;
 import edu.wpi.first.wpilibj.DriverStation;
 import edu.wpi.first.wpilibj.PowerDistribution;
 import edu.wpi.first.wpilibj.DriverStation.Alliance;
@@ -39,6 +45,8 @@ import edu.wpi.first.wpilibj.smartdashboard.SmartDashboard;
 import edu.wpi.first.wpilibj2.command.Command;
 import edu.wpi.first.wpilibj2.command.CommandScheduler;
 import edu.wpi.first.wpilibj2.command.Commands;
+import edu.wpi.first.wpilibj2.command.SequentialCommandGroup;
+import edu.wpi.first.wpilibj2.command.WaitCommand;
 import edu.wpi.first.wpilibj2.command.button.CommandXboxController;
 import edu.wpi.first.wpilibj2.command.button.Trigger;
 
@@ -63,6 +71,20 @@ public class RobotContainer {
       .withHeadingPID(DrivebaseConstants.HEADING_CONTROLLER.getP(), DrivebaseConstants.HEADING_CONTROLLER.getI(), DrivebaseConstants.HEADING_CONTROLLER.getD());
   private final SwerveRequest.SwerveDriveBrake brake = new SwerveRequest.SwerveDriveBrake();
   private AimTowardsGoal aimingCommand = null;
+  Supplier<Vector3> position = () -> {
+    Pose2d position = drivebase.getState().Pose;
+    return new Vector3(position.getX(), position.getY(), 0);
+  };
+  DoubleSupplier heading = () -> drivebase.getState().RawHeading.getRadians();
+  Supplier<Vector3> velocity = () -> {
+    ChassisSpeeds velocity = drivebase.getState().Speeds;
+    velocity = ChassisSpeeds.fromRobotRelativeSpeeds(velocity, drivebase.getState().Pose.getRotation());
+    Vector3 input = new Vector3(velocity.vxMetersPerSecond, velocity.vyMetersPerSecond, 0);
+    return input;
+  };
+  DoubleSupplier angularVelocity = () -> drivebase.getState().Speeds.omegaRadiansPerSecond;
+  Supplier<Vector3> inputVelocity = () -> Vector3.getOrigin();
+  DoubleSupplier inputAngularVelocity = () -> 0.;
   private AimingMath aimingMath;
 
   private boolean driverAllowIndexing = false;
@@ -77,10 +99,12 @@ public class RobotContainer {
 
   /** The container for the robot. Contains subsystems, OI devices, and commands. */
   public RobotContainer() {
+    aimingMath = new AimingMath(position, heading, velocity, angularVelocity, inputVelocity, inputAngularVelocity, () -> shooter.getVelocity().in(RPM), ShooterConstants.getGoal(DriverStation.getAlliance().get()));
+
     // PLEASE DON'T SET DEFAULT COMMANDS UP HERE!! USE TELEOPINIT() AT BOTTOM OF FILE
     indexer.setDefaultCommand(indexer.set(0.));
 
-    // SmartDashboard.putNumber("flywheel speed", 0.);
+    SmartDashboard.putNumber("manual flywheel speed", 2000.);
 
     // Configure the trigger bindings
     configureBindings();
@@ -89,18 +113,30 @@ public class RobotContainer {
     //Create the NamedCommands that will be used in PathPlanner
     NamedCommands.registerCommand("test", Commands.print("I EXIST"));
 
-    NamedCommands.registerCommand("Arm Up", arm.setAngle(ArmConstants.TOP_ANGLE));
-    NamedCommands.registerCommand("Arm Down", arm.setAngle(ArmConstants.BOTTOM_ANGLE));
-    NamedCommands.registerCommand("Arm Middle", arm.setAngle(ArmConstants.MIDDLE_ANGLE));
+    NamedCommands.registerCommand("Arm Up", Commands.runOnce(() -> arm.setAngle(ArmConstants.TOP_ANGLE).schedule()));
+    NamedCommands.registerCommand("Arm Down", Commands.runOnce(() -> arm.setAngle(ArmConstants.BOTTOM_ANGLE).schedule()));
+    NamedCommands.registerCommand("Arm Middle", Commands.runOnce(() -> arm.setAngle(ArmConstants.MIDDLE_ANGLE).schedule()));
 
-    NamedCommands.registerCommand("Intake Forward", intake.set(IntakeConstants.DUTY_CYCLE));
-    NamedCommands.registerCommand("Intake Stop", intake.set(0));
+    NamedCommands.registerCommand("Intake Forward", Commands.runOnce(() -> intake.set(IntakeConstants.DUTY_CYCLE).schedule()));
+    NamedCommands.registerCommand("Intake Stop", Commands.runOnce(() -> intake.set(0).schedule()));
 
-    NamedCommands.registerCommand("Indexer Forward", indexer.set(IndexerConstants.DUTY_CYCLE));
+    NamedCommands.registerCommand("Shoot Preload",
+        new SequentialCommandGroup(shooter.setBallVelocity(() -> MetersPerSecond.of(aimingMath.getIdealShotSpeed())))
+            .until(shooter::atGoal)
+            .raceWith(new WaitCommand(ShooterConstants.SPIN_UP_TIME))
+            .andThen(indexer.set(IndexerConstants.DUTY_CYCLE))
+            .andThen(new WaitCommand(6.))
+            .andThen(indexer.set(0)));
+    NamedCommands.registerCommand("Shoot Hopper",
+        new SequentialCommandGroup(shooter.setBallVelocity(() -> MetersPerSecond.of(aimingMath.getIdealShotSpeed())))
+            .until(shooter::atGoal)
+            .raceWith(new WaitCommand(ShooterConstants.SPIN_UP_TIME))
+            .andThen(indexer.set(IndexerConstants.DUTY_CYCLE))
+            .andThen(new WaitCommand(25. / ShooterConstants.SHOTS_PER_SECOND))
+            .andThen(indexer.set(0)));
 
-    // NamedCommands.registerCommand("Shoot", new SequentialCommandGroup(shooter.setAngularVelocity(() -> RPM.of(aimingMath.getIdealShotSpeed(ShooterConstants.LOOKAHEAD)*ShooterConstants.SHOT_SPEED_CONVERSION_FACTOR)))
-    //                                                    .until(shooter.
-    //                                                    ));
+    NamedCommands.registerCommand("Climb Up", climb.setAngularPosition(ClimbConstants.UP_ANGLE));
+    NamedCommands.registerCommand("Climb Down", climb.setAngularPosition(ClimbConstants.DOWN_ANGLE));
 
     //Have the autoChooser pull in all PathPlanner autos as options
     autoChooser = AutoBuilder.buildAutoChooser();
@@ -164,7 +200,7 @@ public class RobotContainer {
         }
         return driveFacingAngle.withVelocityX(-driverController.getLeftY() * DrivebaseConstants.MAX_SPEED) // Drive forward with negative Y (forward)
              .withVelocityY(-driverController.getLeftX() * DrivebaseConstants.MAX_SPEED) // Drive left with negative X (left)
-             .withTargetDirection(lastHeading); // Drive counterclockwise with negative X (left)
+             .withTargetDirection(lastHeading); // Point in joystick direction
     }));
 
     // Zero Gyro
@@ -242,14 +278,14 @@ public class RobotContainer {
             CommandScheduler.getInstance().schedule(indexer.set(IndexerConstants.DUTY_CYCLE));
           }
           else {
-            CommandScheduler.getInstance().schedule(indexer.getDefaultCommand());
+            CommandScheduler.getInstance().schedule(indexer.set(0));
           }
         }))
-                                     .onFalse(indexer.getDefaultCommand());
+                                     .onFalse(indexer.set(0));
     operatorController.leftBumper().whileTrue(indexer.set(IndexerConstants.DUTY_CYCLE));
 
     // Silly shooter override (set this to shoot from an easy to drive to position, like in front of the hub)
-    operatorController.x().whileTrue(shooter.set(0.6));
+    operatorController.x().whileTrue(shooter.useManualSpeed());
     // TODO can we get a position based standstill shooter speed button for operator?
 
     // Climb
@@ -260,7 +296,6 @@ public class RobotContainer {
     operatorController.povUp().whileTrue(intake.set(1.));
     operatorController.povRight().whileTrue(indexer.set(-0.5).alongWith(shooter.set(-0.3)));
     operatorController.povDown().whileTrue(intake.set(-1.));
-    operatorController.povLeft().whileTrue(arm.set(1.));
 
     // Reset Arm Gyro
     operatorController.start().onTrue(arm.resetAngle(ArmConstants.BOTTOM_ANGLE));
