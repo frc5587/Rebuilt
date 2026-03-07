@@ -104,8 +104,6 @@ public class RobotContainer {
     // PLEASE DON'T SET DEFAULT COMMANDS UP HERE!! USE TELEOPINIT() AT BOTTOM OF FILE
     indexer.setDefaultCommand(indexer.set(0.));
 
-    SmartDashboard.putNumber("manual flywheel speed", 2000.);
-
     // Configure the trigger bindings
     configureBindings();
     DriverStation.silenceJoystickConnectionWarning(true);

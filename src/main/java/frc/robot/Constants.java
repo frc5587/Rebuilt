@@ -66,7 +66,7 @@ public final class Constants {
     public static final int MOTOR_ID = 30;
     public static final UnaryOperator<SmartMotorControllerConfig> APPLY_SMC_CONFIG = (SmartMotorControllerConfig config) -> {
       return config.withControlMode(ControlMode.CLOSED_LOOP)
-                   .withClosedLoopController(0.05, 0, 0.7)
+                   .withClosedLoopController(0.01, 0.00002, 0)
                    .withSimClosedLoopController(1, 0, 0)
                    .withFeedforward(new SimpleMotorFeedforward(0, 0, 0))
                    .withSimFeedforward(new SimpleMotorFeedforward(0, 0, 0))
@@ -139,7 +139,7 @@ public final class Constants {
     public static final UnaryOperator<SmartMotorControllerConfig> APPLY_SMC_CONFIG = (SmartMotorControllerConfig config) -> {
       return config.withControlMode(ControlMode.OPEN_LOOP)
              .withTelemetry("IntakeMotor", TelemetryVerbosity.LOW)
-             .withGearing(new MechanismGearing(GearBox.fromReductionStages(3)))
+             .withGearing(new MechanismGearing(GearBox.fromReductionStages(5)))
              .withMotorInverted(false)
              .withIdleMode(MotorMode.COAST)
              .withStatorCurrentLimit(Amps.of(20));
@@ -169,7 +169,6 @@ public final class Constants {
     public static final UnaryOperator<FlyWheelConfig> APPLY_INDEXER_CONFIG = (FlyWheelConfig config) -> {
       return config.withDiameter(Inches.of(1))
                    .withMass(Pounds.of(1))
-    
                    .withTelemetry("Indexer", TelemetryVerbosity.LOW);
     };
   }
