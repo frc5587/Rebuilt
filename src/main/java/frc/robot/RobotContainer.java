@@ -209,9 +209,9 @@ public class RobotContainer {
     // Zero Odmometry
     driverController.back().onTrue(Commands.runOnce(() -> {
       if (DriverStation.getAlliance().get() == Alliance.Blue){
-        drivebase.addVisionMeasurement(DrivebaseConstants.BLUE_ALLIANCE_MIDDLE_HUB, Timer.getFPGATimestamp());
+        drivebase.resetPose(DrivebaseConstants.BLUE_ALLIANCE_MIDDLE_HUB);
       } else if (DriverStation.getAlliance().get() == Alliance.Red){
-        drivebase.addVisionMeasurement(DrivebaseConstants.RED_ALLIANCE_MIDDLE_HUB, Timer.getFPGATimestamp());
+        drivebase.resetPose(DrivebaseConstants.RED_ALLIANCE_MIDDLE_HUB);
       }
     }));
 

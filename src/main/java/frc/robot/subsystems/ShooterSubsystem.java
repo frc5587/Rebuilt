@@ -48,8 +48,9 @@ public class ShooterSubsystem extends SubsystemBase {
   public ShooterSubsystem() {
     ballSpeedToRPM.put(1.,500.);
     ballSpeedToRPM.put(7.24428015,2900.);
+    ballSpeedToRPM.put(8.37671351, 3350.);
     ballSpeedToRPM.put(20., 10000.);
-    SmartDashboard.putNumber("manual flywheel speed", 2000.);
+    SmartDashboard.putNumber("manual flywheel speed", 3500.);
   }
     
   /**

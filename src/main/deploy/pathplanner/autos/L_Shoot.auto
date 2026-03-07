@@ -5,9 +5,15 @@
     "data": {
       "commands": [
         {
+          "type": "path",
+          "data": {
+            "pathName": "L_ShootClimb1"
+          }
+        },
+        {
           "type": "named",
           "data": {
-            "name": "Arm Down"
+            "name": "Arm Middle"
           }
         },
         {
@@ -17,21 +23,15 @@
           }
         },
         {
-          "type": "path",
-          "data": {
-            "pathName": "T_MiddleShoot1"
-          }
-        },
-        {
           "type": "named",
           "data": {
-            "name": "Shoot Hopper"
+            "name": "Shoot Preload"
           }
         }
       ]
     }
   },
   "resetOdom": true,
-  "folder": "top",
+  "folder": "left",
   "choreoAuto": false
 }

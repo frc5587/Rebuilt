@@ -7,7 +7,7 @@
         {
           "type": "path",
           "data": {
-            "pathName": "T_ShootClimb1"
+            "pathName": "L_ShootClimb1"
           }
         },
         {
@@ -43,7 +43,7 @@
         {
           "type": "path",
           "data": {
-            "pathName": "T_DepotShoot1"
+            "pathName": "L_DepotShoot1"
           }
         },
         {
@@ -61,7 +61,7 @@
         {
           "type": "path",
           "data": {
-            "pathName": "T_DepotShoot2"
+            "pathName": "L_DepotShoot2"
           }
         },
         {
@@ -86,6 +86,6 @@
     }
   },
   "resetOdom": true,
-  "folder": "top",
+  "folder": "left",
   "choreoAuto": false
 }

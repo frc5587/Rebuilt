@@ -5,9 +5,21 @@
     "data": {
       "commands": [
         {
+          "type": "named",
+          "data": {
+            "name": "Arm Down"
+          }
+        },
+        {
+          "type": "wait",
+          "data": {
+            "waitTime": 1.0
+          }
+        },
+        {
           "type": "path",
           "data": {
-            "pathName": "B_ShootClimb1"
+            "pathName": "R_MiddleShoot1"
           }
         },
         {
@@ -19,13 +31,13 @@
         {
           "type": "named",
           "data": {
-            "name": "Shoot Preload"
+            "name": "Shoot Hopper"
           }
         }
       ]
     }
   },
   "resetOdom": true,
-  "folder": "bottom",
+  "folder": "right",
   "choreoAuto": false
 }
