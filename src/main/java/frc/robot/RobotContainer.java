@@ -120,19 +120,19 @@ public class RobotContainer {
     NamedCommands.registerCommand("Intake Stop", Commands.runOnce(() -> intake.set(0).schedule()));
 
     NamedCommands.registerCommand("Shoot Preload",
-        new SequentialCommandGroup(shooter.setBallVelocity(() -> MetersPerSecond.of(aimingMath.getIdealShotSpeed())))
+        new SequentialCommandGroup(shooter.setAngularVelocity(() -> RPM.of(3500.)))
             .until(shooter::atGoal)
             .raceWith(new WaitCommand(ShooterConstants.SPIN_UP_TIME))
             .andThen(Commands.runOnce(() -> indexer.set(IndexerConstants.DUTY_CYCLE).schedule()))
-            .andThen(new WaitCommand(6.))
+            .andThen(new WaitCommand(10.))
             .andThen(Commands.runOnce(() -> indexer.set(0).schedule()))
             .andThen(Commands.runOnce(() -> shooter.set(0).schedule())));
     NamedCommands.registerCommand("Shoot Hopper",
-        new SequentialCommandGroup(shooter.setBallVelocity(() -> MetersPerSecond.of(aimingMath.getIdealShotSpeed())))
+        new SequentialCommandGroup(shooter.setAngularVelocity(() -> RPM.of(3500.)))
             .until(shooter::atGoal)
             .raceWith(new WaitCommand(ShooterConstants.SPIN_UP_TIME))
             .andThen(Commands.runOnce(() -> indexer.set(IndexerConstants.DUTY_CYCLE).schedule()))
-            .andThen(new WaitCommand(8.))
+            .andThen(new WaitCommand(10.))
             .andThen(Commands.runOnce(() -> indexer.set(0).schedule()))
             .andThen(Commands.runOnce(() -> shooter.set(0).schedule())));
 
@@ -303,8 +303,9 @@ public class RobotContainer {
     // TODO can we get a position based standstill shooter speed button for operator?
 
     // Climb
-    operatorController.y().onTrue(climb.setAngularPosition(ClimbConstants.UP_ANGLE));
-    operatorController.a().onTrue(climb.setAngularPosition(Radians.of(0.)));
+    // operatorController.y().onTrue(climb.setAngularPosition(ClimbConstants.UP_ANGLE));
+    // operatorController.a().onTrue(climb.setAngularPosition(Radians.of(0.)));
+    operatorController.b().whileTrue(shooter.setBallVelocity(() -> MetersPerSecond.of(aimingMath.getIdealShotSpeed())));
 
     // Utils
     operatorController.povUp().whileTrue(intake.set(1.));
@@ -329,7 +330,7 @@ public class RobotContainer {
   }
 
   public void teleopInit() {
-    shooter.setDefaultCommand(shooter.set(0.));
+    shooter.setDefaultCommand(shooter.set(10.));
     indexer.setDefaultCommand(indexer.stop());
     intake.setDefaultCommand(intake.stop());
   }

@@ -128,7 +128,7 @@ public class Vision {
     //    * pose estimation, even when odometry is incorrect.
     //    * (This is why teams implement vision system to correct odometry.)
     //    * Therefore, we must ensure that the actual robot pose is provided in the
-    //    * simulator when updating the vision simulation during the simulation.
+    //    * simulator when updating the vision sifmulation during the simulation.
     //    */
     //   visionSim.update(swerveDrive.getSimulationDriveTrainPose().get());
     // }
@@ -265,7 +265,7 @@ public class Vision {
      * Left Camera
      */
     LEFT_CAM("left",
-        new Rotation3d(0, Math.toRadians(-24.094), Math.toRadians(30)),
+        new Rotation3d(0., 0., Math.toRadians(90.)),
         new Translation3d(Units.inchesToMeters(-8.379322),
             Units.inchesToMeters(12.037456),
             Units.inchesToMeters(8.575626)),
@@ -274,7 +274,7 @@ public class Vision {
      * Right Camera
      */
     RIGHT_CAM("right",
-        new Rotation3d(0, Math.toRadians(-24.094), Math.toRadians(-30)),
+        new Rotation3d(0., 0., Math.toRadians(-90.)),
         new Translation3d(Units.inchesToMeters(-8.378073),
             Units.inchesToMeters(-12.037120),
             Units.inchesToMeters(8.590626)),
@@ -283,7 +283,7 @@ public class Vision {
      * Center Camera
      */
     BACK_CAM("back",
-        new Rotation3d(0, Units.degreesToRadians(18), 0),
+        new Rotation3d(0., 0., Math.toRadians(180.)),
         new Translation3d(Units.inchesToMeters(-12.038703),
             Units.inchesToMeters(8.376490),
             Units.inchesToMeters(8.575626)),
