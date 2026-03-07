@@ -112,6 +112,19 @@
               "period": 0.06,
               "sort_options": false
             }
+          },
+          {
+            "title": "Vision Enabled",
+            "x": 512.0,
+            "y": 128.0,
+            "width": 128.0,
+            "height": 128.0,
+            "type": "Toggle Button",
+            "properties": {
+              "topic": "/SmartDashboard/Vision Enabled",
+              "period": 0.06,
+              "data_type": "boolean"
+            }
           }
         ]
       }
@@ -485,6 +498,19 @@
               "period": 0.06,
               "data_type": "double",
               "show_submit_button": true
+            }
+          },
+          {
+            "title": "Auto Chooser",
+            "x": 768.0,
+            "y": 0.0,
+            "width": 256.0,
+            "height": 128.0,
+            "type": "ComboBox Chooser",
+            "properties": {
+              "topic": "/SmartDashboard/Auto Chooser",
+              "period": 0.06,
+              "sort_options": false
             }
           }
         ]
