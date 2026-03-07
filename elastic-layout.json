@@ -99,7 +99,21 @@
             ]
           }
         ],
-        "containers": []
+        "containers": [
+          {
+            "title": "Auto Chooser",
+            "x": 512.0,
+            "y": 0.0,
+            "width": 128.0,
+            "height": 128.0,
+            "type": "ComboBox Chooser",
+            "properties": {
+              "topic": "/SmartDashboard/Auto Chooser",
+              "period": 0.06,
+              "sort_options": false
+            }
+          }
+        ]
       }
     },
     {
@@ -228,34 +242,26 @@
             "title": "bottom arm resetencoders",
             "x": 640.0,
             "y": 0.0,
-            "width": 128.0,
+            "width": 256.0,
             "height": 128.0,
-            "type": "Boolean Box",
+            "type": "Toggle Button",
             "properties": {
               "topic": "/SmartDashboard/bottom arm resetencoders",
               "period": 0.06,
-              "data_type": "boolean",
-              "true_color": 4283215696,
-              "false_color": 4294198070,
-              "true_icon": "None",
-              "false_icon": "None"
+              "data_type": "boolean"
             }
           },
           {
             "title": "top arm resetencoders",
             "x": 640.0,
             "y": 128.0,
-            "width": 128.0,
+            "width": 256.0,
             "height": 128.0,
-            "type": "Boolean Box",
+            "type": "Toggle Button",
             "properties": {
               "topic": "/SmartDashboard/top arm resetencoders",
               "period": 0.06,
-              "data_type": "boolean",
-              "true_color": 4283215696,
-              "false_color": 4294198070,
-              "true_icon": "None",
-              "false_icon": "None"
+              "data_type": "boolean"
             }
           }
         ]

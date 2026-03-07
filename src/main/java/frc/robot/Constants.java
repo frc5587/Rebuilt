@@ -17,6 +17,9 @@ import java.util.function.UnaryOperator;
 import edu.wpi.first.math.controller.ArmFeedforward;
 import edu.wpi.first.math.controller.ProfiledPIDController;
 import edu.wpi.first.math.controller.SimpleMotorFeedforward;
+import edu.wpi.first.math.geometry.Pose2d;
+import edu.wpi.first.math.geometry.Rotation2d;
+import edu.wpi.first.math.geometry.Translation2d;
 import edu.wpi.first.math.geometry.Translation3d;
 import edu.wpi.first.math.trajectory.TrapezoidProfile.Constraints;
 import edu.wpi.first.math.util.Units;
@@ -60,6 +63,9 @@ public final class Constants {
     public static final double SHOOT_WHILE_MOVING_SPEED  = Units.feetToMeters(4);
     public static final double SHOOT_WHILE_MOVE_ACCEL_LIMIT = 10;
     public static final ProfiledPIDController SHOOT_WHILE_MOVE_HEADING_CONTROLLER = new ProfiledPIDController(25,0,0,new Constraints(MAX_SPIN_SPEED_RADIANS_PER_SECOND, MAX_SPIN_ACCEL));
+
+    public static final Pose2d RED_ALLIANCE_MIDDLE_HUB = new Pose2d(new Translation2d(16.072, 0.455), Rotation2d.k180deg);
+    public static final Pose2d BLUE_ALLIANCE_MIDDLE_HUB = new Pose2d(new Translation2d(0.455, 7.621), Rotation2d.kZero);
   }
 
   public static class ShooterConstants {

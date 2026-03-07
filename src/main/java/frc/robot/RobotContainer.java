@@ -38,6 +38,7 @@ import edu.wpi.first.math.geometry.Rotation2d;
 import edu.wpi.first.math.kinematics.ChassisSpeeds;
 import edu.wpi.first.wpilibj.DriverStation;
 import edu.wpi.first.wpilibj.PowerDistribution;
+import edu.wpi.first.wpilibj.Timer;
 import edu.wpi.first.wpilibj.DriverStation.Alliance;
 import edu.wpi.first.wpilibj.smartdashboard.SendableChooser;
 import edu.wpi.first.wpilibj.smartdashboard.SmartDashboard;
@@ -122,16 +123,18 @@ public class RobotContainer {
         new SequentialCommandGroup(shooter.setBallVelocity(() -> MetersPerSecond.of(aimingMath.getIdealShotSpeed())))
             .until(shooter::atGoal)
             .raceWith(new WaitCommand(ShooterConstants.SPIN_UP_TIME))
-            .andThen(indexer.set(IndexerConstants.DUTY_CYCLE))
+            .andThen(Commands.runOnce(() -> indexer.set(IndexerConstants.DUTY_CYCLE).schedule()))
             .andThen(new WaitCommand(6.))
-            .andThen(indexer.set(0)));
+            .andThen(Commands.runOnce(() -> indexer.set(0).schedule()))
+            .andThen(Commands.runOnce(() -> shooter.set(0).schedule())));
     NamedCommands.registerCommand("Shoot Hopper",
         new SequentialCommandGroup(shooter.setBallVelocity(() -> MetersPerSecond.of(aimingMath.getIdealShotSpeed())))
             .until(shooter::atGoal)
             .raceWith(new WaitCommand(ShooterConstants.SPIN_UP_TIME))
-            .andThen(indexer.set(IndexerConstants.DUTY_CYCLE))
-            .andThen(new WaitCommand(25. / ShooterConstants.SHOTS_PER_SECOND))
-            .andThen(indexer.set(0)));
+            .andThen(Commands.runOnce(() -> indexer.set(IndexerConstants.DUTY_CYCLE).schedule()))
+            .andThen(new WaitCommand(8.))
+            .andThen(Commands.runOnce(() -> indexer.set(0).schedule()))
+            .andThen(Commands.runOnce(() -> shooter.set(0).schedule())));
 
     NamedCommands.registerCommand("Climb Up", climb.setAngularPosition(ClimbConstants.UP_ANGLE));
     NamedCommands.registerCommand("Climb Down", climb.setAngularPosition(ClimbConstants.DOWN_ANGLE));
@@ -184,7 +187,6 @@ public class RobotContainer {
    * POV Up: 100% intake speed
    * POV Right: Reverse indexer and shooter
    * POV Down: Reverse intake
-   * POV Left: Arm 100% dutycycle
    * 
    * Start: reset arm position to top
    */
@@ -204,6 +206,14 @@ public class RobotContainer {
     // Zero Gyro
     driverController.start().onTrue((Commands.runOnce(drivebase::seedFieldCentric))
                                     .alongWith(Commands.runOnce(() -> {lastHeading = Rotation2d.fromDegrees(0.);})));
+    // Zero Odmometry
+    driverController.back().onTrue(Commands.runOnce(() -> {
+      if (DriverStation.getAlliance().get() == Alliance.Blue){
+        drivebase.addVisionMeasurement(DrivebaseConstants.BLUE_ALLIANCE_MIDDLE_HUB, Timer.getFPGATimestamp());
+      } else if (DriverStation.getAlliance().get() == Alliance.Red){
+        drivebase.addVisionMeasurement(DrivebaseConstants.RED_ALLIANCE_MIDDLE_HUB, Timer.getFPGATimestamp());
+      }
+    }));
 
     // Sim stuff
     driverController.leftTrigger().onTrue(Commands.runOnce(() -> {if(aimingCommand != null) {aimingCommand.getMath().logSim();}}));
@@ -235,16 +245,20 @@ public class RobotContainer {
                                    .alongWith(drivebase.applyRequest(() -> driveFacingAngle.withVelocityX(-driverController.getLeftY() * DrivebaseConstants.MAX_SPEED) // Drive forward with negative Y (forward)
                                                                                            .withVelocityY(-driverController.getLeftX() * DrivebaseConstants.MAX_SPEED)
                                                                                            .withTargetDirection(Rotation2d.kZero))));
-    driverController.a().whileTrue(arm.setAngle(ArmConstants.BOTTOM_ANGLE)
-                                   .alongWith(intake.set(IntakeConstants.DUTY_CYCLE))
-                                   .alongWith(drivebase.applyRequest(() -> {
-        if (Math.hypot(driverController.getLeftY(), driverController.getLeftX()) > DrivebaseConstants.INTAKE_HEADING_DEADBAND) {
-          lastHeading = new Rotation2d(-driverController.getLeftY(), -driverController.getLeftX());
-        }
-        return driveFacingAngle.withVelocityX(-driverController.getLeftY() * DrivebaseConstants.MAX_SPEED) // Drive forward with negative Y (forward)
-             .withVelocityY(-driverController.getLeftX() * DrivebaseConstants.MAX_SPEED) // Drive left with negative X (left)
-             .withTargetDirection(lastHeading); // Drive counterclockwise with negative X (left)
-    })));
+    // driverController.a().whileTrue(arm.setAngle(ArmConstants.BOTTOM_ANGLE)
+    //                                .alongWith(intake.set(IntakeConstants.DUTY_CYCLE))
+    //                                .alongWith(drivebase.applyRequest(() -> {
+    //     if (Math.hypot(driverController.getLeftY(), driverController.getLeftX()) > DrivebaseConstants.INTAKE_HEADING_DEADBAND) {
+    //       lastHeading = new Rotation2d(-driverController.getLeftY(), -driverController.getLeftX());
+    //     }
+    //     return driveFacingAngle.withVelocityX(-driverController.getLeftY() * DrivebaseConstants.MAX_SPEED) // Drive forward with negative Y (forward)
+    //          .withVelocityY(-driverController.getLeftX() * DrivebaseConstants.MAX_SPEED) // Drive left with negative X (left)
+    //          .withTargetDirection(lastHeading); // Drive counterclockwise with negative X (left)
+    // })));
+    driverController.a().whileTrue(arm.setAngle(ArmConstants.TOP_ANGLE)
+                                   .alongWith(drivebase.applyRequest(() -> driveFacingAngle.withVelocityX(-driverController.getLeftY() * DrivebaseConstants.MAX_SPEED) // Drive forward with negative Y (forward)
+                                                                                           .withVelocityY(-driverController.getLeftX() * DrivebaseConstants.MAX_SPEED)
+                                                                                           .withTargetDirection(Rotation2d.fromDegrees(45.)))));
     driverController.leftBumper().onTrue(Commands.runOnce(() -> {
         if (aimingCommand != null  &&  aimingCommand.isScheduled()) {
           aimingCommand.cancel();
@@ -262,6 +276,8 @@ public class RobotContainer {
                                   .onFalse(Commands.run(() -> {driverAllowIndexing = false;}));
 
     // Operator
+
+  
     
     // Arm
     operatorController.rightTrigger().whileTrue(arm.setAngle(ArmConstants.BOTTOM_ANGLE)
