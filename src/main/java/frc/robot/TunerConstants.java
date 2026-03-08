@@ -64,6 +64,7 @@ public class TunerConstants {
                 .withSupplyCurrentLimit(Amps.of(40))
                 .withStatorCurrentLimit(Amps.of(120))
                 .withStatorCurrentLimitEnable(true)
+                .withSupplyCurrentLimitEnable(true)
         );
     private static final CANcoderConfiguration encoderInitialConfigs = new CANcoderConfiguration();
     // Configs for the Pigeon 2; leave this null to skip applying Pigeon 2 configs
