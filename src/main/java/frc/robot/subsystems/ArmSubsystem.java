@@ -13,6 +13,7 @@ import edu.wpi.first.units.measure.Angle;
 import edu.wpi.first.wpilibj.smartdashboard.SmartDashboard;
 import edu.wpi.first.wpilibj2.command.Command;
 import edu.wpi.first.wpilibj2.command.CommandScheduler;
+import edu.wpi.first.wpilibj2.command.Commands;
 import edu.wpi.first.wpilibj2.command.SubsystemBase;
 import frc.robot.Constants.ArmConstants;
 import yams.mechanisms.config.ArmConfig;
@@ -27,10 +28,8 @@ public class ArmSubsystem extends SubsystemBase {
 
   private SmartMotorControllerConfig rightSMCConfig = ArmConstants.APPLY_SMC_CONFIG
       .apply(new SmartMotorControllerConfig(this));
-
   private SparkMax leftSpark = new SparkMax(ArmConstants.LEFT_MOTOR_ID, MotorType.kBrushless);
   private SparkMax rightSpark = new SparkMax(ArmConstants.RIGHT_MOTOR_ID, MotorType.kBrushless);
-
   private SmartMotorController lSparkSmartMotorController = new SparkWrapper(leftSpark, DCMotor.getNEO(1),
       leftSMCConfig);
   private SmartMotorController rSparkSmartMotorController = new SparkWrapper(rightSpark, DCMotor.getNEO(1),
@@ -39,8 +38,9 @@ public class ArmSubsystem extends SubsystemBase {
 
   private ArmConfig rightArmConfig = ArmConstants.APPLY_ARM_CONFIG.apply(new ArmConfig(rSparkSmartMotorController));
   private ArmConfig leftArmCfg = ArmConstants.APPLY_ARM_CONFIG.apply(new ArmConfig(lSparkSmartMotorController));
-
   private Arm arm = new Arm(rightArmConfig);
+
+  private Angle lastAngle = ArmConstants.BOTTOM_ANGLE;
 
   public ArmSubsystem() {
     CommandScheduler.getInstance().schedule(arm.setAngle(ArmConstants.TOP_ANGLE));
@@ -56,7 +56,11 @@ public class ArmSubsystem extends SubsystemBase {
    * @return A command.
    */
   public Command setAngle(Angle angle) {
-    return arm.setAngle(angle);
+    return arm.setAngle(angle).alongWith(Commands.runOnce(() -> lastAngle = angle));
+  }
+
+  public Angle getLastSetpoint() {
+    return lastAngle;
   }
 
   /**
@@ -65,7 +69,7 @@ public class ArmSubsystem extends SubsystemBase {
    * @param dutycycle [-1, 1] speed to set the arm to.
    */
   public Command set(double dutycycle) {
-    return arm.set(dutycycle);
+    return Commands.run(() -> {lSparkSmartMotorController.setDutyCycle(dutycycle); rSparkSmartMotorController.setDutyCycle(dutycycle);});
   }
 
   /**

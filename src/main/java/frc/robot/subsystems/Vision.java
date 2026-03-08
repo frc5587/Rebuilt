@@ -271,14 +271,14 @@ public class Vision {
             Units.inchesToMeters(8.575626)),
         VecBuilder.fill(4, 4, 8), VecBuilder.fill(0.5, 0.5, 1)),
     /**
-     * Right Camera
+     * Right Camera // TODO uncomment when right camera is plugged back in
      */
-    RIGHT_CAM("right",
-        new Rotation3d(0., 0., Math.toRadians(-90.)),
-        new Translation3d(Units.inchesToMeters(-8.378073),
-            Units.inchesToMeters(-12.037120),
-            Units.inchesToMeters(8.590626)),
-        VecBuilder.fill(4, 4, 8), VecBuilder.fill(0.5, 0.5, 1)),
+    // RIGHT_CAM("right",
+    //     new Rotation3d(0., 0., Math.toRadians(-90.)),
+    //     new Translation3d(Units.inchesToMeters(-8.378073), 
+    //         Units.inchesToMeters(-12.037120),
+    //         Units.inchesToMeters(8.590626)),
+    //     VecBuilder.fill(4, 4, 8), VecBuilder.fill(0.5, 0.5, 1)),
     /**
      * Center Camera
      */

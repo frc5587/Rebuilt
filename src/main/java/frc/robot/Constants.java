@@ -72,7 +72,7 @@ public final class Constants {
     public static final int MOTOR_ID = 30;
     public static final UnaryOperator<SmartMotorControllerConfig> APPLY_SMC_CONFIG = (SmartMotorControllerConfig config) -> {
       return config.withControlMode(ControlMode.CLOSED_LOOP)
-                   .withClosedLoopController(0.01, 0., 0.)
+                   .withClosedLoopController(0.025, 0., 0.01)
                    .withSimClosedLoopController(1., 0., 0.)
                    .withFeedforward(new SimpleMotorFeedforward(0, 0.12, 0))
                    .withSimFeedforward(new SimpleMotorFeedforward(0, 0, 0))
@@ -112,7 +112,7 @@ public final class Constants {
     public static final int LEFT_MOTOR_ID = 20;
     public static final int RIGHT_MOTOR_ID = 21;
     public static final Angle TOP_ANGLE = Degrees.of(100.);
-    public static final Angle BOTTOM_ANGLE = Degrees.of(0.);
+    public static final Angle BOTTOM_ANGLE = Degrees.of(0.); //TODO test
     public static final Angle MIDDLE_ANGLE = Degrees.of(45.);
     public static final UnaryOperator<SmartMotorControllerConfig> APPLY_SMC_CONFIG = (SmartMotorControllerConfig config) -> {
       return config.withControlMode(ControlMode.CLOSED_LOOP)
@@ -140,7 +140,7 @@ public final class Constants {
   }
 
   public static class IntakeConstants {
-    public static final double DUTY_CYCLE = 0.65;
+    public static final double DUTY_CYCLE = 0.45;
     public static final int MOTOR_ID = 22;
     public static final UnaryOperator<SmartMotorControllerConfig> APPLY_SMC_CONFIG = (SmartMotorControllerConfig config) -> {
       return config.withControlMode(ControlMode.OPEN_LOOP)
