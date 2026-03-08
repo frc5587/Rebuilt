@@ -120,7 +120,7 @@ public class RobotContainer {
     NamedCommands.registerCommand("Intake Stop", Commands.runOnce(() -> intake.set(0).schedule()));
 
     NamedCommands.registerCommand("Shoot Preload",
-        new SequentialCommandGroup(shooter.setAngularVelocity(() -> RPM.of(3500.)))
+        new SequentialCommandGroup(shooter.setAngularVelocity(() -> RPM.of(3400.)))
             .until(shooter::atGoal)
             .raceWith(new WaitCommand(ShooterConstants.SPIN_UP_TIME))
             .andThen(Commands.runOnce(() -> indexer.set(IndexerConstants.DUTY_CYCLE).schedule()))
@@ -128,7 +128,7 @@ public class RobotContainer {
             .andThen(Commands.runOnce(() -> indexer.set(0).schedule()))
             .andThen(Commands.runOnce(() -> shooter.set(0).schedule())));
     NamedCommands.registerCommand("Shoot Hopper",
-        new SequentialCommandGroup(shooter.setAngularVelocity(() -> RPM.of(3500.)))
+        new SequentialCommandGroup(shooter.setAngularVelocity(() -> RPM.of(3400.)))
             .until(shooter::atGoal)
             .raceWith(new WaitCommand(ShooterConstants.SPIN_UP_TIME))
             .andThen(Commands.runOnce(() -> indexer.set(IndexerConstants.DUTY_CYCLE).schedule()))
@@ -330,7 +330,7 @@ public class RobotContainer {
   }
 
   public void teleopInit() {
-    shooter.setDefaultCommand(shooter.set(10.));
+    shooter.setDefaultCommand(shooter.set(.30));
     indexer.setDefaultCommand(indexer.stop());
     intake.setDefaultCommand(intake.stop());
   }
