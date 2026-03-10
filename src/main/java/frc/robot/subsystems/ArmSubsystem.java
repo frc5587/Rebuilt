@@ -1,5 +1,6 @@
 package frc.robot.subsystems;
 
+import static edu.wpi.first.units.Units.Degrees;
 import static edu.wpi.first.units.Units.Rotations;
 import static edu.wpi.first.units.Units.Second;
 import static edu.wpi.first.units.Units.Seconds;
@@ -57,6 +58,15 @@ public class ArmSubsystem extends SubsystemBase {
    */
   public Command setAngle(Angle angle) {
     return arm.setAngle(angle).alongWith(Commands.runOnce(() -> lastAngle = angle));
+  }
+  /**
+   * Gets the current angle of the arm
+   * 
+   * 
+   * @return current {@link Angle} of the arm.
+   */
+  public Angle getAngle() {
+    return arm.getMotorController().getMechanismPosition();
   }
 
   public Angle getLastSetpoint() {

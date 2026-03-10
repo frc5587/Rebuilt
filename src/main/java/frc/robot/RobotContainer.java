@@ -18,6 +18,7 @@ import frc.robot.Constants.IndexerConstants;
 import frc.robot.Constants.IntakeConstants;
 import frc.robot.Constants.ShooterConstants;
 import frc.robot.commands.AimTowardsGoal;
+import frc.robot.commands.WiggleCommand;
 import frc.robot.math.AimingMath;
 import frc.robot.math.Vector3;
 import frc.robot.subsystems.ShooterSubsystem;
@@ -69,6 +70,7 @@ public class RobotContainer {
       .withHeadingPID(DrivebaseConstants.HEADING_CONTROLLER.getP(), DrivebaseConstants.HEADING_CONTROLLER.getI(), DrivebaseConstants.HEADING_CONTROLLER.getD());
   private final SwerveRequest.SwerveDriveBrake brake = new SwerveRequest.SwerveDriveBrake();
   private AimTowardsGoal aimingCommand = null;
+  private final WiggleCommand wiggleCommand = new WiggleCommand(arm);
   Supplier<Vector3> position = () -> {
     Pose2d position = drivebase.getState().Pose;
     return new Vector3(position.getX(), position.getY(), 0);
@@ -296,6 +298,10 @@ public class RobotContainer {
 
     // Silly shooter override (set this to shoot from an easy to drive to position, like in front of the hub)
     operatorController.x().whileTrue(shooter.useManualSpeed().alongWith(intake.set(1.)));
+    operatorController.x().whileTrue(Commands.repeatingSequence(
+              Commands.runOnce(() -> arm.set(1).schedule()).until(() -> arm.getAngle().in(Degree)>=ArmConstants.MIDDLE_ANGLE.in(Degree)), 
+              Commands.runOnce(() -> arm.set(-1).schedule()).until(() -> arm.getAngle().in(Degree)<=ArmConstants.BOTTOM_ANGLE.in(Degree))))
+              .onFalse(arm.setAngle(arm.getLastSetpoint()));
     // TODO can we get a position based standstill shooter speed button for operator?
 
     // Climb
