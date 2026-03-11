@@ -4,28 +4,28 @@
     {
       "anchor": {
         "x": 0.6493191937727214,
-        "y": 6.1645955410530355
+        "y": 5.728321682204819
       },
       "prevControl": null,
       "nextControl": {
-        "x": 1.62133275868805,
-        "y": 6.1753276999955276
+        "x": 1.0885196442231717,
+        "y": 6.06538249301563
       },
       "isLocked": false,
-      "linkedName": "Depot Top Intake Position"
+      "linkedName": "Depot Bottom Intake Position"
     },
     {
       "anchor": {
-        "x": 0.6493191937727214,
-        "y": 5.728321682204819
+        "x": 2.331155492154065,
+        "y": 5.684679029957205
       },
       "prevControl": {
-        "x": 1.62133275868805,
-        "y": 5.746327717383744
+        "x": 1.55180222637231,
+        "y": 6.177363147136486
       },
       "nextControl": null,
       "isLocked": false,
-      "linkedName": "Depot Bottom Intake Position"
+      "linkedName": "Top Shoot Position"
     }
   ],
   "rotationTargets": [],
@@ -42,7 +42,7 @@
   },
   "goalEndState": {
     "velocity": 0,
-    "rotation": 180.0
+    "rotation": -35.87309363811689
   },
   "reversed": false,
   "folder": "left",

@@ -16,16 +16,16 @@
     },
     {
       "anchor": {
-        "x": 0.6708108108108113,
-        "y": 5.9347972972972975
+        "x": 0.6493191937727214,
+        "y": 6.1645955410530355
       },
       "prevControl": {
-        "x": 1.3755743243243248,
-        "y": 5.945011261261261
+        "x": 1.354082707286235,
+        "y": 6.174809505016999
       },
       "nextControl": null,
       "isLocked": false,
-      "linkedName": "Depot Intake Position"
+      "linkedName": "Depot Top Intake Position"
     }
   ],
   "rotationTargets": [

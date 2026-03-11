@@ -41,6 +41,12 @@
           }
         },
         {
+          "type": "path",
+          "data": {
+            "pathName": "L_DepotShoot3"
+          }
+        },
+        {
           "type": "named",
           "data": {
             "name": "Shoot Hopper"
