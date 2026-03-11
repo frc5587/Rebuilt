@@ -112,8 +112,7 @@ public class RobotContainer {
     NamedCommands.registerCommand("test", Commands.print("I EXIST"));
 
     NamedCommands.registerCommand("Arm Up", Commands.runOnce(() -> arm.setAngle(ArmConstants.TOP_ANGLE).schedule()));
-    NamedCommands.registerCommand("Arm Down",
-        Commands.runOnce(() -> arm.setAngle(ArmConstants.BOTTOM_ANGLE).schedule()));
+    NamedCommands.registerCommand("Arm Down", Commands.runOnce(() -> arm.set(-0.5).schedule()));
 
     NamedCommands.registerCommand("Intake Forward",
         Commands.runOnce(() -> intake.set(IntakeConstants.DUTY_CYCLE).schedule()));
