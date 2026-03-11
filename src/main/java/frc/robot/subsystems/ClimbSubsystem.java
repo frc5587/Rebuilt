@@ -64,7 +64,8 @@ public class ClimbSubsystem extends SubsystemBase {
   public boolean hasLimitSwitch() {
     return hasLimitSwitch;
   }
-
+  
+  @SuppressWarnings("unused")
   @Override
   public void periodic() {
     SmartDashboard.putNumber("climb position", sparkSmartMotorController.getMechanismPosition().in(Rotations));
@@ -76,7 +77,7 @@ public class ClimbSubsystem extends SubsystemBase {
       sparkSmartMotorController.setEncoderPosition(ClimbConstants.DOWN_ANGLE);
     }
     SmartDashboard.putBoolean("climb resetencoder", false);
-
+    
     if (hasLimitSwitch  &&  limitSwitch.get()) {
       sparkSmartMotorController.setEncoderPosition(Radians.of(0.));
     }

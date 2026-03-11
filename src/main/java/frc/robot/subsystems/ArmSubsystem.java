@@ -102,15 +102,15 @@ public class ArmSubsystem extends SubsystemBase {
   @Override
   public void periodic() {
     arm.updateTelemetry();
-    SmartDashboard.putNumber("right arm position", rSparkSmartMotorController.getMechanismPosition().in(Rotations));
+    SmartDashboard.putNumber("right arm position", rSparkSmartMotorController.getMechanismPosition().in(Degrees));
     if (rSparkSmartMotorController.getMechanismPositionSetpoint().isPresent()) {
-      SmartDashboard.putNumber("right arm setpoint", rSparkSmartMotorController.getMechanismPositionSetpoint().get().in(Rotations));
+      SmartDashboard.putNumber("right arm setpoint", rSparkSmartMotorController.getMechanismPositionSetpoint().get().in(Degrees));
     }
     SmartDashboard.putNumber("right dutycycle", rSparkSmartMotorController.getDutyCycle());
 
-    SmartDashboard.putNumber("left arm position", lSparkSmartMotorController.getMechanismPosition().in(Rotations));
+    SmartDashboard.putNumber("left arm position", lSparkSmartMotorController.getMechanismPosition().in(Degrees));
     if (rSparkSmartMotorController.getMechanismPositionSetpoint().isPresent()) {
-      SmartDashboard.putNumber("left arm setpoint", lSparkSmartMotorController.getMechanismPositionSetpoint().get().in(Rotations));
+      SmartDashboard.putNumber("left arm setpoint", lSparkSmartMotorController.getMechanismPositionSetpoint().get().in(Degrees));
     }
     SmartDashboard.putNumber("left dutycycle", lSparkSmartMotorController.getDutyCycle());
 

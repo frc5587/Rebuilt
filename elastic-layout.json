@@ -512,6 +512,19 @@
               "period": 0.06,
               "sort_options": false
             }
+          },
+          {
+            "title": "Vision Enabled",
+            "x": 768.0,
+            "y": 128.0,
+            "width": 128.0,
+            "height": 128.0,
+            "type": "Toggle Button",
+            "properties": {
+              "topic": "/SmartDashboard/Vision Enabled",
+              "period": 0.06,
+              "data_type": "boolean"
+            }
           }
         ]
       }
