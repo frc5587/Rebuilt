@@ -1,6 +1,7 @@
 package frc.robot.commands;
 
 import static edu.wpi.first.units.Units.Degree;
+import static edu.wpi.first.units.Units.Degrees;
 
 import edu.wpi.first.wpilibj.Timer;
 import edu.wpi.first.wpilibj.smartdashboard.SmartDashboard;
@@ -31,7 +32,7 @@ public class LoadBalls extends Command {
   @Override
   public void execute() {
     CommandScheduler scheduler = CommandScheduler.getInstance();
-
+    scheduler.schedule(shooter.useManualSpeed());
     if (!shooter.atGoal()) {
       lastTimestampNotAtGoal = Timer.getFPGATimestamp();
     }
@@ -39,12 +40,16 @@ public class LoadBalls extends Command {
     if (shooter.atGoal()  &&  Timer.getFPGATimestamp()-lastTimestampNotAtGoal > ShooterConstants.SPIN_UP_DELAY) {
       scheduler.schedule(indexer.set(IndexerConstants.DUTY_CYCLE));
       scheduler.schedule(intake.set(1.));
-      scheduler.schedule(arm.set(1.).until(() -> arm.getAngle().in(Degree) >= ArmConstants.MIDDLE_ANGLE.in(Degree))
-                         .andThen(arm.set(-0.5).until(() -> arm.getAngle().in(Degree) <= ArmConstants.BOTTOM_ANGLE.in(Degree))));
+      if (arm.getAngle().in(Degrees) >= ArmConstants.WIGGLE_ANGLE_UP.in(Degrees)) {
+        scheduler.schedule(arm.set(-0.5));
+      } 
+      else if (arm.getAngle().in(Degrees) <= ArmConstants.WIGGLE_ANGLE_DOWN.in(Degrees)) {
+        scheduler.schedule(arm.set(1.));
+      }
       SmartDashboard.putBoolean("test 1", true);
     }
     else {
-      CommandScheduler.getInstance().schedule(indexer.set(0));
+      scheduler.schedule(indexer.set(0));
       SmartDashboard.putBoolean("test 1", false);
     }
   }
@@ -55,5 +60,6 @@ public class LoadBalls extends Command {
     scheduler.schedule(arm.setAngle(arm.getLastSetpoint()));
     scheduler.cancel(intake.getCurrentCommand());
     scheduler.cancel(indexer.getCurrentCommand());
+    scheduler.cancel(shooter.getCurrentCommand());
   }
 }

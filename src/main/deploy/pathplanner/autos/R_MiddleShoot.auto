@@ -13,19 +13,13 @@
         {
           "type": "wait",
           "data": {
-            "waitTime": 1.0
+            "waitTime": 0.25
           }
         },
         {
           "type": "path",
           "data": {
             "pathName": "R_MiddleShoot1"
-          }
-        },
-        {
-          "type": "named",
-          "data": {
-            "name": "Arm Middle"
           }
         },
         {

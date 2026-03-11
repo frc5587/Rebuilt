@@ -114,8 +114,6 @@ public class RobotContainer {
     NamedCommands.registerCommand("Arm Up", Commands.runOnce(() -> arm.setAngle(ArmConstants.TOP_ANGLE).schedule()));
     NamedCommands.registerCommand("Arm Down",
         Commands.runOnce(() -> arm.setAngle(ArmConstants.BOTTOM_ANGLE).schedule()));
-    NamedCommands.registerCommand("Arm Middle",
-        Commands.runOnce(() -> arm.setAngle(ArmConstants.MIDDLE_ANGLE).schedule()));
 
     NamedCommands.registerCommand("Intake Forward",
         Commands.runOnce(() -> intake.set(IntakeConstants.DUTY_CYCLE).schedule()));
@@ -309,7 +307,6 @@ public class RobotContainer {
         .onFalse(intake.set(0.)
             .alongWith(arm.setAngle(ArmConstants.BOTTOM_ANGLE)));
     operatorController.leftTrigger().whileTrue(arm.setAngle(ArmConstants.TOP_ANGLE));
-    operatorController.b().whileTrue(arm.setAngle(ArmConstants.MIDDLE_ANGLE));
 
     // Indexer
     operatorController.rightBumper().whileTrue(Commands.run(() -> {
