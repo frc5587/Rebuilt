@@ -58,6 +58,7 @@ public class ArmSubsystem extends SubsystemBase {
   public Command setAngle(Angle angle) {
     return arm.setAngle(angle).alongWith(Commands.runOnce(() -> lastAngle = angle));
   }
+
   /**
    * Gets the current angle of the arm
    * 
@@ -79,6 +80,11 @@ public class ArmSubsystem extends SubsystemBase {
    */
   public Command set(double dutycycle) {
     return Commands.run(() -> {lSparkSmartMotorController.setDutyCycle(dutycycle); rSparkSmartMotorController.setDutyCycle(dutycycle);});
+  }
+
+  public void setVoid(double dutycycle) {
+    lSparkSmartMotorController.setDutyCycle(dutycycle); 
+    rSparkSmartMotorController.setDutyCycle(dutycycle);
   }
 
   /**

@@ -22,7 +22,6 @@ import frc.robot.commands.LoadBalls;
 import frc.robot.math.Vector3;
 import frc.robot.subsystems.ShooterSubsystem;
 import frc.robot.subsystems.SwerveSubsystem;
-import yams.mechanisms.config.ArmConfig;
 import frc.robot.subsystems.ArmSubsystem;
 import frc.robot.subsystems.ClimbSubsystem;
 import frc.robot.subsystems.IndexerSubsystem;
@@ -302,15 +301,11 @@ public class RobotContainer {
     // Operator
 
     // Arm
-    operatorController.rightTrigger().whileTrue(Commands.runOnce(() -> {
-        if (arm.getAngle().in(Degrees) > ArmConstants.BOTTOM_ANGLE.in(Degrees) + 10) {
-          arm.setAngle(ArmConstants.BOTTOM_ANGLE).schedule();
-        }
-        else {
-          arm.set(-1.).schedule();
-        }
-        })
-        .alongWith(intake.set(IntakeConstants.DUTY_CYCLE)));
+    operatorController.rightTrigger().whileTrue(
+        intake.set(IntakeConstants.DUTY_CYCLE)
+        .alongWith(arm.setAngle(ArmConstants.BOTTOM_ANGLE).until(() -> !(arm.getAngle().in(Degrees) > ArmConstants.BOTTOM_ANGLE.in(Degrees) + 10))
+        .andThen(arm.set(-.3))))
+        .onFalse(arm.set(0.));
     operatorController.leftTrigger().whileTrue(arm.setAngle(ArmConstants.TOP_ANGLE));
 
     // Indexer

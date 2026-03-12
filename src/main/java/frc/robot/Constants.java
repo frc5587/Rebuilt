@@ -72,9 +72,9 @@ public final class Constants {
     public static final int MOTOR_ID = 30;
     public static final UnaryOperator<SmartMotorControllerConfig> APPLY_SMC_CONFIG = (SmartMotorControllerConfig config) -> {
       return config.withControlMode(ControlMode.CLOSED_LOOP)
-                   .withClosedLoopController(0.025, 0., 0.01)
+                   .withClosedLoopController(0.08, 0., 0.3)
                    .withSimClosedLoopController(1., 0., 0.)
-                   .withFeedforward(new SimpleMotorFeedforward(0, 0.12, 0))
+                   .withFeedforward(new SimpleMotorFeedforward(0, 0.127, 0))
                    .withSimFeedforward(new SimpleMotorFeedforward(0, 0, 0))
                    .withTelemetry("ShooterMotor", TelemetryVerbosity.HIGH)
                    .withGearing(new MechanismGearing(GearBox.fromReductionStages(1)))
@@ -91,12 +91,12 @@ public final class Constants {
     public static final double SPIN_UP_DELAY = 0.25;
 
     // Aiming math
-    public static final double PITCH = 1.2217304764;
+    public static final double PITCH = 1.13446;
     public static final double LOOKAHEAD = 0.1;
     public static final double SHOTS_PER_SECOND = 2;
-    public static final double SPIN_UP_TIME = 2.0; // TODO set
+    public static final double SPIN_UP_TIME = 1.0; // TODO set
     public static final double TIME_BETWEEN_LOG_TIMESTAMPS = 0.055;
-    public static final Vector3 SHOOTER_POSITION = new Vector3(0.2,0,0.4);
+    public static final Vector3 SHOOTER_POSITION = new Vector3(0.05,0,0.5);
     public static final Vector3 BLUE_ALLIANCE_GOAL = new Vector3(4.625626,4.0346315,1.8288);
     public static final Vector3 RED_ALLIANCE_GOAL = new Vector3(11.915426,4.0346315,1.8288);
     public static final Vector3 getGoal(Alliance alliance) {
@@ -132,8 +132,7 @@ public final class Constants {
                    .withOpenLoopRampRate(Seconds.of(0.25));
     };
     public static final UnaryOperator<ArmConfig> APPLY_ARM_CONFIG = (ArmConfig config) -> {
-      return config.withSoftLimits(BOTTOM_ANGLE,TOP_ANGLE)
-                   .withHardLimit(BOTTOM_ANGLE,TOP_ANGLE)
+      return config.withHardLimit(BOTTOM_ANGLE,TOP_ANGLE)
                    .withLength(Inches.of(15.81))
                    .withMass(Pounds.of(2))
                    .withTelemetry("Arm", TelemetryVerbosity.HIGH)
@@ -168,7 +167,7 @@ public final class Constants {
     public static final UnaryOperator<SmartMotorControllerConfig> APPLY_SMC_CONFIG = (SmartMotorControllerConfig config) -> {
       return config.withControlMode(ControlMode.OPEN_LOOP)
              .withTelemetry("IndexerMotor", TelemetryVerbosity.LOW)
-             .withGearing(new MechanismGearing(GearBox.fromReductionStages(3)))
+             .withGearing(new MechanismGearing(GearBox.fromReductionStages(5)))
              .withMotorInverted(false)
              .withIdleMode(MotorMode.COAST)
 
