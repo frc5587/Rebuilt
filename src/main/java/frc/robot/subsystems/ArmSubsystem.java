@@ -113,6 +113,9 @@ public class ArmSubsystem extends SubsystemBase {
     }
     SmartDashboard.putNumber("left dutycycle", lSparkSmartMotorController.getDutyCycle());
 
+    SmartDashboard.putNumber("arm position", getAngle().in(Degrees));
+    SmartDashboard.putNumber("arm setpoint", arm.getMechanismSetpoint().orElse(Degrees.of(0.)).in(Degrees));
+
     if (SmartDashboard.getBoolean("top arm resetencoders", false)) {
       resetAngle(ArmConstants.TOP_ANGLE);
     }

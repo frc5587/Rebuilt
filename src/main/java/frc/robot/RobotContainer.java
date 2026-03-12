@@ -22,6 +22,7 @@ import frc.robot.commands.LoadBalls;
 import frc.robot.math.Vector3;
 import frc.robot.subsystems.ShooterSubsystem;
 import frc.robot.subsystems.SwerveSubsystem;
+import yams.mechanisms.config.ArmConfig;
 import frc.robot.subsystems.ArmSubsystem;
 import frc.robot.subsystems.ClimbSubsystem;
 import frc.robot.subsystems.IndexerSubsystem;
@@ -301,10 +302,16 @@ public class RobotContainer {
     // Operator
 
     // Arm
-    operatorController.rightTrigger().whileTrue(arm.set(-1)
+    operatorController.rightTrigger().whileTrue(Commands.run(() -> {
+        if (arm.getAngle().in(Degrees) > ArmConstants.BOTTOM_ANGLE.in(Degrees) + 10) {
+          arm.setAngle(ArmConstants.BOTTOM_ANGLE).schedule();
+        }
+        else {
+          arm.set(-1.).schedule();
+        }
+        })
         .alongWith(intake.set(IntakeConstants.DUTY_CYCLE)))
-        .onFalse(intake.set(0.)
-            .alongWith(arm.setAngle(ArmConstants.BOTTOM_ANGLE)));
+        .onFalse(Commands.runOnce(() -> arm.getCurrentCommand().cancel()));
     operatorController.leftTrigger().whileTrue(arm.setAngle(ArmConstants.TOP_ANGLE));
 
     // Indexer
@@ -320,6 +327,7 @@ public class RobotContainer {
     // Silly shooter override (set this to shoot from an easy to drive to position,
     // like in front of the hub)
     operatorController.x().whileTrue(new LoadBalls(arm, shooter, indexer, intake));
+    operatorController.b().whileTrue(shooter.useManualSpeed());
 
     // Climb
     // operatorController.y().onTrue(climb.setAngularPosition(ClimbConstants.UP_ANGLE));

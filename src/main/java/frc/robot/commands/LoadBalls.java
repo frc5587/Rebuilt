@@ -40,11 +40,11 @@ public class LoadBalls extends Command {
     if (shooter.atGoal()  &&  Timer.getFPGATimestamp()-lastTimestampNotAtGoal > ShooterConstants.SPIN_UP_DELAY) {
       scheduler.schedule(indexer.set(IndexerConstants.DUTY_CYCLE));
       scheduler.schedule(intake.set(1.));
-      if (arm.getAngle().in(Degrees) >= ArmConstants.WIGGLE_ANGLE_UP.in(Degrees)) {
-        scheduler.schedule(arm.set(-0.5));
+      if (arm.getAngle().in(Degrees) >= ArmConstants.WIGGLE_ANGLE_DOWN.in(Degrees)) {
+        scheduler.schedule(arm.set(-0.2));
       } 
-      else if (arm.getAngle().in(Degrees) <= ArmConstants.WIGGLE_ANGLE_DOWN.in(Degrees)) {
-        scheduler.schedule(arm.set(1.));
+      else if (arm.getAngle().in(Degrees) <= ArmConstants.WIGGLE_ANGLE_UP.in(Degrees)) {
+        scheduler.schedule(arm.set(.5));
       }
       SmartDashboard.putBoolean("test 1", true);
     }

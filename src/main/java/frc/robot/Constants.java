@@ -113,9 +113,9 @@ public final class Constants {
     public static final int LEFT_MOTOR_ID = 20;
     public static final int RIGHT_MOTOR_ID = 21;
     public static final Angle TOP_ANGLE = Degrees.of(100.);
-    public static final Angle BOTTOM_ANGLE = Degrees.of(0.); //TODO test
-    public static final Angle WIGGLE_ANGLE_UP = Degrees.of(60.);
-    public static final Angle WIGGLE_ANGLE_DOWN = Degrees.of(45.);
+    public static final Angle BOTTOM_ANGLE = Degrees.of(-8.);
+    public static final Angle WIGGLE_ANGLE_UP = Degrees.of(45.);
+    public static final Angle WIGGLE_ANGLE_DOWN = Degrees.of(30.);
     public static final UnaryOperator<SmartMotorControllerConfig> APPLY_SMC_CONFIG = (SmartMotorControllerConfig config) -> {
       return config.withControlMode(ControlMode.CLOSED_LOOP)
                    .withClosedLoopController(0.8, 0, 0)
