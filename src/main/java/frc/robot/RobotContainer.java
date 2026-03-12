@@ -302,7 +302,7 @@ public class RobotContainer {
     // Operator
 
     // Arm
-    operatorController.rightTrigger().whileTrue(Commands.run(() -> {
+    operatorController.rightTrigger().whileTrue(Commands.runOnce(() -> {
         if (arm.getAngle().in(Degrees) > ArmConstants.BOTTOM_ANGLE.in(Degrees) + 10) {
           arm.setAngle(ArmConstants.BOTTOM_ANGLE).schedule();
         }
@@ -310,12 +310,11 @@ public class RobotContainer {
           arm.set(-1.).schedule();
         }
         })
-        .alongWith(intake.set(IntakeConstants.DUTY_CYCLE)))
-        .onFalse(Commands.runOnce(() -> arm.getCurrentCommand().cancel()));
+        .alongWith(intake.set(IntakeConstants.DUTY_CYCLE)));
     operatorController.leftTrigger().whileTrue(arm.setAngle(ArmConstants.TOP_ANGLE));
 
     // Indexer
-    operatorController.rightBumper().whileTrue(Commands.run(() -> {
+    operatorController.rightBumper().whileTrue(Commands.runOnce(() -> {
       if (shooter.atGoal()) {
         CommandScheduler.getInstance().schedule(indexer.set(IndexerConstants.DUTY_CYCLE));
       }
