@@ -310,10 +310,9 @@ public class RobotContainer {
 
     // Indexer
     operatorController.rightBumper().whileTrue(Commands.runOnce(() -> {
-      if (shooter.atGoal()) {
-        CommandScheduler.getInstance().schedule(indexer.set(IndexerConstants.DUTY_CYCLE));
-      }
-    }))
+        if (shooter.atGoal()) {
+          CommandScheduler.getInstance().schedule(indexer.set(IndexerConstants.DUTY_CYCLE));
+        }}))
         .onFalse(indexer.set(0));
 
     operatorController.leftBumper().whileTrue(indexer.set(IndexerConstants.DUTY_CYCLE));
@@ -335,7 +334,7 @@ public class RobotContainer {
         .onFalse(arm.setAngle(arm.getLastSetpoint()));
 
     // Reset Arm Gyro
-    operatorController.start().onTrue(arm.resetAngle(ArmConstants.BOTTOM_ANGLE));
+    operatorController.start().onTrue(Commands.runOnce(() -> arm.resetAngle(ArmConstants.BOTTOM_ANGLE)));
   }
 
   /**

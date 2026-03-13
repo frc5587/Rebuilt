@@ -114,11 +114,11 @@ public final class Constants {
     public static final int RIGHT_MOTOR_ID = 21;
     public static final Angle TOP_ANGLE = Degrees.of(100.);
     public static final Angle BOTTOM_ANGLE = Degrees.of(-8.);
-    public static final Angle WIGGLE_ANGLE_UP = Degrees.of(45.);
+    public static final Angle WIGGLE_ANGLE_UP = Degrees.of(50.);
     public static final Angle WIGGLE_ANGLE_DOWN = Degrees.of(30.);
     public static final UnaryOperator<SmartMotorControllerConfig> APPLY_SMC_CONFIG = (SmartMotorControllerConfig config) -> {
       return config.withControlMode(ControlMode.CLOSED_LOOP)
-                   .withClosedLoopController(0.8, 0, 0)
+                   .withClosedLoopController(2.5, 0, 0)
                    .withSimClosedLoopController(1, 0, 0)
                    .withClosedLoopTolerance(Degrees.of(1.))
                    .withFeedforward(new ArmFeedforward(0,0.5, 0))
@@ -141,7 +141,7 @@ public final class Constants {
   }
 
   public static class IntakeConstants {
-    public static final double DUTY_CYCLE = 1.;
+    public static final double DUTY_CYCLE = 0.6;
     public static final int MOTOR_ID = 22;
     public static final UnaryOperator<SmartMotorControllerConfig> APPLY_SMC_CONFIG = (SmartMotorControllerConfig config) -> {
       return config.withControlMode(ControlMode.OPEN_LOOP)

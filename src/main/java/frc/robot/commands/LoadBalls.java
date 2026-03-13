@@ -1,6 +1,5 @@
 package frc.robot.commands;
 
-import static edu.wpi.first.units.Units.Degree;
 import static edu.wpi.first.units.Units.Degrees;
 
 import edu.wpi.first.wpilibj.Timer;
@@ -20,7 +19,9 @@ public class LoadBalls extends Command {
   private ShooterSubsystem shooter;
   private IndexerSubsystem indexer;
   private IntakeSubsystem intake;
-  private double lastTimestampNotAtGoal;
+
+  private double lastTimestampNotAtGoal = Timer.getFPGATimestamp();
+  private boolean isGoingUp = true;
 
   public LoadBalls(ArmSubsystem _arm, ShooterSubsystem _shooter, IndexerSubsystem _indexer, IntakeSubsystem _intake) {
     arm = _arm;
@@ -32,7 +33,6 @@ public class LoadBalls extends Command {
   @Override
   public void execute() {
     CommandScheduler scheduler = CommandScheduler.getInstance();
-    scheduler.schedule(shooter.useManualSpeed());
     if (!shooter.atGoal()) {
       lastTimestampNotAtGoal = Timer.getFPGATimestamp();
     }
@@ -40,11 +40,16 @@ public class LoadBalls extends Command {
     if (shooter.atGoal()  &&  Timer.getFPGATimestamp()-lastTimestampNotAtGoal > ShooterConstants.SPIN_UP_DELAY) {
       scheduler.schedule(indexer.set(IndexerConstants.DUTY_CYCLE));
       scheduler.schedule(intake.set(1.));
-      if (arm.getAngle().in(Degrees) >= ArmConstants.WIGGLE_ANGLE_DOWN.in(Degrees)) {
-        scheduler.schedule(arm.set(-0.2));
-      } 
-      else if (arm.getAngle().in(Degrees) <= ArmConstants.WIGGLE_ANGLE_UP.in(Degrees)) {
-        scheduler.schedule(arm.set(.5));
+      if (arm.getAngle().in(Degrees) >= ArmConstants.WIGGLE_ANGLE_DOWN.in(Degrees)+5.  &&  !isGoingUp) {
+        scheduler.schedule(arm.setAngle(ArmConstants.WIGGLE_ANGLE_DOWN));
+        isGoingUp = false;
+      }
+      else if (arm.getAngle().in(Degrees) <= ArmConstants.WIGGLE_ANGLE_UP.in(Degrees)-5.) {
+        scheduler.schedule(arm.setAngle(ArmConstants.WIGGLE_ANGLE_UP));
+        isGoingUp = true;
+      }
+      else {
+        isGoingUp = false;
       }
       SmartDashboard.putBoolean("test 1", true);
     }
@@ -57,7 +62,7 @@ public class LoadBalls extends Command {
   @Override
   public void end(boolean interrupted) {
     CommandScheduler scheduler = CommandScheduler.getInstance();
-    scheduler.schedule(arm.setAngle(arm.getLastSetpoint()));
+    scheduler.schedule(arm.setAngle(ArmConstants.BOTTOM_ANGLE));
     scheduler.cancel(intake.getCurrentCommand());
     scheduler.cancel(indexer.getCurrentCommand());
     scheduler.cancel(shooter.getCurrentCommand());

@@ -97,11 +97,9 @@ public class ArmSubsystem extends SubsystemBase {
   /*
    * Resets angle
    */
-  public Command resetAngle(Angle _angle) {
-    return run(() -> {
-      lSparkSmartMotorController.setEncoderPosition(_angle);
-      rSparkSmartMotorController.setEncoderPosition(_angle);
-    });
+  public void resetAngle(Angle _angle) {
+    lSparkSmartMotorController.setEncoderPosition(_angle);
+    rSparkSmartMotorController.setEncoderPosition(_angle);
   }
 
   @Override

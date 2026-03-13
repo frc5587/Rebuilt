@@ -50,7 +50,7 @@ public class ShooterSubsystem extends SubsystemBase {
     // 2026-3-12
     // ballSpeedToRPM.put(7.24667899,2860.);
     // ballSpeedToRPM.put(7.54408842,2960.);
-    // ballSpeedToRPM.put(8.49759462,3300.);
+    // ballSpeedToRPM.put(8.49759462,3300.);++++++++++++++++++
     ballSpeedToRPM.put(8.20538041,3225.);
     ballSpeedToRPM.put(8.97973555,3500.);
     ballSpeedToRPM.put(20., 10000.);
