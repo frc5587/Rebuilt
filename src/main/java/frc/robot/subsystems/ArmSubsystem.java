@@ -48,6 +48,8 @@ public class ArmSubsystem extends SubsystemBase {
     leftArmCfg.applyConfig();
     SmartDashboard.putBoolean("top arm resetencoders", false);
     SmartDashboard.putBoolean("bottom arm resetencoders", false);
+    SmartDashboard.putNumber("Left Arm Temp", (leftSpark.getMotorTemperature()*(9/5)+32));
+    SmartDashboard.putNumber("Right Arm Temp", (rightSpark.getMotorTemperature()*(9/5)+32));
   }
 
   /**
@@ -134,6 +136,9 @@ public class ArmSubsystem extends SubsystemBase {
       resetAngle(ArmConstants.BOTTOM_ANGLE);
     }
     SmartDashboard.putBoolean("bottom arm resetencoders", false);
+
+    SmartDashboard.putNumber("Left Arm Temp", (leftSpark.getMotorTemperature()));
+    SmartDashboard.putNumber("Right Arm Temp", (rightSpark.getMotorTemperature()));
   }
 
   @Override

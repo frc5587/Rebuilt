@@ -4,6 +4,8 @@
 
 package frc.robot.subsystems;
 
+import static edu.wpi.first.units.Units.Celsius;
+import static edu.wpi.first.units.Units.Fahrenheit;
 import static edu.wpi.first.units.Units.MetersPerSecond;
 import static edu.wpi.first.units.Units.RPM;
 import static edu.wpi.first.units.Units.Second;
@@ -58,6 +60,7 @@ public class ShooterSubsystem extends SubsystemBase {
     ballSpeedToRPM.put(8.97973555,3500.);
     ballSpeedToRPM.put(20., 10000.);
     SmartDashboard.putNumber("manual flywheel speed", 3500.);
+    SmartDashboard.putNumber("Shooter Temp", shooter.getMotor().getTemperature().in(Fahrenheit));
   }
     
   /**
@@ -126,6 +129,7 @@ public class ShooterSubsystem extends SubsystemBase {
       SmartDashboard.putNumber("flywheel setpoint", sparkSmartMotorController.getMechanismSetpointVelocity().get().in(RPM));
     }
     SmartDashboard.putNumber("flywheel dutycycle", sparkSmartMotorController.getDutyCycle());
+    SmartDashboard.putNumber("Shooter Temp", shooter.getMotor().getTemperature().in(Celsius));
   }
 
   @Override

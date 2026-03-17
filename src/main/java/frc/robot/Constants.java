@@ -26,7 +26,6 @@ import edu.wpi.first.math.trajectory.TrapezoidProfile.Constraints;
 import edu.wpi.first.math.util.Units;
 import edu.wpi.first.units.measure.Angle;
 import edu.wpi.first.units.measure.AngularVelocity;
-import edu.wpi.first.units.measure.Velocity;
 import edu.wpi.first.wpilibj.DriverStation.Alliance;
 import frc.robot.math.Vector3;
 import swervelib.math.Matter;
@@ -115,10 +114,13 @@ public final class Constants {
   public static class ArmConstants {
     public static final int LEFT_MOTOR_ID = 20;
     public static final int RIGHT_MOTOR_ID = 21;
-    public static final Angle TOP_ANGLE = Degrees.of(100.);
-    public static final Angle BOTTOM_ANGLE = Degrees.of(-8.);
-    public static final Angle WIGGLE_ANGLE_UP = Degrees.of(50.);
-    public static final Angle WIGGLE_ANGLE_DOWN = Degrees.of(30.);
+    private static final double BALANCE_OFFSET = 19;
+    public static final Angle TOP_ANGLE = Degrees.of(105.+BALANCE_OFFSET);
+    public static final Angle BOTTOM_ANGLE = Degrees.of(-8.+BALANCE_OFFSET);
+    public static final Angle WIGGLE_ANGLE_UP = Degrees.of(30.+BALANCE_OFFSET);
+    public static final Angle WIGGLE_ANGLE_DOWN = BOTTOM_ANGLE;
+    public static final double WIGGLE_TIME_UP = 1;
+    public static final double WIGGLE_TIME_DOWN = 0.5;
     public static final double WIGGLE_DUTYCYCLE = 0.5;
     public static final AngularVelocity ARM_VELOCITY_WIGGLE = RotationsPerSecond.of(0.5);
     public static final UnaryOperator<SmartMotorControllerConfig> APPLY_SMC_CONFIG = (SmartMotorControllerConfig config) -> {
@@ -126,7 +128,7 @@ public final class Constants {
                    .withClosedLoopController(1., 0, 0)
                    .withSimClosedLoopController(1, 0, 0)
                    .withClosedLoopTolerance(Degrees.of(1.))
-                   .withFeedforward(new ArmFeedforward(0,0.2, 0))
+                   .withFeedforward(new ArmFeedforward(0,0.6, 0))
                    .withSimFeedforward(new ArmFeedforward(0, 0, 0))
                    .withTelemetry("ArmMotor", TelemetryVerbosity.HIGH)
                    .withGearing(new MechanismGearing(GearBox.fromReductionStages(5.,32./18.)))

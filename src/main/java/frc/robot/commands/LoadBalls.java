@@ -13,6 +13,7 @@ import frc.robot.subsystems.ArmSubsystem;
 import frc.robot.subsystems.IndexerSubsystem;
 import frc.robot.subsystems.IntakeSubsystem;
 import frc.robot.subsystems.ShooterSubsystem;
+import yams.mechanisms.config.ArmConfig;
 
 public class LoadBalls extends Command {
   private ArmSubsystem arm;
@@ -21,6 +22,7 @@ public class LoadBalls extends Command {
   private IntakeSubsystem intake;
 
   private double lastTimestampNotAtGoal = Timer.getFPGATimestamp();
+  private double lastAngleSwitchTimestamp = Timer.getFPGATimestamp();
   private boolean isGoingUp = true;
 
   public LoadBalls(ArmSubsystem _arm, ShooterSubsystem _shooter, IndexerSubsystem _indexer, IntakeSubsystem _intake) {
@@ -41,17 +43,16 @@ public class LoadBalls extends Command {
       scheduler.schedule(indexer.set(IndexerConstants.DUTY_CYCLE));
       scheduler.schedule(intake.set(1.));
       // DOWN
-      if (arm.getAngle().in(Degrees) >= ArmConstants.WIGGLE_ANGLE_DOWN.in(Degrees)+5.  &&  !isGoingUp) {
+      if (lastAngleSwitchTimestamp > Timer.getFPGATimestamp()-ArmConstants.WIGGLE_TIME_DOWN  &&  !isGoingUp) {
         scheduler.schedule(arm.setAngle(ArmConstants.WIGGLE_ANGLE_DOWN));
-        isGoingUp = false;
       }
       // UP
-      else if (arm.getAngle().in(Degrees) <= ArmConstants.WIGGLE_ANGLE_UP.in(Degrees)-5.) {
-        scheduler.schedule(arm.set(ArmConstants.WIGGLE_DUTYCYCLE));
-        isGoingUp = true;
+      else if (lastAngleSwitchTimestamp > Timer.getFPGATimestamp()-ArmConstants.WIGGLE_TIME_UP) {
+        scheduler.schedule(arm.setAngle(ArmConstants.WIGGLE_ANGLE_UP));
       }
       else {
-        isGoingUp = false;
+        isGoingUp = !isGoingUp;
+        lastAngleSwitchTimestamp = Timer.getFPGATimestamp();
       }
       SmartDashboard.putBoolean("test 1", true);
     }
