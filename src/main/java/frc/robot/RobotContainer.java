@@ -331,7 +331,10 @@ public class RobotContainer {
     operatorController.povRight().whileTrue(indexer.set(-0.5).alongWith(shooter.set(-0.3)));
     operatorController.povLeft().whileTrue(intake.set(-1.));
     operatorController.povLeft().whileTrue(arm.set(1.))
-        .onFalse(arm.setAngle(arm.getLastSetpoint()));
+      .onFalse(arm.setAngle(arm.getLastSetpoint()));
+    // operatorController.povDown().whileTrue(Commands.runOnce(() -> arm.setAngularVelocity(ArmConstants.ARM_VELOCITY_WIGGLE)))
+    //     .onFalse(Commands.runOnce(() -> arm.setAngularVelocity(RotationsPerSecond.of(0))));
+        
 
     // Reset Arm Gyro
     operatorController.start().onTrue(Commands.runOnce(() -> arm.resetAngle(ArmConstants.BOTTOM_ANGLE)));
@@ -353,6 +356,7 @@ public class RobotContainer {
   }
 
   public void teleopInit() {
+    arm.setVoid(0.);
     shooter.setDefaultCommand(shooter.set(.30));
     indexer.setDefaultCommand(indexer.stop());
     intake.setDefaultCommand(intake.stop());

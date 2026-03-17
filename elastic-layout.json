@@ -146,8 +146,8 @@
               "period": 0.033,
               "data_type": "double",
               "time_displayed": 5.0,
-              "min_value": 0.0,
-              "max_value": 2.0,
+              "min_value": -20.0,
+              "max_value": 120.0,
               "color": 4278238420,
               "line_width": 2.0
             }
@@ -164,15 +164,15 @@
               "period": 0.033,
               "data_type": "double",
               "time_displayed": 5.0,
-              "min_value": 0.0,
-              "max_value": 2.0,
+              "min_value": -20.0,
+              "max_value": 120.0,
               "color": 4278238420,
               "line_width": 2.0
             }
           },
           {
             "title": "intake velocity",
-            "x": 896.0,
+            "x": 1152.0,
             "y": 0.0,
             "width": 256.0,
             "height": 256.0,
@@ -201,8 +201,8 @@
               "data_type": "double",
               "start_angle": -140.0,
               "end_angle": 140.0,
-              "min_value": 0.0,
-              "max_value": 2.0,
+              "min_value": -20.0,
+              "max_value": 120.0,
               "number_of_labels": 8,
               "wrap_value": false,
               "show_pointer": true,
@@ -222,8 +222,8 @@
               "data_type": "double",
               "start_angle": -140.0,
               "end_angle": 140.0,
-              "min_value": 0.0,
-              "max_value": 2.0,
+              "min_value": -20.0,
+              "max_value": 120.0,
               "number_of_labels": 8,
               "wrap_value": false,
               "show_pointer": true,
@@ -232,7 +232,7 @@
           },
           {
             "title": "intake velocity",
-            "x": 896.0,
+            "x": 1152.0,
             "y": 256.0,
             "width": 256.0,
             "height": 256.0,
@@ -275,6 +275,191 @@
               "topic": "/SmartDashboard/top arm resetencoders",
               "period": 0.06,
               "data_type": "boolean"
+            }
+          },
+          {
+            "title": "Live Tuning",
+            "x": 640.0,
+            "y": 256.0,
+            "width": 256.0,
+            "height": 128.0,
+            "type": "Command",
+            "properties": {
+              "topic": "/SmartDashboard/Mechanisms/Commands/ArmSubsystem/Live Tuning",
+              "period": 0.06,
+              "show_type": true,
+              "maximize_button_space": false
+            }
+          },
+          {
+            "title": "kD",
+            "x": 896.0,
+            "y": 384.0,
+            "width": 128.0,
+            "height": 128.0,
+            "type": "Text Display",
+            "properties": {
+              "topic": "/Tuning/Arm/ArmMotor/closedloop/feedback/kD",
+              "period": 0.06,
+              "data_type": "double",
+              "show_submit_button": true
+            }
+          },
+          {
+            "title": "kI",
+            "x": 768.0,
+            "y": 384.0,
+            "width": 128.0,
+            "height": 128.0,
+            "type": "Text Display",
+            "properties": {
+              "topic": "/Tuning/Arm/ArmMotor/closedloop/feedback/kI",
+              "period": 0.06,
+              "data_type": "double",
+              "show_submit_button": true
+            }
+          },
+          {
+            "title": "kP",
+            "x": 640.0,
+            "y": 384.0,
+            "width": 128.0,
+            "height": 128.0,
+            "type": "Text Display",
+            "properties": {
+              "topic": "/Tuning/Arm/ArmMotor/closedloop/feedback/kP",
+              "period": 0.06,
+              "data_type": "double",
+              "show_submit_button": true
+            }
+          },
+          {
+            "title": "kG",
+            "x": 1024.0,
+            "y": 256.0,
+            "width": 128.0,
+            "height": 128.0,
+            "type": "Text Display",
+            "properties": {
+              "topic": "/Tuning/Arm/ArmMotor/closedloop/feedforward/kG",
+              "period": 0.06,
+              "data_type": "double",
+              "show_submit_button": true
+            }
+          },
+          {
+            "title": "kS",
+            "x": 896.0,
+            "y": 256.0,
+            "width": 128.0,
+            "height": 128.0,
+            "type": "Text Display",
+            "properties": {
+              "topic": "/Tuning/Arm/ArmMotor/closedloop/feedforward/kS",
+              "period": 0.06,
+              "data_type": "double",
+              "show_submit_button": true
+            }
+          },
+          {
+            "title": "position",
+            "x": 1024.0,
+            "y": 384.0,
+            "width": 128.0,
+            "height": 128.0,
+            "type": "Text Display",
+            "properties": {
+              "topic": "/Tuning/Arm/ArmMotor/closedloop/setpoint/position",
+              "period": 0.06,
+              "data_type": "double",
+              "show_submit_button": true
+            }
+          }
+        ]
+      }
+    },
+    {
+      "name": "Climb",
+      "grid_layout": {
+        "layouts": [],
+        "containers": [
+          {
+            "title": "climb position",
+            "x": 128.0,
+            "y": 0.0,
+            "width": 256.0,
+            "height": 256.0,
+            "type": "Graph",
+            "properties": {
+              "topic": "/SmartDashboard/climb position",
+              "period": 0.033,
+              "data_type": "double",
+              "time_displayed": 5.0,
+              "min_value": 0.0,
+              "max_value": 100.0,
+              "color": 4278238420,
+              "line_width": 2.0
+            }
+          },
+          {
+            "title": "climb setpoint",
+            "x": 384.0,
+            "y": 0.0,
+            "width": 256.0,
+            "height": 256.0,
+            "type": "Graph",
+            "properties": {
+              "topic": "/SmartDashboard/climb setpoint",
+              "period": 0.033,
+              "data_type": "double",
+              "time_displayed": 5.0,
+              "min_value": 0.0,
+              "max_value": 100.0,
+              "color": 4278238420,
+              "line_width": 2.0
+            }
+          },
+          {
+            "title": "climb position",
+            "x": 128.0,
+            "y": 256.0,
+            "width": 256.0,
+            "height": 256.0,
+            "type": "Large Text Display",
+            "properties": {
+              "topic": "/SmartDashboard/climb position",
+              "period": 0.033,
+              "data_type": "double"
+            }
+          },
+          {
+            "title": "climb setpoint",
+            "x": 384.0,
+            "y": 256.0,
+            "width": 256.0,
+            "height": 256.0,
+            "type": "Large Text Display",
+            "properties": {
+              "topic": "/SmartDashboard/climb setpoint",
+              "period": 0.033,
+              "data_type": "double"
+            }
+          },
+          {
+            "title": "climb resetencoder",
+            "x": 640.0,
+            "y": 0.0,
+            "width": 128.0,
+            "height": 128.0,
+            "type": "Boolean Box",
+            "properties": {
+              "topic": "/SmartDashboard/climb resetencoder",
+              "period": 0.06,
+              "data_type": "boolean",
+              "true_color": 4283215696,
+              "false_color": 4294198070,
+              "true_icon": "None",
+              "false_icon": "None"
             }
           }
         ]
@@ -525,92 +710,33 @@
               "period": 0.06,
               "data_type": "boolean"
             }
-          }
-        ]
-      }
-    },
-    {
-      "name": "Climb",
-      "grid_layout": {
-        "layouts": [],
-        "containers": [
-          {
-            "title": "climb position",
-            "x": 128.0,
-            "y": 0.0,
-            "width": 256.0,
-            "height": 256.0,
-            "type": "Graph",
-            "properties": {
-              "topic": "/SmartDashboard/climb position",
-              "period": 0.033,
-              "data_type": "double",
-              "time_displayed": 5.0,
-              "min_value": 0.0,
-              "max_value": 100.0,
-              "color": 4278238420,
-              "line_width": 2.0
-            }
           },
           {
-            "title": "climb setpoint",
-            "x": 384.0,
-            "y": 0.0,
-            "width": 256.0,
-            "height": 256.0,
-            "type": "Graph",
-            "properties": {
-              "topic": "/SmartDashboard/climb setpoint",
-              "period": 0.033,
-              "data_type": "double",
-              "time_displayed": 5.0,
-              "min_value": 0.0,
-              "max_value": 100.0,
-              "color": 4278238420,
-              "line_width": 2.0
-            }
-          },
-          {
-            "title": "climb position",
-            "x": 128.0,
+            "title": "kS",
+            "x": 896.0,
             "y": 256.0,
-            "width": 256.0,
-            "height": 256.0,
-            "type": "Large Text Display",
-            "properties": {
-              "topic": "/SmartDashboard/climb position",
-              "period": 0.033,
-              "data_type": "double"
-            }
-          },
-          {
-            "title": "climb setpoint",
-            "x": 384.0,
-            "y": 256.0,
-            "width": 256.0,
-            "height": 256.0,
-            "type": "Large Text Display",
-            "properties": {
-              "topic": "/SmartDashboard/climb setpoint",
-              "period": 0.033,
-              "data_type": "double"
-            }
-          },
-          {
-            "title": "climb resetencoder",
-            "x": 640.0,
-            "y": 0.0,
             "width": 128.0,
             "height": 128.0,
-            "type": "Boolean Box",
+            "type": "Text Display",
             "properties": {
-              "topic": "/SmartDashboard/climb resetencoder",
+              "topic": "/Tuning/Shooter/ShooterMotor/closedloop/feedforward/kS",
               "period": 0.06,
-              "data_type": "boolean",
-              "true_color": 4283215696,
-              "false_color": 4294198070,
-              "true_icon": "None",
-              "false_icon": "None"
+              "data_type": "double",
+              "show_submit_button": false
+            }
+          },
+          {
+            "title": "kV",
+            "x": 1024.0,
+            "y": 256.0,
+            "width": 128.0,
+            "height": 128.0,
+            "type": "Text Display",
+            "properties": {
+              "topic": "/Tuning/Shooter/ShooterMotor/closedloop/feedforward/kV",
+              "period": 0.06,
+              "data_type": "double",
+              "show_submit_button": false
             }
           }
         ]

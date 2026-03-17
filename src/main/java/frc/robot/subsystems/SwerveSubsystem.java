@@ -160,7 +160,7 @@ public class SwerveSubsystem extends TunerSwerveDrivetrain implements Subsystem 
       if (visionDriveTest) {
         configurePhotonVision();
       }
-      SmartDashboard.putBoolean("Vision Enabled", false);
+      SmartDashboard.putBoolean("Vision Enabled", true);
       configureAutoBuilder();
     }
   

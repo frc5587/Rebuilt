@@ -10,6 +10,7 @@ import static edu.wpi.first.units.Units.Inches;
 import static edu.wpi.first.units.Units.Pounds;
 import static edu.wpi.first.units.Units.RPM;
 import static edu.wpi.first.units.Units.Rotations;
+import static edu.wpi.first.units.Units.RotationsPerSecond;
 import static edu.wpi.first.units.Units.Seconds;
 
 import java.util.function.UnaryOperator;
@@ -24,6 +25,8 @@ import edu.wpi.first.math.geometry.Translation3d;
 import edu.wpi.first.math.trajectory.TrapezoidProfile.Constraints;
 import edu.wpi.first.math.util.Units;
 import edu.wpi.first.units.measure.Angle;
+import edu.wpi.first.units.measure.AngularVelocity;
+import edu.wpi.first.units.measure.Velocity;
 import edu.wpi.first.wpilibj.DriverStation.Alliance;
 import frc.robot.math.Vector3;
 import swervelib.math.Matter;
@@ -116,18 +119,20 @@ public final class Constants {
     public static final Angle BOTTOM_ANGLE = Degrees.of(-8.);
     public static final Angle WIGGLE_ANGLE_UP = Degrees.of(50.);
     public static final Angle WIGGLE_ANGLE_DOWN = Degrees.of(30.);
+    public static final double WIGGLE_DUTYCYCLE = 0.5;
+    public static final AngularVelocity ARM_VELOCITY_WIGGLE = RotationsPerSecond.of(0.5);
     public static final UnaryOperator<SmartMotorControllerConfig> APPLY_SMC_CONFIG = (SmartMotorControllerConfig config) -> {
       return config.withControlMode(ControlMode.CLOSED_LOOP)
-                   .withClosedLoopController(2.5, 0, 0)
+                   .withClosedLoopController(1., 0, 0)
                    .withSimClosedLoopController(1, 0, 0)
                    .withClosedLoopTolerance(Degrees.of(1.))
-                   .withFeedforward(new ArmFeedforward(0,0.5, 0))
+                   .withFeedforward(new ArmFeedforward(0,0.2, 0))
                    .withSimFeedforward(new ArmFeedforward(0, 0, 0))
                    .withTelemetry("ArmMotor", TelemetryVerbosity.HIGH)
                    .withGearing(new MechanismGearing(GearBox.fromReductionStages(5.,32./18.)))
                    .withMotorInverted(false)
                    .withIdleMode(MotorMode.BRAKE)
-                   .withStatorCurrentLimit(Amps.of(40))
+                   .withStatorCurrentLimit(Amps.of(60))
                    .withClosedLoopRampRate(Seconds.of(0.25))
                    .withOpenLoopRampRate(Seconds.of(0.25));
     };
