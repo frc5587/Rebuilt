@@ -99,6 +99,8 @@ public class Robot extends TimedRobot {
       m_autonomousCommand.cancel();
     }
     robotContainer.teleopInit();
+     // Stop any animations started while disabled so teleop patterns can take over.
+    ledController.turnOffAll();
 
     /* LED Logic */
      final LedState[] currentState = new LedState[] {LedState.IDLE};
@@ -106,6 +108,9 @@ public class Robot extends TimedRobot {
         () -> {
           currentState[0] = LedState.IDLE;
           ledController.stopLimitSwitchProgressLoop();
+           // Establish a known idle look at the start of teleop.
+          ledController.turnOffAll();
+          ledController.applyBlinkColor(LEDColor.YELLOW);
         },
         () -> {
           boolean intakeStalling = robotContainer.intakeIsStalling();
