@@ -146,11 +146,12 @@ public class LEDController extends SubsystemBase {
    */
   private void applyColorSolid(int r, int g, int b, int ledLength){ 
     r = (int) (r * LEDConstants.LED_BRIGHTNESS);
-    g = (int) (g * LEDConstants.LED_BRIGHTNESS);
-    b = (int) (b * LEDConstants.LED_BRIGHTNESS); // keep brightness param low (.1-.2) to avoid current draw
+   g = (int) (g * LEDConstants.LED_BRIGHTNESS);
+   b = (int) (b * LEDConstants.LED_BRIGHTNESS); // keep brightness param low (.1-.2) to avoid current draw
     for (int i = 0; i < LEDConstants.NUM_OF_LEDS; i++) {
         m_ledBuffer.setRGB(i, r, g, b); // instantaneous blue at reduced brightness
     }
+    m_led.setData(m_ledBuffer);
   }
 
   // Turn off all LEDs - LEDController.applyOff() will turn off the strip
@@ -311,6 +312,9 @@ public class LEDController extends SubsystemBase {
     snakeActive = true;
     snakeTimer.reset();
     snakeTimer.start();
+    // Draw the first frame immediately so the strip updates even before periodic runs.
+    runSnakeAnimation();
+    m_led.setData(m_ledBuffer);
 
     // Pause other effects so the snake remains visible
     blinkingColor = false;
