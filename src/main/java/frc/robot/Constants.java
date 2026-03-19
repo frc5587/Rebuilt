@@ -150,13 +150,14 @@ public final class Constants {
   public static class IntakeConstants {
     public static final double DUTY_CYCLE = 0.6;
     public static final int MOTOR_ID = 22;
+    public static final double STATOR_CURRENT_LIMIT = 20.0;
     public static final UnaryOperator<SmartMotorControllerConfig> APPLY_SMC_CONFIG = (SmartMotorControllerConfig config) -> {
       return config.withControlMode(ControlMode.OPEN_LOOP)
              .withTelemetry("IntakeMotor", TelemetryVerbosity.LOW)
              .withGearing(new MechanismGearing(GearBox.fromReductionStages(5)))
              .withMotorInverted(false)
              .withIdleMode(MotorMode.COAST)
-             .withStatorCurrentLimit(Amps.of(20));
+             .withStatorCurrentLimit(Amps.of(STATOR_CURRENT_LIMIT));
     };
     
     
@@ -210,5 +211,11 @@ public final class Constants {
 
   public static class OperatorConstants {
     public static final double DEADBAND = 0.1;
+  }
+
+  public static class LEDConstants {
+    public static final int PWM_PORT = 0;
+    public static final int NUM_OF_LEDS = 180;
+    public static final double LED_BRIGHTNESS = 0.2;
   }
 }

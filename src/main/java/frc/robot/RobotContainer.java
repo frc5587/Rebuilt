@@ -26,6 +26,7 @@ import frc.robot.subsystems.ArmSubsystem;
 import frc.robot.subsystems.ClimbSubsystem;
 import frc.robot.subsystems.IndexerSubsystem;
 import frc.robot.subsystems.IntakeSubsystem;
+import frc.robot.subsystems.LEDController;
 
 import com.ctre.phoenix6.swerve.SwerveRequest;
 import com.pathplanner.lib.auto.AutoBuilder;
@@ -70,6 +71,7 @@ public class RobotContainer {
   private final IntakeSubsystem intake = new IntakeSubsystem();
   private final IndexerSubsystem indexer = new IndexerSubsystem();
   private final ClimbSubsystem climb = new ClimbSubsystem();
+  private final LEDController ledController = new LEDController();
 
   private final SwerveRequest.FieldCentricFacingAngle driveFacingAngle = new SwerveRequest.FieldCentricFacingAngle()
       .withDeadband(DrivebaseConstants.MAX_SPEED * 0.1) // Add a 10% deadband
@@ -379,4 +381,15 @@ public class RobotContainer {
           .withTargetDirection(lastHeading); // Point in joystick direction
     }));
   }
+    public LEDController getLEDController() {
+      return ledController;
+    }
+
+    public boolean intakeIsStalling() {
+      return intake.isStalling();
+    }
+
+    public boolean shooterAtGoal() {
+      return shooter.atGoal();
+    }
 }

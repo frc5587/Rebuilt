@@ -8,6 +8,9 @@ import edu.wpi.first.wpilibj.TimedRobot;
 import edu.wpi.first.wpilibj.Timer;
 import edu.wpi.first.wpilibj2.command.Command;
 import edu.wpi.first.wpilibj2.command.CommandScheduler;
+import edu.wpi.first.wpilibj2.command.FunctionalCommand;
+import frc.robot.subsystems.LEDController;
+import frc.robot.subsystems.LEDController.LEDColor;
 
 /**
  * The methods in this class are called automatically corresponding to each mode, as described in
@@ -18,6 +21,8 @@ public class Robot extends TimedRobot {
   private Command m_autonomousCommand;
 
   private final RobotContainer robotContainer;
+   private final LEDController ledController;
+   private enum LedState { IDLE, SHOOT, INTAKE }
 
   private Timer disabledTimer;
   /**
@@ -28,7 +33,7 @@ public class Robot extends TimedRobot {
     // Instantiate our RobotContainer.  This will perform all our button bindings, and put our
     // autonomous chooser on the dashboard.
     robotContainer = new RobotContainer();
-
+    ledController = robotContainer.getLEDController();
     disabledTimer = new Timer();
   }
 
@@ -54,6 +59,9 @@ public class Robot extends TimedRobot {
     robotContainer.setMotorBrake(true);
     disabledTimer.reset();
     disabledTimer.start();
+    ledController.turnOffAll();
+    ledController.applyColorSolid(LEDController.LEDColor.BLUE);
+    ledController.startSnakeAnimation(LEDColor.BLUE, LEDColor.RED, true);
   }
 
   @Override
@@ -91,6 +99,49 @@ public class Robot extends TimedRobot {
       m_autonomousCommand.cancel();
     }
     robotContainer.teleopInit();
+
+    /* LED Logic */
+     final LedState[] currentState = new LedState[] {LedState.IDLE};
+      ledController.setDefaultCommand(new FunctionalCommand(
+        () -> {
+          currentState[0] = LedState.IDLE;
+          ledController.stopLimitSwitchProgressLoop();
+        },
+        () -> {
+          boolean intakeStalling = robotContainer.intakeIsStalling();
+          boolean shooterRevving = robotContainer.shooterAtGoal();
+
+          LedState desiredState = LedState.IDLE;
+          if (intakeStalling) {
+            desiredState = LedState.INTAKE;
+          } else if (shooterRevving) {
+            desiredState = LedState.SHOOT;
+          }
+          if (desiredState != currentState[0]) {
+            switch (desiredState) {
+              case INTAKE:
+                ledController.applyColorBlink(LEDColor.RED, LEDColor.OFF, 0);
+                break;
+              case SHOOT:
+                ledController.startLimitSwitchProgressLoop();
+                break;
+              case IDLE:
+              default:
+                ledController.applyColorSolid(LEDColor.YELLOW);
+                break;
+            }
+            currentState[0] = desiredState;
+          }
+          if (currentState[0] == LedState.SHOOT) {
+            ledController.runLimitSwitchProgressLoop();
+          }
+        },
+        interrupted -> {
+          currentState[0] = LedState.IDLE;
+          ledController.stopLimitSwitchProgressLoop();
+        },
+        () -> false,
+        ledController));
   }
 
   /** This function is called periodically during operator control. */
