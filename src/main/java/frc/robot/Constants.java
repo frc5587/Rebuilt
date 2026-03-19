@@ -72,6 +72,7 @@ public final class Constants {
 
   public static class ShooterConstants {
     public static final int MOTOR_ID = 30;
+    public static final double IDLE_DUTYCYCLE = 0.3;
     public static final UnaryOperator<SmartMotorControllerConfig> APPLY_SMC_CONFIG = (SmartMotorControllerConfig config) -> {
       return config.withControlMode(ControlMode.CLOSED_LOOP)
                    .withClosedLoopController(0.08, 0., 0.3)
@@ -214,7 +215,7 @@ public final class Constants {
   }
 
   public static class LEDConstants {
-    public static final int PWM_PORT = 0;
+    public static final int PWM_PORT = 1;
     public static final int NUM_OF_LEDS = 180;
     public static final double LED_BRIGHTNESS = 0.2;
   }

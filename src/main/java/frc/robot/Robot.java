@@ -22,7 +22,7 @@ public class Robot extends TimedRobot {
 
   private final RobotContainer robotContainer;
    private final LEDController ledController;
-   private enum LedState { IDLE, SHOOT, INTAKE }
+   private enum LedState { IDLE, READY_TO_SHOOT, INTAKE_STALLING, REVVING }
 
   private Timer disabledTimer;
   /**
@@ -109,30 +109,37 @@ public class Robot extends TimedRobot {
         },
         () -> {
           boolean intakeStalling = robotContainer.intakeIsStalling();
-          boolean shooterRevving = robotContainer.shooterAtGoal();
+          boolean shooterAtGoal = robotContainer.shooterAtGoal();
+          boolean shooterUsingNonDefaultCommand = robotContainer.shooterUsingNonDefaultCommand();
 
           LedState desiredState = LedState.IDLE;
           if (intakeStalling) {
-            desiredState = LedState.INTAKE;
-          } else if (shooterRevving) {
-            desiredState = LedState.SHOOT;
+            desiredState = LedState.INTAKE_STALLING;
+          } else if (shooterAtGoal && shooterUsingNonDefaultCommand) { //TODO add additional check to make sure setpoint is above idle velocity, else go to yellow idle 
+            desiredState = LedState.READY_TO_SHOOT;
+          } else if (shooterUsingNonDefaultCommand) {
+            desiredState = LedState.REVVING;
+          } else {
+            desiredState = LedState.IDLE;
           }
           if (desiredState != currentState[0]) {
             switch (desiredState) {
-              case INTAKE:
-                ledController.applyColorBlink(LEDColor.RED, LEDColor.OFF, 0);
+              case INTAKE_STALLING:
+                ledController.applyColorBlink(LEDColor.RED, LEDColor.OFF, 0.0);
                 break;
-              case SHOOT:
+              case READY_TO_SHOOT:
                 ledController.startLimitSwitchProgressLoop();
                 break;
+              case REVVING:
+                ledController.applyColorBlink(LEDColor.YELLOW, LEDColor.OFF, 0.0);
               case IDLE:
               default:
-                ledController.applyColorSolid(LEDColor.YELLOW);
+                ledController.applyColorSolid(LEDColor.BLUE);
                 break;
             }
             currentState[0] = desiredState;
           }
-          if (currentState[0] == LedState.SHOOT) {
+          if (currentState[0] == LedState.READY_TO_SHOOT) {
             ledController.runLimitSwitchProgressLoop();
           }
         },

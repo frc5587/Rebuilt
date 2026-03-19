@@ -362,7 +362,7 @@ public class RobotContainer {
 
   public void teleopInit() {
     arm.setVoid(0.);
-    shooter.setDefaultCommand(shooter.set(.30));
+    shooter.setDefaultCommand(shooter.set(ShooterConstants.IDLE_DUTYCYCLE));
     indexer.setDefaultCommand(indexer.stop());
     intake.setDefaultCommand(intake.stop());
     lastHeading = drivebase.getState().Pose.getRotation();
@@ -391,5 +391,10 @@ public class RobotContainer {
 
     public boolean shooterAtGoal() {
       return shooter.atGoal();
+    }
+    public boolean shooterUsingNonDefaultCommand() {
+      if (shooter.getCurrentCommand() != shooter.getDefaultCommand()) {
+        return true;
+      } else {return false;}
     }
 }
