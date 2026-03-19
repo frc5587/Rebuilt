@@ -39,6 +39,7 @@ import edu.wpi.first.wpilibj.PowerDistribution;
 import edu.wpi.first.wpilibj.DriverStation.Alliance;
 import edu.wpi.first.wpilibj.smartdashboard.SendableChooser;
 import edu.wpi.first.wpilibj.smartdashboard.SmartDashboard;
+import edu.wpi.first.wpilibj.GenericHID.RumbleType;
 
 import edu.wpi.first.wpilibj2.command.Command;
 import edu.wpi.first.wpilibj2.command.CommandScheduler;
@@ -57,9 +58,15 @@ import edu.wpi.first.wpilibj2.command.button.Trigger;
  * subsystems, commands, and trigger mappings) should be declared here.
  */
 public class RobotContainer {
+    // Replace with CommandPS4Controller or CommandJoystick if needed
+  private final CommandXboxController driver = new CommandXboxController(0);
+  private final CommandXboxController operator = new CommandXboxController(1);
+  
   private final ShooterSubsystem shooter = new ShooterSubsystem();
   private final SwerveSubsystem drivebase = TunerConstants.createDrivetrain();
-  private final ArmSubsystem arm = new ArmSubsystem();
+  private final ArmSubsystem arm = new ArmSubsystem((rumbleMagnitude) -> {
+            driver.getHID().setRumble(RumbleType.kBothRumble, rumbleMagnitude);
+            operator.getHID().setRumble(RumbleType.kBothRumble, rumbleMagnitude);});
   private final IntakeSubsystem intake = new IntakeSubsystem();
   private final IndexerSubsystem indexer = new IndexerSubsystem();
   private final ClimbSubsystem climb = new ClimbSubsystem();
@@ -89,9 +96,6 @@ public class RobotContainer {
 
   private Rotation2d lastHeading;
 
-  // Replace with CommandPS4Controller or CommandJoystick if needed
-  private final CommandXboxController driverController = new CommandXboxController(0);
-  private final CommandXboxController operatorController = new CommandXboxController(1);
   private final PowerDistribution pdh = new PowerDistribution();
 
   private final SendableChooser<Command> autoChooser;
@@ -112,10 +116,9 @@ public class RobotContainer {
     NamedCommands.registerCommand("test", Commands.print("I EXIST"));
 
     NamedCommands.registerCommand("Arm Up", Commands.runOnce(() -> arm.setAngle(ArmConstants.TOP_ANGLE).schedule()));
-    NamedCommands.registerCommand("Arm Down", Commands.runOnce(() -> arm.set(-0.5).schedule()));
+    NamedCommands.registerCommand("Arm Down", Commands.runOnce(() -> arm.setAngle(ArmConstants.BOTTOM_ANGLE).schedule()));
 
-    NamedCommands.registerCommand("Intake Forward",
-        Commands.runOnce(() -> intake.set(IntakeConstants.DUTY_CYCLE).schedule()));
+    NamedCommands.registerCommand("Intake Forward", Commands.runOnce(() -> intake.set(IntakeConstants.DUTY_CYCLE).schedule()));
     NamedCommands.registerCommand("Intake Stop", Commands.runOnce(() -> intake.set(0).schedule()));
 
     NamedCommands.registerCommand("Shoot Preload",
@@ -192,12 +195,12 @@ public class RobotContainer {
     // Driver
 
     // Zero Gyro
-    driverController.start().onTrue((Commands.runOnce(drivebase::seedFieldCentric))
+    driver.start().onTrue((Commands.runOnce(drivebase::seedFieldCentric))
         .alongWith(Commands.runOnce(() -> {
           lastHeading = Rotation2d.fromDegrees(0.);
         })));
     // Zero Odmometry
-    driverController.back().onTrue(Commands.runOnce(() -> {
+    driver.back().onTrue(Commands.runOnce(() -> {
       if (DriverStation.getAlliance().get() == Alliance.Blue) {
         drivebase.resetPose(DrivebaseConstants.BLUE_ALLIANCE_MIDDLE_HUB);
       } else if (DriverStation.getAlliance().get() == Alliance.Red) {
@@ -206,19 +209,19 @@ public class RobotContainer {
     }));
 
     // Sim stuff
-    driverController.leftTrigger().onTrue(Commands.runOnce(() -> {
+    driver.leftTrigger().onTrue(Commands.runOnce(() -> {
       if (aimingCommand != null) {
         aimingCommand.getMath().logSim();
       }
     }));
-    driverController.rightTrigger().onTrue(Commands.runOnce(() -> {
+    driver.rightTrigger().onTrue(Commands.runOnce(() -> {
       if (aimingCommand != null) {
         aimingCommand.getMath().resetSim();
       }
     }));
 
     // Main controlls
-    driverController.x().onTrue(Commands.runOnce(() -> {
+    driver.x().onTrue(Commands.runOnce(() -> {
       if (aimingCommand != null && aimingCommand.isScheduled()) {
         aimingCommand.cancel();
       }
@@ -227,8 +230,8 @@ public class RobotContainer {
             .normalize(Vector3.subtract(ShooterConstants.getGoal(DriverStation.getAlliance().get()),
                 new Vector3(drivebase.getState().Pose.getX(), drivebase.getState().Pose.getY(), 0)).get2D());
         double goalAngle = Vector3.getCounterclockwiseAngle(goalVector);
-        Vector3 input = new Vector3(driverController.getLeftY() * DrivebaseConstants.SHOOT_WHILE_MOVING_SPEED,
-            driverController.getLeftX() * DrivebaseConstants.SHOOT_WHILE_MOVING_SPEED, 0);
+        Vector3 input = new Vector3(driver.getLeftY() * DrivebaseConstants.SHOOT_WHILE_MOVING_SPEED,
+            driver.getLeftX() * DrivebaseConstants.SHOOT_WHILE_MOVING_SPEED, 0);
         if (DriverStation.getAlliance().get() == Alliance.Red) {
           input = Vector3.scale(input, -1.);
         }
@@ -244,15 +247,15 @@ public class RobotContainer {
             .alongWith(Commands.runOnce(() -> {
               lastHeading = drivebase.getState().Pose.getRotation();
             })));
-    driverController.y().whileTrue(arm.setAngle(ArmConstants.BOTTOM_ANGLE)
+    driver.y().whileTrue(arm.setAngle(ArmConstants.BOTTOM_ANGLE)
         .alongWith(drivebase.applyRequest(
-            () -> driveFacingAngle.withVelocityX(-driverController.getLeftY() * DrivebaseConstants.MAX_SPEED) // Drive
+            () -> driveFacingAngle.withVelocityX(-driver.getLeftY() * DrivebaseConstants.MAX_SPEED) // Drive
                                                                                                               // forward
                                                                                                               // with
                                                                                                               // negative
                                                                                                               // Y
                                                                                                               // (forward)
-                .withVelocityY(-driverController.getLeftX() * DrivebaseConstants.MAX_SPEED)
+                .withVelocityY(-driver.getLeftX() * DrivebaseConstants.MAX_SPEED)
                 .withTargetDirection(Rotation2d.kZero))));
     // driverController.a().whileTrue(arm.setAngle(ArmConstants.BOTTOM_ANGLE)
     // .alongWith(intake.set(IntakeConstants.DUTY_CYCLE))
@@ -269,23 +272,23 @@ public class RobotContainer {
     // .withTargetDirection(lastHeading); // Drive counterclockwise with negative X
     // (left)
     // })));
-    driverController.a().whileTrue(arm.setAngle(ArmConstants.TOP_ANGLE)
+    driver.a().whileTrue(arm.setAngle(ArmConstants.TOP_ANGLE)
         .alongWith(drivebase.applyRequest(
-            () -> driveFacingAngle.withVelocityX(-driverController.getLeftY() * DrivebaseConstants.MAX_SPEED) // Drive
+            () -> driveFacingAngle.withVelocityX(-driver.getLeftY() * DrivebaseConstants.MAX_SPEED) // Drive
                                                                                                               // forward
                                                                                                               // with
                                                                                                               // negative
                                                                                                               // Y
                                                                                                               // (forward)
-                .withVelocityY(-driverController.getLeftX() * DrivebaseConstants.MAX_SPEED)
+                .withVelocityY(-driver.getLeftX() * DrivebaseConstants.MAX_SPEED)
                 .withTargetDirection(Rotation2d.fromDegrees(45.)))));
-    driverController.leftBumper().onTrue(Commands.runOnce(() -> {
+    driver.leftBumper().onTrue(Commands.runOnce(() -> {
       if (aimingCommand != null && aimingCommand.isScheduled()) {
         aimingCommand.cancel();
       }
       aimingCommand = new AimTowardsGoal(
-          () -> new Vector3(-driverController.getLeftY() * DrivebaseConstants.SHOOT_WHILE_MOVING_SPEED,
-              -driverController.getLeftX() * DrivebaseConstants.SHOOT_WHILE_MOVING_SPEED, 0),
+          () -> new Vector3(-driver.getLeftY() * DrivebaseConstants.SHOOT_WHILE_MOVING_SPEED,
+              -driver.getLeftX() * DrivebaseConstants.SHOOT_WHILE_MOVING_SPEED, 0),
           shooter,
           drivebase,
           ShooterConstants.getGoal(DriverStation.getAlliance().get()));
@@ -301,43 +304,43 @@ public class RobotContainer {
     // Operator
 
     // Arm
-    operatorController.rightTrigger().whileTrue(
+    operator.rightTrigger().whileTrue(
         intake.set(IntakeConstants.DUTY_CYCLE)
-        .alongWith(arm.setAngle(ArmConstants.BOTTOM_ANGLE).until(() -> !(arm.getAngle().in(Degrees) > ArmConstants.BOTTOM_ANGLE.in(Degrees) + 10))
+        .alongWith(arm.setAngle(ArmConstants.BOTTOM_ANGLE).until(() -> !(arm.getAngle().in(Degrees) > ArmConstants.BOTTOM_ANGLE.in(Degrees) + 20))
         .andThen(arm.set(-.3))))
         .onFalse(arm.set(0.));
-    operatorController.leftTrigger().whileTrue(arm.setAngle(ArmConstants.TOP_ANGLE));
+    operator.leftTrigger().whileTrue(arm.setAngle(ArmConstants.TOP_ANGLE));
 
     // Indexer
-    operatorController.rightBumper().whileTrue(Commands.runOnce(() -> {
+    operator.rightBumper().whileTrue(Commands.runOnce(() -> {
         if (shooter.atGoal()) {
           CommandScheduler.getInstance().schedule(indexer.set(IndexerConstants.DUTY_CYCLE));
         }}))
         .onFalse(indexer.set(0));
 
-    operatorController.leftBumper().whileTrue(indexer.set(IndexerConstants.DUTY_CYCLE));
+    operator.leftBumper().whileTrue(indexer.set(IndexerConstants.DUTY_CYCLE));
 
     // Silly shooter override (set this to shoot from an easy to drive to position,
     // like in front of the hub)
-    operatorController.x().whileTrue(new LoadBalls(arm, shooter, indexer, intake));
-    operatorController.b().whileTrue(shooter.useManualSpeed());
+    operator.x().whileTrue(new LoadBalls(arm, shooter, indexer, intake));
+    operator.b().whileTrue(shooter.useManualSpeed());
 
     // Climb
     // operatorController.y().onTrue(climb.setAngularPosition(ClimbConstants.UP_ANGLE));
     // operatorController.a().onTrue(climb.setAngularPosition(Radians.of(0.)));
 
     // Utils
-    operatorController.povUp().whileTrue(intake.set(1.));
-    operatorController.povRight().whileTrue(indexer.set(-0.5).alongWith(shooter.set(-0.3)));
-    operatorController.povLeft().whileTrue(intake.set(-1.));
-    operatorController.povLeft().whileTrue(arm.set(1.))
+    operator.povUp().whileTrue(intake.set(1.));
+    operator.povRight().whileTrue(indexer.set(-0.5).alongWith(shooter.set(-0.3)));
+    operator.povLeft().whileTrue(intake.set(-1.));
+    operator.povLeft().whileTrue(arm.set(1.))
       .onFalse(arm.setAngle(arm.getLastSetpoint()));
     // operatorController.povDown().whileTrue(Commands.runOnce(() -> arm.setAngularVelocity(ArmConstants.ARM_VELOCITY_WIGGLE)))
     //     .onFalse(Commands.runOnce(() -> arm.setAngularVelocity(RotationsPerSecond.of(0))));
         
 
     // Reset Arm Gyro
-    operatorController.start().onTrue(Commands.runOnce(() -> arm.resetAngle(ArmConstants.BOTTOM_ANGLE)));
+    operator.start().onTrue(Commands.runOnce(() -> arm.resetAngle(ArmConstants.BOTTOM_ANGLE)));
   }
 
   /**
@@ -363,15 +366,15 @@ public class RobotContainer {
     lastHeading = drivebase.getState().Pose.getRotation();
     // Swerve
     drivebase.setDefaultCommand(drivebase.applyRequest(() -> {
-      if (Math.hypot(driverController.getRightX(),
-          driverController.getRightY()) > DrivebaseConstants.HEADING_DEADBAND) {
-        lastHeading = new Rotation2d(-driverController.getRightY(), -driverController.getRightX());
+      if (Math.hypot(driver.getRightX(),
+          driver.getRightY()) > DrivebaseConstants.HEADING_DEADBAND) {
+        lastHeading = new Rotation2d(-driver.getRightY(), -driver.getRightX());
       }
-      return driveFacingAngle.withVelocityX(-driverController.getLeftY() * DrivebaseConstants.MAX_SPEED) // Drive
+      return driveFacingAngle.withVelocityX(-driver.getLeftY() * DrivebaseConstants.MAX_SPEED) // Drive
                                                                                                          // forward with
                                                                                                          // negative Y
                                                                                                          // (forward)
-          .withVelocityY(-driverController.getLeftX() * DrivebaseConstants.MAX_SPEED) // Drive left with negative X
+          .withVelocityY(-driver.getLeftX() * DrivebaseConstants.MAX_SPEED) // Drive left with negative X
                                                                                       // (left)
           .withTargetDirection(lastHeading); // Point in joystick direction
     }));

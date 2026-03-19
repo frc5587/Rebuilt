@@ -5,12 +5,15 @@ import static edu.wpi.first.units.Units.Second;
 import static edu.wpi.first.units.Units.Seconds;
 import static edu.wpi.first.units.Units.Volts;
 
+import java.util.function.DoubleConsumer;
+
 import com.revrobotics.spark.SparkMax;
 import com.revrobotics.spark.SparkLowLevel.MotorType;
 
 import edu.wpi.first.math.system.plant.DCMotor;
 import edu.wpi.first.units.measure.Angle;
 import edu.wpi.first.units.measure.AngularVelocity;
+import edu.wpi.first.wpilibj.Timer;
 import edu.wpi.first.wpilibj.smartdashboard.SmartDashboard;
 import edu.wpi.first.wpilibj2.command.Command;
 import edu.wpi.first.wpilibj2.command.CommandScheduler;
@@ -40,10 +43,12 @@ public class ArmSubsystem extends SubsystemBase {
   private ArmConfig rightArmConfig = ArmConstants.APPLY_ARM_CONFIG.apply(new ArmConfig(rSparkSmartMotorController));
   private ArmConfig leftArmCfg = ArmConstants.APPLY_ARM_CONFIG.apply(new ArmConfig(lSparkSmartMotorController));
   private Arm arm = new Arm(rightArmConfig);
+  private final DoubleConsumer rumbleConsumer;
 
   private Angle lastAngle = ArmConstants.BOTTOM_ANGLE;
 
-  public ArmSubsystem() {
+  public ArmSubsystem(DoubleConsumer rumbleConsumer) {
+    this.rumbleConsumer = rumbleConsumer;
     CommandScheduler.getInstance().schedule(arm.setAngle(ArmConstants.TOP_ANGLE));
     leftArmCfg.applyConfig();
     SmartDashboard.putBoolean("top arm resetencoders", false);
@@ -139,6 +144,10 @@ public class ArmSubsystem extends SubsystemBase {
 
     SmartDashboard.putNumber("Left Arm Temp", (leftSpark.getMotorTemperature()));
     SmartDashboard.putNumber("Right Arm Temp", (rightSpark.getMotorTemperature()));
+
+    if ((leftSpark.getMotorTemperature() >= 85) || (rightSpark.getMotorTemperature() >= 85)) { //TODO test
+        rumbleConsumer.accept(1.);
+    } else {rumbleConsumer.accept(0.);}
   }
 
   @Override

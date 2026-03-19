@@ -119,7 +119,7 @@ public final class Constants {
     public static final Angle BOTTOM_ANGLE = Degrees.of(-8.+BALANCE_OFFSET);
     public static final Angle WIGGLE_ANGLE_UP = Degrees.of(30.+BALANCE_OFFSET);
     public static final Angle WIGGLE_ANGLE_DOWN = BOTTOM_ANGLE;
-    public static final double WIGGLE_TIME_UP = 1;
+    public static final double WIGGLE_TIME_UP = 0.5;
     public static final double WIGGLE_TIME_DOWN = 0.5;
     public static final double WIGGLE_DUTYCYCLE = 0.5;
     public static final AngularVelocity ARM_VELOCITY_WIGGLE = RotationsPerSecond.of(0.5);
@@ -134,7 +134,7 @@ public final class Constants {
                    .withGearing(new MechanismGearing(GearBox.fromReductionStages(5.,32./18.)))
                    .withMotorInverted(false)
                    .withIdleMode(MotorMode.BRAKE)
-                   .withStatorCurrentLimit(Amps.of(60))
+                   .withStatorCurrentLimit(Amps.of(40))
                    .withClosedLoopRampRate(Seconds.of(0.25))
                    .withOpenLoopRampRate(Seconds.of(0.25));
     };

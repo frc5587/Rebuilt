@@ -1,6 +1,6 @@
 {
   "version": 1.0,
-  "grid_size": 128,
+  "grid_size": 64,
   "tabs": [
     {
       "name": "Swerve",
@@ -11,7 +11,7 @@
             "x": 128.0,
             "y": 0.0,
             "width": 256.0,
-            "height": 128.0,
+            "height": 256.0,
             "type": "List Layout",
             "properties": {
               "label_position": "TOP"
@@ -373,6 +373,34 @@
               "period": 0.06,
               "data_type": "double",
               "show_submit_button": true
+            }
+          },
+          {
+            "title": "Left Arm Temp",
+            "x": 896.0,
+            "y": 128.0,
+            "width": 128.0,
+            "height": 128.0,
+            "type": "Text Display",
+            "properties": {
+              "topic": "/SmartDashboard/Left Arm Temp",
+              "period": 0.06,
+              "data_type": "double",
+              "show_submit_button": false
+            }
+          },
+          {
+            "title": "Right Arm Temp",
+            "x": 1024.0,
+            "y": 128.0,
+            "width": 128.0,
+            "height": 128.0,
+            "type": "Text Display",
+            "properties": {
+              "topic": "/SmartDashboard/Right Arm Temp",
+              "period": 0.06,
+              "data_type": "double",
+              "show_submit_button": false
             }
           }
         ]
@@ -737,6 +765,67 @@
               "period": 0.06,
               "data_type": "double",
               "show_submit_button": false
+            }
+          },
+          {
+            "title": "Shooter Temp",
+            "x": 896.0,
+            "y": 128.0,
+            "width": 128.0,
+            "height": 128.0,
+            "type": "Text Display",
+            "properties": {
+              "topic": "/SmartDashboard/Shooter Temp",
+              "period": 0.06,
+              "data_type": "double",
+              "show_submit_button": false
+            }
+          }
+        ]
+      }
+    },
+    {
+      "name": "Vision?",
+      "grid_layout": {
+        "layouts": [],
+        "containers": [
+          {
+            "title": "Right Camera",
+            "x": 960.0,
+            "y": 0.0,
+            "width": 384.0,
+            "height": 384.0,
+            "type": "Camera Stream",
+            "properties": {
+              "topic": "/CameraPublisher/photonvision_Port_1182_Output_MJPEG_Server",
+              "period": 0.06,
+              "rotation_turns": 0
+            }
+          },
+          {
+            "title": "Left Camera",
+            "x": 192.0,
+            "y": 0.0,
+            "width": 384.0,
+            "height": 384.0,
+            "type": "Camera Stream",
+            "properties": {
+              "topic": "/CameraPublisher/photonvision_Port_1184_Output_MJPEG_Server",
+              "period": 0.06,
+              "rotation_turns": 0
+            }
+          },
+          {
+            "title": "Back Camera",
+            "x": 576.0,
+            "y": 0.0,
+            "width": 384.0,
+            "height": 384.0,
+            "type": "Camera Stream",
+            "properties": {
+              "topic": "/CameraPublisher/photonvision_Port_1186_Output_MJPEG_Server",
+              "period": 0.06,
+              "rotation_turns": 0
             }
           }
         ]
