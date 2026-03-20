@@ -92,7 +92,8 @@ public final class Constants {
           .withGearing(new MechanismGearing(GearBox.fromReductionStages(1)))
           .withMotorInverted(false)
           .withIdleMode(MotorMode.COAST)
-          .withStatorCurrentLimit(Amps.of(40))
+          .withSupplyCurrentLimit(Amps.of(40))
+          .withStatorCurrentLimit(Amps.of(80))
           .withTemperatureCutoff(Celsius.of(90));
     };
     public static final UnaryOperator<FlyWheelConfig> APPLY_FLYWHEEL_CONFIG = (FlyWheelConfig config) -> {
@@ -150,8 +151,6 @@ public final class Constants {
           .withIdleMode(MotorMode.BRAKE)
           .withSupplyCurrentLimit(Amps.of(40))
           .withStatorCurrentLimit(Amps.of(80))
-          .withClosedLoopRampRate(Seconds.of(0.25))
-          .withOpenLoopRampRate(Seconds.of(0.25))
           .withTemperatureCutoff(Celsius.of(90));
     };
     public static final UnaryOperator<ArmConfig> APPLY_ARM_CONFIG = (ArmConfig config) -> {

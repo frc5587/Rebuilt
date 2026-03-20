@@ -29,7 +29,6 @@ public class ClimbSubsystem extends SubsystemBase {
   private SmartMotorController climbSMC = new SparkWrapper(leftSpark, DCMotor.getNEO(1), leftSMCConfig);
 
   public ClimbSubsystem() {
-
     climbSMC.setEncoderPosition(Radians.of(0));
     SmartDashboard.putBoolean("climb resetencoder", false);
   }
