@@ -69,7 +69,7 @@ public class IntakeSubsystem extends SubsystemBase {
   }
 
   public boolean isStalling() {
-    if (spark.getOutputCurrent() >= 0.90*IntakeConstants.STATOR_CURRENT_LIMIT) {
+    if (spark.getOutputCurrent() >= 0.90*IntakeConstants.SUPPLY_CURRENT_LIMIT) {
       return true;
     } else {return false;}
   }
