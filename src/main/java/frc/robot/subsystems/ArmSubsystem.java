@@ -81,6 +81,10 @@ public class ArmSubsystem extends SubsystemBase {
     return lastAngle;
   }
 
+  public Angle getCurrentSetpoint() {
+    return arm.getMechanismSetpoint().orElse(ArmConstants.BOTTOM_ANGLE);
+  }
+
   /**
    * Move the arm up and down.
    * 
