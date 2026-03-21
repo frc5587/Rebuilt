@@ -59,7 +59,7 @@ public class ShooterSubsystem extends SubsystemBase {
     ballSpeedToRPM.put(8.20538041,3225.);
     ballSpeedToRPM.put(8.97973555,3500.);
     ballSpeedToRPM.put(20., 10000.);
-    SmartDashboard.putNumber("manual flywheel speed", 3500.);
+    SmartDashboard.putNumber("manual flywheel speed", 3100.);
     SmartDashboard.putNumber("Shooter Temp", shooter.getMotor().getTemperature().in(Fahrenheit));
   }
     
@@ -93,7 +93,7 @@ public class ShooterSubsystem extends SubsystemBase {
   }
 
   public Command useManualSpeed() {
-    return setAngularVelocity(() -> RPM.of(SmartDashboard.getNumber("manual flywheel speed", 0)));
+    return setAngularVelocity(() -> RPM.of(SmartDashboard.getNumber("manual flywheel speed", 3100)));
   }
 
   /**

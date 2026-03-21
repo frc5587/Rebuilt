@@ -3,32 +3,37 @@
   "waypoints": [
     {
       "anchor": {
-        "x": 2.331155492154065,
-        "y": 5.684679029957205
+        "x": 3.76,
+        "y": 7.603
       },
       "prevControl": null,
       "nextControl": {
-        "x": 1.711394569431751,
-        "y": 5.038689281807566
+        "x": 2.628744650499286,
+        "y": 7.133808844507846
       },
       "isLocked": false,
-      "linkedName": "Top Shoot Position"
+      "linkedName": "Top Start"
     },
     {
       "anchor": {
-        "x": 0.8585320411940278,
-        "y": 4.8985889452697675
+        "x": 2.331,
+        "y": 5.685
       },
       "prevControl": {
-        "x": 1.517301433344965,
-        "y": 5.767360475972827
+        "x": 2.745573155289814,
+        "y": 6.735940629754623
       },
       "nextControl": null,
       "isLocked": false,
-      "linkedName": "[1] Right Side Climb Lineup"
+      "linkedName": "Top Shoot Position"
     }
   ],
-  "rotationTargets": [],
+  "rotationTargets": [
+    {
+      "waypointRelativePos": 0.3,
+      "rotationDegrees": 0.0
+    }
+  ],
   "constraintZones": [],
   "pointTowardsZones": [],
   "eventMarkers": [],
@@ -42,13 +47,13 @@
   },
   "goalEndState": {
     "velocity": 0,
-    "rotation": 90.0
+    "rotation": -35.87309363811689
   },
   "reversed": false,
   "folder": "left",
   "idealStartingState": {
     "velocity": 0,
-    "rotation": -35.87309363811689
+    "rotation": 0.0
   },
   "useDefaultConstraints": true
 }

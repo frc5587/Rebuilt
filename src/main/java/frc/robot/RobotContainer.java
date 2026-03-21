@@ -45,7 +45,6 @@ import edu.wpi.first.wpilibj.GenericHID.RumbleType;
 import edu.wpi.first.wpilibj2.command.Command;
 import edu.wpi.first.wpilibj2.command.CommandScheduler;
 import edu.wpi.first.wpilibj2.command.Commands;
-import edu.wpi.first.wpilibj2.command.ParallelCommandGroup;
 import edu.wpi.first.wpilibj2.command.SequentialCommandGroup;
 import edu.wpi.first.wpilibj2.command.button.CommandXboxController;
 import edu.wpi.first.wpilibj2.command.button.Trigger;
@@ -125,18 +124,18 @@ public class RobotContainer {
     NamedCommands.registerCommand("Arm Down", Commands.runOnce(() -> arm.setAngle(ArmConstants.BOTTOM_ANGLE).schedule()));
 
     NamedCommands.registerCommand("Intake Forward", Commands.runOnce(() -> intake.set(IntakeConstants.DUTY_CYCLE).schedule())
-                                                         .alongWith(Commands.runOnce(() -> arm.set(0.3).schedule())));
+                                                         .alongWith(Commands.runOnce(() -> arm.set(-0.3).schedule())));
     NamedCommands.registerCommand("Intake Stop", Commands.runOnce(() -> intake.set(0).schedule()));
 
     NamedCommands.registerCommand("Shoot Preload",
         new SequentialCommandGroup(
-            Commands.runOnce(() -> shooter.setAngularVelocity(() -> RPM.of(3000.)).schedule()),
+            Commands.runOnce(() -> shooter.setBallVelocity(() -> MetersPerSecond.of(6.80873631)).schedule()),
             new LoadBalls(arm, shooter, indexer, intake).raceWith(Commands.waitSeconds(5.)),
             Commands.runOnce(() -> shooter.set(0.).schedule())));
 
     NamedCommands.registerCommand("Shoot Hopper",
         new SequentialCommandGroup(
-            Commands.runOnce(() -> shooter.setAngularVelocity(() -> RPM.of(3000.)).schedule()),
+            Commands.runOnce(() -> shooter.setBallVelocity(() -> MetersPerSecond.of(6.80873631)).schedule()),
             new LoadBalls(arm, shooter, indexer, intake).raceWith(Commands.waitSeconds(10.)),
             Commands.runOnce(() -> shooter.set(0.).schedule())));
     NamedCommands.registerCommand("Climb Up", climb.setAngularPosition(ClimbConstants.UP_ANGLE));

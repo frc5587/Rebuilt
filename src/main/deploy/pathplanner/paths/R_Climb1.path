@@ -3,29 +3,29 @@
   "waypoints": [
     {
       "anchor": {
-        "x": 0.8585320411940278,
-        "y": 4.651794887084488
+        "x": 1.8,
+        "y": 3.3137710843373496
       },
       "prevControl": null,
       "nextControl": {
-        "x": 1.1085320411940278,
-        "y": 4.651794887084488
+        "x": 2.05,
+        "y": 3.3137710843373496
       },
       "isLocked": false,
-      "linkedName": "[2] Right Side Climb Lineup"
+      "linkedName": "[1] Left Side Climb Lineup"
     },
     {
       "anchor": {
-        "x": 1.061345680516654,
-        "y": 4.651794887084488
+        "x": 1.4,
+        "y": 3.314
       },
       "prevControl": {
-        "x": 0.8113456805166539,
-        "y": 4.651794887084488
+        "x": 1.15,
+        "y": 3.314
       },
       "nextControl": null,
       "isLocked": false,
-      "linkedName": "[3] Right Side Climb Lineup"
+      "linkedName": "[2] Left Side Climb Lineup"
     }
   ],
   "rotationTargets": [],
@@ -34,7 +34,7 @@
   "eventMarkers": [],
   "globalConstraints": {
     "maxVelocity": 0.5,
-    "maxAcceleration": 0.5,
+    "maxAcceleration": 1.0,
     "maxAngularVelocity": 540.0,
     "maxAngularAcceleration": 720.0,
     "nominalVoltage": 12.0,
@@ -42,13 +42,13 @@
   },
   "goalEndState": {
     "velocity": 0,
-    "rotation": 90.0
+    "rotation": 0.0
   },
   "reversed": false,
-  "folder": "left",
+  "folder": "right",
   "idealStartingState": {
     "velocity": 0,
-    "rotation": 90.0
+    "rotation": 0.0
   },
   "useDefaultConstraints": false
 }

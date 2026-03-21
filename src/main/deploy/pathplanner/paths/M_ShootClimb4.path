@@ -3,13 +3,13 @@
   "waypoints": [
     {
       "anchor": {
-        "x": 0.8585320411940278,
-        "y": 4.651794887084488
+        "x": 1.4,
+        "y": 4.177
       },
       "prevControl": null,
       "nextControl": {
-        "x": 1.1085320411940278,
-        "y": 4.651794887084488
+        "x": 1.65,
+        "y": 4.177
       },
       "isLocked": false,
       "linkedName": "[2] Right Side Climb Lineup"
@@ -48,7 +48,7 @@
   "folder": "middle",
   "idealStartingState": {
     "velocity": 0,
-    "rotation": 90.0
+    "rotation": 0.0
   },
   "useDefaultConstraints": false
 }

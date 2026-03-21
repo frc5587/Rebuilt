@@ -3,25 +3,25 @@
   "waypoints": [
     {
       "anchor": {
-        "x": 0.8585320411940278,
-        "y": 4.8985889452697675
+        "x": 1.7570843373493976,
+        "y": 4.177060240963855
       },
       "prevControl": null,
       "nextControl": {
-        "x": 0.8585320411940278,
-        "y": 4.646947605507134
+        "x": 1.7570843373493976,
+        "y": 3.9254189012012217
       },
       "isLocked": false,
       "linkedName": "[1] Right Side Climb Lineup"
     },
     {
       "anchor": {
-        "x": 0.8585320411940278,
-        "y": 4.651794887084488
+        "x": 1.4,
+        "y": 4.177
       },
       "prevControl": {
-        "x": 0.8585320411940278,
-        "y": 4.901794887084488
+        "x": 1.4,
+        "y": 4.427
       },
       "nextControl": null,
       "isLocked": false,
@@ -42,13 +42,13 @@
   },
   "goalEndState": {
     "velocity": 0,
-    "rotation": 90.0
+    "rotation": 0.0
   },
   "reversed": false,
   "folder": "middle",
   "idealStartingState": {
     "velocity": 0,
-    "rotation": 90.0
+    "rotation": 0.0
   },
   "useDefaultConstraints": false
 }
