@@ -206,7 +206,7 @@ public final class Constants {
     public static final Angle DOWN_ANGLE = Rotations.of(0.);
     public static final int LEFT_MOTOR_ID = 40;
     public static final int RIGHT_MOTOR_ID = 41;
-    public static final boolean LEFT_MOTOR_INVERTED = false;
+    public static final boolean LEFT_MOTOR_INVERTED = true;
     public static final double SLOW_DUTYCYCLE = 0.25;
     public static final UnaryOperator<SmartMotorControllerConfig> APPLY_SMC_CONFIG = (
         SmartMotorControllerConfig config) -> {
