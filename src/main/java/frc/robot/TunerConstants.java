@@ -63,7 +63,7 @@ public class TunerConstants {
         new CurrentLimitsConfigs()
           // Swerve azimuth does not require much torque output, so we can set a relatively low
           // stator current limit to help avoid brownouts without impacting performance.
-          .withSupplyCurrentLimit(Amps.of(60))
+          .withSupplyCurrentLimit(Amps.of(40))
           .withSupplyCurrentLowerLimit(Amps.of(40))
           .withStatorCurrentLimit(Amps.of(120))
           .withSupplyCurrentLimitEnable(true)
@@ -165,7 +165,7 @@ public class TunerConstants {
   private static final int kBackLeftDriveMotorId = 12;
   private static final int kBackLeftSteerMotorId = 17;
   private static final int kBackLeftEncoderId = 52;
-  private static final Angle kBackLeftEncoderOffset = Rotations.of(0.279296875);
+  private static final Angle kBackLeftEncoderOffset = Rotations.of(-0.440185546875);
   private static final boolean kBackLeftSteerMotorInverted = true;
   private static final boolean kBackLeftEncoderInverted = false;
 

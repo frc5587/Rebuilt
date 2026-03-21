@@ -128,7 +128,7 @@ public final class Constants {
     private static final double BALANCE_OFFSET = 19;
     public static final Angle TOP_ANGLE = Degrees.of(105. + BALANCE_OFFSET);
     public static final Angle BOTTOM_ANGLE = Degrees.of(-8. + BALANCE_OFFSET);
-    public static final Angle WIGGLE_ANGLE_UP = Degrees.of(30. + BALANCE_OFFSET);
+    public static final Angle WIGGLE_ANGLE_UP = Degrees.of(40. + BALANCE_OFFSET);
     public static final Angle WIGGLE_ANGLE_DOWN = BOTTOM_ANGLE;
     public static final double WIGGLE_TIME_UP = 0.5;
     public static final double WIGGLE_TIME_DOWN = 0.5;
@@ -207,6 +207,7 @@ public final class Constants {
     public static final int LEFT_MOTOR_ID = 40;
     public static final int RIGHT_MOTOR_ID = 41;
     public static final boolean LEFT_MOTOR_INVERTED = false;
+    public static final double SLOW_DUTYCYCLE = 0.25;
     public static final UnaryOperator<SmartMotorControllerConfig> APPLY_SMC_CONFIG = (
         SmartMotorControllerConfig config) -> {
       return config.withControlMode(ControlMode.CLOSED_LOOP)
@@ -218,7 +219,7 @@ public final class Constants {
           .withGearing(new MechanismGearing(GearBox.fromReductionStages(4, 4, 3)))
           .withMotorInverted(LEFT_MOTOR_INVERTED) // TODO check inversion states
           .withIdleMode(MotorMode.BRAKE)
-          .withSoftLimit(Rotations.of(DOWN_ANGLE.in(Rotations)-0.1), Rotations.of(UP_ANGLE.in(Rotations)+0.1))
+          .withSoftLimit(Rotations.of(DOWN_ANGLE.in(Rotations)-0.1), Rotations.of(UP_ANGLE.in(Rotations)+10.1)) //TODO i temporarily increased top soft limit
           .withSupplyCurrentLimit(Amps.of(40))
           .withStatorCurrentLimit(Amps.of(100));
 

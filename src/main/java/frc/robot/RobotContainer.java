@@ -332,11 +332,11 @@ public class RobotContainer {
     operator.b().whileTrue(shooter.useManualSpeed());
 
     // Climb
-    // operator.y().whileTrue(climb.set(1.)).onFalse(climb.set(0.));
-    // operator.a().whileTrue(climb.set(-0.5)).onFalse(climb.set(0.));
+    operator.y().whileTrue(climb.set(ClimbConstants.SLOW_DUTYCYCLE)).onFalse(climb.set(0.));
+    operator.a().whileTrue(climb.set(-ClimbConstants.SLOW_DUTYCYCLE)).onFalse(climb.set(0.));
+    operator.povUp().whileTrue(climb.set(1.0)).onFalse(climb.set(0.));
 
     // Utils
-    operator.povUp().whileTrue(intake.set(1.));
     operator.povRight().whileTrue(indexer.set(-0.5).alongWith(shooter.set(-0.3)));
     operator.povLeft().whileTrue(intake.set(-1.));
     operator.povLeft().whileTrue(arm.set(1.))

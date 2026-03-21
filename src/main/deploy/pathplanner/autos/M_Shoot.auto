@@ -13,7 +13,13 @@
         {
           "type": "named",
           "data": {
-            "name": "Shoot Hopper"
+            "name": "Shoot Preload"
+          }
+        },
+        {
+          "type": "path",
+          "data": {
+            "pathName": "New New New Path"
           }
         }
       ]
