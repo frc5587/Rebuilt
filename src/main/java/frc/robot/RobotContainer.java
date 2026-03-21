@@ -215,16 +215,20 @@ public class RobotContainer {
     }));
 
     // Sim stuff
-    driver.leftTrigger().onTrue(Commands.runOnce(() -> {
-      if (aimingCommand != null) {
-        aimingCommand.getMath().logSim();
-      }
-    }));
-    driver.rightTrigger().onTrue(Commands.runOnce(() -> {
-      if (aimingCommand != null) {
-        aimingCommand.getMath().resetSim();
-      }
-    }));
+    // driver.leftTrigger().onTrue(Commands.runOnce(() -> {
+    //   if (aimingCommand != null) {
+    //     aimingCommand.getMath().logSim();
+    //   }
+    // }));
+    // driver.rightTrigger().onTrue(Commands.runOnce(() -> {
+    //   if (aimingCommand != null) {
+    //     aimingCommand.getMath().resetSim();
+    //   }
+    // }));
+    driver.rightTrigger().whileTrue(shooter.useManualSpeed());
+    driver.rightBumper().whileTrue(shooter.setAngularVelocity(() -> RPM.of(3200)));
+    driver.leftTrigger().whileTrue(shooter.setAngularVelocity(() -> RPM.of(2900)));
+    driver.leftBumper().whileTrue(shooter.setAngularVelocity(() -> RPM.of(3000)));
 
     // Main controlls
     driver.x().onTrue(Commands.runOnce(() -> {
@@ -288,19 +292,19 @@ public class RobotContainer {
                                                                                                               // (forward)
                 .withVelocityY(-driver.getLeftX() * DrivebaseConstants.MAX_SPEED)
                 .withTargetDirection(Rotation2d.fromDegrees(45.)))));
-    driver.leftBumper().onTrue(Commands.runOnce(() -> {
-      if (aimingCommand != null && aimingCommand.isScheduled()) {
-        aimingCommand.cancel();
-      }
-      aimingCommand = new AimTowardsGoal(
-          () -> new Vector3(-driver.getLeftY() * DrivebaseConstants.SHOOT_WHILE_MOVING_SPEED,
-              -driver.getLeftX() * DrivebaseConstants.SHOOT_WHILE_MOVING_SPEED, 0),
-          shooter,
-          drivebase,
-          ShooterConstants.getGoal(DriverStation.getAlliance().get()));
-      CommandScheduler.getInstance().schedule(aimingCommand);
-    }))
-        .onFalse(Commands.runOnce(() -> aimingCommand.cancel()));
+    // driver.leftBumper().onTrue(Commands.runOnce(() -> {
+    //   if (aimingCommand != null && aimingCommand.isScheduled()) {
+    //     aimingCommand.cancel();
+    //   }
+    //   aimingCommand = new AimTowardsGoal(
+    //       () -> new Vector3(-driver.getLeftY() * DrivebaseConstants.SHOOT_WHILE_MOVING_SPEED,
+    //           -driver.getLeftX() * DrivebaseConstants.SHOOT_WHILE_MOVING_SPEED, 0),
+    //       shooter,
+    //       drivebase,
+    //       ShooterConstants.getGoal(DriverStation.getAlliance().get()));
+    //   CommandScheduler.getInstance().schedule(aimingCommand);
+    // }))
+    //     .onFalse(Commands.runOnce(() -> aimingCommand.cancel()));
 
     // Indexer
     // driverController.rightBumper().whileTrue(Commands.run(() ->
