@@ -93,8 +93,7 @@ public final class Constants {
           .withMotorInverted(false)
           .withIdleMode(MotorMode.COAST)
           .withSupplyCurrentLimit(Amps.of(40))
-          .withStatorCurrentLimit(Amps.of(80))
-          .withTemperatureCutoff(Celsius.of(90));
+          .withStatorCurrentLimit(Amps.of(80));
     };
     public static final UnaryOperator<FlyWheelConfig> APPLY_FLYWHEEL_CONFIG = (FlyWheelConfig config) -> {
       return config.withDiameter(Inches.of(4))
@@ -150,8 +149,7 @@ public final class Constants {
           .withMotorInverted(false)
           .withIdleMode(MotorMode.BRAKE)
           .withSupplyCurrentLimit(Amps.of(40))
-          .withStatorCurrentLimit(Amps.of(80))
-          .withTemperatureCutoff(Celsius.of(90));
+          .withStatorCurrentLimit(Amps.of(80));
     };
     public static final UnaryOperator<ArmConfig> APPLY_ARM_CONFIG = (ArmConfig config) -> {
       return config.withHardLimit(BOTTOM_ANGLE, TOP_ANGLE)
@@ -163,7 +161,7 @@ public final class Constants {
   }
 
   public static class IntakeConstants {
-    public static final double DUTY_CYCLE = 0.6;
+    public static final double DUTY_CYCLE = 1.;
     public static final int MOTOR_ID = 22;
     public static final double SUPPLY_CURRENT_LIMIT = 20.0;
     public static final double STATOR_CURRENT_LIMIT = 30.0;
@@ -206,21 +204,23 @@ public final class Constants {
   }
 
   public static class ClimbConstants {
-    public static final Angle UP_ANGLE = Rotations.of(77);
-    public static final Angle DOWN_ANGLE = Rotations.of(0);
+    public static final Angle UP_ANGLE = Rotations.of(1.32+0.64);
+    public static final Angle DOWN_ANGLE = Rotations.of(0.);
     public static final int LEFT_MOTOR_ID = 40;
     public static final int RIGHT_MOTOR_ID = 41;
+    public static final boolean LEFT_MOTOR_INVERTED = false;
     public static final UnaryOperator<SmartMotorControllerConfig> APPLY_SMC_CONFIG = (
         SmartMotorControllerConfig config) -> {
       return config.withControlMode(ControlMode.CLOSED_LOOP)
-          .withClosedLoopController(0.25, 0, 0)
+          .withClosedLoopController(1., 0, 0)
           .withSimClosedLoopController(1, 0, 0)
           .withFeedforward(new SimpleMotorFeedforward(0, 0, 0))
           .withSimFeedforward(new SimpleMotorFeedforward(0, 0, 0))
           .withTelemetry("ClimbMotor", TelemetryVerbosity.HIGH)
           .withGearing(new MechanismGearing(GearBox.fromReductionStages(4, 4, 3)))
-          .withMotorInverted(false) // TODO check inversion states
+          .withMotorInverted(LEFT_MOTOR_INVERTED) // TODO check inversion states
           .withIdleMode(MotorMode.BRAKE)
+          .withSoftLimit(Rotations.of(DOWN_ANGLE.in(Rotations)-0.1), Rotations.of(UP_ANGLE.in(Rotations)+0.1))
           .withSupplyCurrentLimit(Amps.of(40))
           .withStatorCurrentLimit(Amps.of(100));
 

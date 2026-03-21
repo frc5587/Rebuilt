@@ -5,6 +5,9 @@ import static edu.wpi.first.units.Units.Rotations;
 import static edu.wpi.first.units.Units.Volts;
 
 import com.revrobotics.spark.SparkLowLevel.MotorType;
+import com.revrobotics.spark.config.SparkBaseConfig;
+import com.revrobotics.PersistMode;
+import com.revrobotics.ResetMode;
 import com.revrobotics.spark.SparkMax;
 
 import edu.wpi.first.math.Pair;
@@ -23,13 +26,19 @@ import yams.motorcontrollers.local.SparkWrapper;
 public class ClimbSubsystem extends SubsystemBase {
   private SparkMax leftSpark = new SparkMax(ClimbConstants.LEFT_MOTOR_ID, MotorType.kBrushless);
   private SparkMax rightSpark = new SparkMax(ClimbConstants.RIGHT_MOTOR_ID, MotorType.kBrushless);
-  private SmartMotorControllerConfig leftSMCConfig = ClimbConstants.APPLY_SMC_CONFIG
+  private SmartMotorControllerConfig SMCConfig = ClimbConstants.APPLY_SMC_CONFIG
       .apply(new SmartMotorControllerConfig(this).withFollowers(Pair.of(rightSpark, true)));
 
-  private SmartMotorController climbSMC = new SparkWrapper(leftSpark, DCMotor.getNEO(1), leftSMCConfig);
+  private SmartMotorController climbSMC = new SparkWrapper(leftSpark, DCMotor.getNEO(1), SMCConfig);
 
   public ClimbSubsystem() {
     climbSMC.setEncoderPosition(Radians.of(0));
+    if (SMCConfig.getVendorConfig().isPresent()) {
+      leftSpark.configure((SparkBaseConfig)SMCConfig.getVendorConfig().get(), ResetMode.kResetSafeParameters, PersistMode.kPersistParameters);
+      SparkBaseConfig rightSparkBaseConfig = (SparkBaseConfig)SMCConfig.getVendorConfig().get();
+      rightSparkBaseConfig.inverted(!ClimbConstants.LEFT_MOTOR_INVERTED);
+      rightSpark.configure(rightSparkBaseConfig, ResetMode.kResetSafeParameters, PersistMode.kPersistParameters);
+    }
     SmartDashboard.putBoolean("climb resetencoder", false);
   }
 

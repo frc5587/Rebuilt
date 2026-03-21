@@ -122,20 +122,10 @@ public class RobotContainer {
     NamedCommands.registerCommand("test", Commands.print("I EXIST"));
 
     NamedCommands.registerCommand("Arm Up", Commands.runOnce(() -> arm.setAngle(ArmConstants.TOP_ANGLE).schedule()));
-    // NamedCommands.registerCommand("Arm Down", Commands.runOnce(() -> arm.setAngle(ArmConstants.BOTTOM_ANGLE).schedule()));
-    NamedCommands.registerCommand("Arm Down", Commands.runOnce(() -> intake.set(IntakeConstants.DUTY_CYCLE)
-        .alongWith(arm.setAngle(ArmConstants.BOTTOM_ANGLE).until(() -> !(arm.getAngle().in(Degrees) > ArmConstants.BOTTOM_ANGLE.in(Degrees) + 20))
-        .andThen(arm.set(-.3)).until(() -> arm.getCurrentSetpoint() != ArmConstants.BOTTOM_ANGLE)))
-        );
-    NamedCommands.registerCommand("Arm Down",
-          new SequentialCommandGroup(
-						arm.setAngle(ArmConstants.BOTTOM_ANGLE)
-								.until(() -> !(arm.getAngle().in(Degrees) > ArmConstants.BOTTOM_ANGLE.in(Degrees) + 20)),
-						arm.set(-0.3)
-								.until(() -> arm.getCurrentSetpoint() != ArmConstants.BOTTOM_ANGLE)
-          )); // TODO test
+    NamedCommands.registerCommand("Arm Down", Commands.runOnce(() -> arm.setAngle(ArmConstants.BOTTOM_ANGLE).schedule()));
 
-    NamedCommands.registerCommand("Intake Forward", Commands.runOnce(() -> intake.set(IntakeConstants.DUTY_CYCLE).schedule()));
+    NamedCommands.registerCommand("Intake Forward", Commands.runOnce(() -> intake.set(IntakeConstants.DUTY_CYCLE).schedule())
+                                                         .alongWith(Commands.runOnce(() -> arm.set(0.3).schedule())));
     NamedCommands.registerCommand("Intake Stop", Commands.runOnce(() -> intake.set(0).schedule()));
 
     NamedCommands.registerCommand("Shoot Preload",
@@ -343,8 +333,8 @@ public class RobotContainer {
     operator.b().whileTrue(shooter.useManualSpeed());
 
     // Climb
-    // operatorController.y().onTrue(climb.setAngularPosition(ClimbConstants.UP_ANGLE));
-    // operatorController.a().onTrue(climb.setAngularPosition(Radians.of(0.)));
+    // operator.y().whileTrue(climb.set(1.)).onFalse(climb.set(0.));
+    // operator.a().whileTrue(climb.set(-0.5)).onFalse(climb.set(0.));
 
     // Utils
     operator.povUp().whileTrue(intake.set(1.));
@@ -354,15 +344,15 @@ public class RobotContainer {
       .onFalse(arm.setAngle(arm.getLastSetpoint()));
     // operatorController.povDown().whileTrue(Commands.runOnce(() -> arm.setAngularVelocity(ArmConstants.ARM_VELOCITY_WIGGLE)))
     //     .onFalse(Commands.runOnce(() -> arm.setAngularVelocity(RotationsPerSecond.of(0))));
-        
 
     // Reset Arm Gyro
     operator.start().onTrue(Commands.runOnce(() -> arm.resetAngle(ArmConstants.BOTTOM_ANGLE)));
 
 
     // Triggers
-    armUp.whileTrue(shooter.stop())
-        .onFalse(shooter.set(ShooterConstants.IDLE_DUTYCYCLE));
+    armUp.whileTrue(shooter.stop()
+          .alongWith(indexer.stop()))
+          .onFalse(shooter.set(ShooterConstants.IDLE_DUTYCYCLE));
   }
 
   /**

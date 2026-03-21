@@ -17,6 +17,12 @@
           }
         },
         {
+          "type": "named",
+          "data": {
+            "name": "Intake Forward"
+          }
+        },
+        {
           "type": "path",
           "data": {
             "pathName": "R_MiddleShoot1"
