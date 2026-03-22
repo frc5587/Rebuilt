@@ -36,26 +36,25 @@ public class LoadBalls extends Command {
       lastTimestampNotAtGoal = Timer.getFPGATimestamp();
     }
 
+    scheduler.schedule(intake.set(1.));
+    // DOWN
+    if (lastAngleSwitchTimestamp > Timer.getFPGATimestamp()-ArmConstants.WIGGLE_TIME_DOWN  &&  !isGoingUp) {
+      scheduler.schedule(arm.setAngle(ArmConstants.WIGGLE_ANGLE_DOWN));
+    }
+    // UP
+    else if (lastAngleSwitchTimestamp > Timer.getFPGATimestamp()-ArmConstants.WIGGLE_TIME_UP) {
+      scheduler.schedule(arm.setAngle(ArmConstants.WIGGLE_ANGLE_UP));
+    }
+    else {
+      isGoingUp = !isGoingUp;
+      lastAngleSwitchTimestamp = Timer.getFPGATimestamp();
+    }
+
     if (shooter.atGoal()  &&  Timer.getFPGATimestamp()-lastTimestampNotAtGoal > ShooterConstants.SPIN_UP_DELAY) {
       scheduler.schedule(indexer.set(IndexerConstants.DUTY_CYCLE));
-      scheduler.schedule(intake.set(1.));
-      // DOWN
-      if (lastAngleSwitchTimestamp > Timer.getFPGATimestamp()-ArmConstants.WIGGLE_TIME_DOWN  &&  !isGoingUp) {
-        scheduler.schedule(arm.setAngle(ArmConstants.WIGGLE_ANGLE_DOWN));
-      }
-      // UP
-      else if (lastAngleSwitchTimestamp > Timer.getFPGATimestamp()-ArmConstants.WIGGLE_TIME_UP) {
-        scheduler.schedule(arm.setAngle(ArmConstants.WIGGLE_ANGLE_UP));
-      }
-      else {
-        isGoingUp = !isGoingUp;
-        lastAngleSwitchTimestamp = Timer.getFPGATimestamp();
-      }
-      SmartDashboard.putBoolean("test 1", true);
     }
     else {
       scheduler.schedule(indexer.set(0));
-      SmartDashboard.putBoolean("test 1", false);
     }
   }
 
