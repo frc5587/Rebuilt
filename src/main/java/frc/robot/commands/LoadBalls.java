@@ -50,12 +50,12 @@ public class LoadBalls extends Command {
       lastAngleSwitchTimestamp = Timer.getFPGATimestamp();
     }
 
-    if (shooter.atGoal()  &&  Timer.getFPGATimestamp()-lastTimestampNotAtGoal > ShooterConstants.SPIN_UP_DELAY) {
+    // if (shooter.atGoal()  &&  Timer.getFPGATimestamp()-lastTimestampNotAtGoal > ShooterConstants.SPIN_UP_DELAY) {
       scheduler.schedule(indexer.set(IndexerConstants.DUTY_CYCLE));
-    }
-    else {
-      scheduler.schedule(indexer.set(0));
-    }
+    // }
+    // else {
+    //   scheduler.schedule(indexer.set(0));
+    // }
   }
 
   @Override
