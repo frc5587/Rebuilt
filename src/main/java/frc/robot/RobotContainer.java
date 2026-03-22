@@ -131,12 +131,14 @@ public class RobotContainer {
         new SequentialCommandGroup(
             Commands.runOnce(() -> shooter.setBallVelocity(() -> MetersPerSecond.of(6.80873631)).schedule()),
             new LoadBalls(arm, shooter, indexer, intake).raceWith(Commands.waitSeconds(5.)),
+            Commands.runOnce(() -> indexer.set(0.).schedule()),
             Commands.runOnce(() -> shooter.set(0.).schedule())));
 
     NamedCommands.registerCommand("Shoot Hopper",
         new SequentialCommandGroup(
             Commands.runOnce(() -> shooter.setBallVelocity(() -> MetersPerSecond.of(6.80873631)).schedule()),
             new LoadBalls(arm, shooter, indexer, intake).raceWith(Commands.waitSeconds(10.)),
+            Commands.runOnce(() -> indexer.set(0.).schedule()),
             Commands.runOnce(() -> shooter.set(0.).schedule())));
     NamedCommands.registerCommand("Climb Up", Commands.runOnce(() -> System.out.println("no climb rn")));
     NamedCommands.registerCommand("Climb Down", Commands.runOnce(() -> System.out.println("no climb rn")));
@@ -205,7 +207,7 @@ public class RobotContainer {
         .alongWith(Commands.runOnce(() -> {
           lastHeading = Rotation2d.fromDegrees(0.);
         })));
-    // Zero Odmometry
+    // Zero Odometry
     driver.back().onTrue(Commands.runOnce(() -> {
       if (DriverStation.getAlliance().get() == Alliance.Blue) {
         drivebase.resetPose(DrivebaseConstants.BLUE_ALLIANCE_MIDDLE_HUB);
@@ -230,7 +232,7 @@ public class RobotContainer {
     driver.leftTrigger().whileTrue(shooter.setAngularVelocity(() -> RPM.of(2900)));
     driver.leftBumper().whileTrue(shooter.setAngularVelocity(() -> RPM.of(3000)));
 
-    // Main controlls
+    // Main controls
     driver.x().onTrue(Commands.runOnce(() -> {
       if (aimingCommand != null && aimingCommand.isScheduled()) {
         aimingCommand.cancel();
@@ -257,16 +259,12 @@ public class RobotContainer {
             .alongWith(Commands.runOnce(() -> {
               lastHeading = drivebase.getState().Pose.getRotation();
             })));
-    driver.y().whileTrue(arm.setAngle(ArmConstants.BOTTOM_ANGLE)
-        .alongWith(drivebase.applyRequest(
-            () -> driveFacingAngle.withVelocityX(-driver.getLeftY() * DrivebaseConstants.MAX_SPEED) // Drive
-                                                                                                              // forward
-                                                                                                              // with
-                                                                                                              // negative
-                                                                                                              // Y
-                                                                                                              // (forward)
+    driver.y().whileTrue(drivebase.applyRequest(
+            () -> driveFacingAngle.withVelocityX(-driver.getLeftY() * DrivebaseConstants.MAX_SPEED)
                 .withVelocityY(-driver.getLeftX() * DrivebaseConstants.MAX_SPEED)
-                .withTargetDirection(Rotation2d.kZero))));
+                .withTargetDirection(Rotation2d.kZero))
+        .alongWith(arm.setAngle(ArmConstants.BOTTOM_ANGLE).until(() -> !(arm.getAngle().in(Degrees) > ArmConstants.BOTTOM_ANGLE.in(Degrees) + 20))
+        .andThen(arm.set(-.3))));
     // driverController.a().whileTrue(arm.setAngle(ArmConstants.BOTTOM_ANGLE)
     // .alongWith(intake.set(IntakeConstants.DUTY_CYCLE))
     // .alongWith(drivebase.applyRequest(() -> {

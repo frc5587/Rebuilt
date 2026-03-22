@@ -78,7 +78,7 @@ public final class Constants {
 
   public static class ShooterConstants {
     public static final int MOTOR_ID = 30;
-    public static final double IDLE_DUTYCYCLE = 0.3;
+    public static final double IDLE_DUTYCYCLE = 0.2;
     public static final UnaryOperator<SmartMotorControllerConfig> APPLY_SMC_CONFIG = (
         SmartMotorControllerConfig config) -> {
       return config.withControlMode(ControlMode.CLOSED_LOOP)
