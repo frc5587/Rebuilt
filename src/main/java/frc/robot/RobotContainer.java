@@ -70,7 +70,7 @@ public class RobotContainer {
             operator.getHID().setRumble(RumbleType.kBothRumble, rumbleMagnitude);});
   private final IntakeSubsystem intake = new IntakeSubsystem();
   private final IndexerSubsystem indexer = new IndexerSubsystem();
-  private final ClimbSubsystem climb = new ClimbSubsystem();
+  // private final ClimbSubsystem climb = new ClimbSubsystem();
   private final LEDController ledController = new LEDController();
 
   private Trigger armUp = new Trigger(() -> arm.getCurrentSetpoint() == ArmConstants.TOP_ANGLE);
@@ -138,8 +138,8 @@ public class RobotContainer {
             Commands.runOnce(() -> shooter.setBallVelocity(() -> MetersPerSecond.of(6.80873631)).schedule()),
             new LoadBalls(arm, shooter, indexer, intake).raceWith(Commands.waitSeconds(10.)),
             Commands.runOnce(() -> shooter.set(0.).schedule())));
-    NamedCommands.registerCommand("Climb Up", climb.setAngularPosition(ClimbConstants.UP_ANGLE));
-    NamedCommands.registerCommand("Climb Down", climb.setAngularPosition(ClimbConstants.DOWN_ANGLE));
+    NamedCommands.registerCommand("Climb Up", Commands.runOnce(() -> System.out.println("no climb rn")));
+    NamedCommands.registerCommand("Climb Down", Commands.runOnce(() -> System.out.println("no climb rn")));
 
     // Have the autoChooser pull in all PathPlanner autos as options
     autoChooser = AutoBuilder.buildAutoChooser();
@@ -336,9 +336,9 @@ public class RobotContainer {
     operator.b().whileTrue(shooter.useManualSpeed());
 
     // Climb
-    operator.y().whileTrue(climb.set(ClimbConstants.SLOW_DUTYCYCLE)).onFalse(climb.set(0.));
-    operator.a().whileTrue(climb.set(-ClimbConstants.SLOW_DUTYCYCLE)).onFalse(climb.set(0.));
-    operator.povUp().whileTrue(climb.set(1.0)).onFalse(climb.set(0.));
+    // operator.y().whileTrue(climb.set(ClimbConstants.SLOW_DUTYCYCLE)).onFalse(climb.set(0.));
+    // operator.a().whileTrue(climb.set(-ClimbConstants.SLOW_DUTYCYCLE)).onFalse(climb.set(0.));
+    // operator.povUp().whileTrue(climb.set(1.0)).onFalse(climb.set(0.));
 
     // Utils
     operator.povRight().whileTrue(indexer.set(-0.5).alongWith(shooter.set(-0.3)));
