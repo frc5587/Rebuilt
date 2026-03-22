@@ -130,6 +130,8 @@ public class RobotContainer {
     NamedCommands.registerCommand("Shoot Preload",
         new SequentialCommandGroup(
             Commands.runOnce(() -> shooter.setBallVelocity(() -> MetersPerSecond.of(6.80873631)).schedule()),
+            Commands.waitUntil(() -> shooter.atGoal()).raceWith(Commands.waitSeconds(ShooterConstants.SPIN_UP_TIME)),
+            Commands.waitSeconds(ShooterConstants.SPIN_UP_DELAY),
             new LoadBalls(arm, shooter, indexer, intake).raceWith(Commands.waitSeconds(5.)),
             Commands.runOnce(() -> indexer.set(0.).schedule()),
             Commands.runOnce(() -> shooter.set(0.).schedule())));
