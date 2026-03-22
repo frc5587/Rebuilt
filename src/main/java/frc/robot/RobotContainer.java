@@ -264,7 +264,8 @@ public class RobotContainer {
                 .withVelocityY(-driver.getLeftX() * DrivebaseConstants.MAX_SPEED)
                 .withTargetDirection(Rotation2d.kZero))
         .alongWith(arm.setAngle(ArmConstants.BOTTOM_ANGLE).until(() -> !(arm.getAngle().in(Degrees) > ArmConstants.BOTTOM_ANGLE.in(Degrees) + 20))
-        .andThen(arm.set(-.3))));
+        .andThen(arm.set(-.3))))
+        .onFalse(arm.set(0.));
     // driverController.a().whileTrue(arm.setAngle(ArmConstants.BOTTOM_ANGLE)
     // .alongWith(intake.set(IntakeConstants.DUTY_CYCLE))
     // .alongWith(drivebase.applyRequest(() -> {
