@@ -99,7 +99,7 @@ public final class Constants {
           .withUpperSoftLimit(RPM.of(5000))
           .withTelemetry("Shooter", TelemetryVerbosity.HIGH);
     };
-    public static final double SPIN_UP_DELAY = 0.25;
+    public static final double SPIN_UP_DELAY = 0.5;
 
     // Aiming math
     public static final double PITCH = 1.13446;
