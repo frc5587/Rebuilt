@@ -14,9 +14,7 @@ import static edu.wpi.first.units.Units.Volts;
 
 import java.util.function.Supplier;
 
-import com.revrobotics.spark.SparkLowLevel.MotorType;
-import com.revrobotics.spark.SparkMax;
-
+import com.ctre.phoenix6.hardware.TalonFX;
 import edu.wpi.first.math.geometry.Pose3d;
 import edu.wpi.first.math.interpolation.InterpolatingDoubleTreeMap;
 import edu.wpi.first.math.system.plant.DCMotor;
@@ -33,13 +31,14 @@ import yams.mechanisms.config.FlyWheelConfig;
 import yams.mechanisms.velocity.FlyWheel;
 import yams.motorcontrollers.SmartMotorController;
 import yams.motorcontrollers.SmartMotorControllerConfig;
-import yams.motorcontrollers.local.SparkWrapper;
+import yams.motorcontrollers.remote.TalonFXWrapper;
 
 
 public class ShooterSubsystem extends SubsystemBase {
   private SmartMotorControllerConfig smcConfig = ShooterConstants.APPLY_SMC_CONFIG.apply(new SmartMotorControllerConfig(this));
-  private SparkMax spark = new SparkMax(ShooterConstants.MOTOR_ID, MotorType.kBrushless);
-  private SmartMotorController sparkSmartMotorController = new SparkWrapper(spark, DCMotor.getNEO(1), smcConfig);
+  private TalonFX kraken = new TalonFX(ShooterConstants.MOTOR_ID);
+
+  private SmartMotorController sparkSmartMotorController = new TalonFXWrapper(kraken, DCMotor.getKrakenX60(1), smcConfig);
   private final FlyWheelConfig shooterConfig = ShooterConstants.APPLY_FLYWHEEL_CONFIG.apply(new FlyWheelConfig(sparkSmartMotorController));
   private FlyWheel shooter = new FlyWheel(shooterConfig);
   private StructArrayPublisher<Pose3d> fuelPosePublisher = NetworkTableInstance.getDefault()
