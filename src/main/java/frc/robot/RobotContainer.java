@@ -64,7 +64,7 @@ public class RobotContainer {
   private final CommandXboxController operator = new CommandXboxController(1);
   
   private final ShooterSubsystem shooter = new ShooterSubsystem();
-  private final SwerveSubsystem drivebase = TunerConstants.createDrivetrain();
+  private final SwerveSubsystem swerve = TunerConstants.createDrivetrain();
   private final ArmSubsystem arm = new ArmSubsystem((rumbleMagnitude) -> {
             driver.getHID().setRumble(RumbleType.kBothRumble, rumbleMagnitude);
             operator.getHID().setRumble(RumbleType.kBothRumble, rumbleMagnitude);});
@@ -84,17 +84,17 @@ public class RobotContainer {
   private final SwerveRequest.SwerveDriveBrake brake = new SwerveRequest.SwerveDriveBrake();
   private AimTowardsGoal aimingCommand = null;
   Supplier<Vector3> position = () -> {
-    Pose2d position = drivebase.getState().Pose;
+    Pose2d position = swerve.getState().Pose;
     return new Vector3(position.getX(), position.getY(), 0);
   };
-  DoubleSupplier heading = () -> drivebase.getState().RawHeading.getRadians();
+  DoubleSupplier heading = () -> swerve.getState().RawHeading.getRadians();
   Supplier<Vector3> velocity = () -> {
-    ChassisSpeeds velocity = drivebase.getState().Speeds;
-    velocity = ChassisSpeeds.fromRobotRelativeSpeeds(velocity, drivebase.getState().Pose.getRotation());
+    ChassisSpeeds velocity = swerve.getState().Speeds;
+    velocity = ChassisSpeeds.fromRobotRelativeSpeeds(velocity, swerve.getState().Pose.getRotation());
     Vector3 input = new Vector3(velocity.vxMetersPerSecond, velocity.vyMetersPerSecond, 0);
     return input;
   };
-  DoubleSupplier angularVelocity = () -> drivebase.getState().Speeds.omegaRadiansPerSecond;
+  DoubleSupplier angularVelocity = () -> swerve.getState().Speeds.omegaRadiansPerSecond;
   Supplier<Vector3> inputVelocity = () -> Vector3.getOrigin();
   DoubleSupplier inputAngularVelocity = () -> 0.;
 
@@ -107,7 +107,6 @@ public class RobotContainer {
   /**
    * The container for the robot. Contains subsystems, OI devices, and commands.
    */
-  @SuppressWarnings("removal")
   public RobotContainer() {
     // PLEASE DON'T SET DEFAULT COMMANDS UP HERE!! USE TELEOPINIT() AT BOTTOM OF
     // FILE
@@ -181,7 +180,7 @@ public class RobotContainer {
      * 
      * X: Shoot while moving swerve
      * Y: Point forward and arm down (for trench)
-     * A: Point in drive direction and intake (for intaking)
+     * A: 45deg swerve angle for bump
      * Left Bumper: Alternate shoot on the move control
      * 
      * Operator Controls
@@ -207,16 +206,16 @@ public class RobotContainer {
     // Driver
 
     // Zero Gyro
-    driver.start().onTrue((Commands.runOnce(drivebase::seedFieldCentric))
+    driver.start().onTrue((Commands.runOnce(swerve::seedFieldCentric))
         .alongWith(Commands.runOnce(() -> {
           lastHeading = Rotation2d.fromDegrees(0.);
         })));
     // Zero Odometry
     driver.back().onTrue(Commands.runOnce(() -> {
       if (DriverStation.getAlliance().get() == Alliance.Blue) {
-        drivebase.resetPose(DrivebaseConstants.BLUE_ALLIANCE_MIDDLE_HUB);
+        swerve.resetPose(DrivebaseConstants.BLUE_ALLIANCE_MIDDLE_HUB);
       } else if (DriverStation.getAlliance().get() == Alliance.Red) {
-        drivebase.resetPose(DrivebaseConstants.RED_ALLIANCE_MIDDLE_HUB);
+        swerve.resetPose(DrivebaseConstants.RED_ALLIANCE_MIDDLE_HUB);
       }
     }));
 
@@ -244,7 +243,7 @@ public class RobotContainer {
       aimingCommand = new AimTowardsGoal(() -> {
         Vector3 goalVector = Vector3
             .normalize(Vector3.subtract(ShooterConstants.getGoal(DriverStation.getAlliance().get()),
-                new Vector3(drivebase.getState().Pose.getX(), drivebase.getState().Pose.getY(), 0)).get2D());
+                new Vector3(swerve.getState().Pose.getX(), swerve.getState().Pose.getY(), 0)).get2D());
         double goalAngle = Vector3.getCounterclockwiseAngle(goalVector);
         Vector3 input = new Vector3(driver.getLeftY() * DrivebaseConstants.SHOOT_WHILE_MOVING_SPEED,
             driver.getLeftX() * DrivebaseConstants.SHOOT_WHILE_MOVING_SPEED, 0);
@@ -255,15 +254,15 @@ public class RobotContainer {
         return input;
       },
           shooter,
-          drivebase,
+          swerve,
           ShooterConstants.getGoal(DriverStation.getAlliance().get()));
       CommandScheduler.getInstance().schedule(aimingCommand);
     }))
         .onFalse(Commands.runOnce(() -> aimingCommand.cancel())
             .alongWith(Commands.runOnce(() -> {
-              lastHeading = drivebase.getState().Pose.getRotation();
+              lastHeading = swerve.getState().Pose.getRotation();
             })));
-    driver.y().whileTrue(drivebase.applyRequest(
+    driver.y().whileTrue(swerve.applyRequest(
             () -> driveFacingAngle.withVelocityX(-driver.getLeftY() * DrivebaseConstants.MAX_SPEED)
                 .withVelocityY(-driver.getLeftX() * DrivebaseConstants.MAX_SPEED)
                 .withTargetDirection(Rotation2d.kZero))
@@ -286,7 +285,7 @@ public class RobotContainer {
     // (left)
     // })));
     driver.a().whileTrue(arm.setAngle(ArmConstants.TOP_ANGLE)
-        .alongWith(drivebase.applyRequest(
+        .alongWith(swerve.applyRequest(
             () -> driveFacingAngle.withVelocityX(-driver.getLeftY() * DrivebaseConstants.MAX_SPEED) // Drive
                                                                                                               // forward
                                                                                                               // with
@@ -346,7 +345,7 @@ public class RobotContainer {
     // Utils
     operator.povRight().whileTrue(indexer.set(-0.5).alongWith(shooter.set(-0.3)));
     operator.povLeft().whileTrue(intake.set(-1.));
-    operator.povLeft().whileTrue(arm.set(1.))
+    operator.povUp().whileTrue(arm.set(1.))
       .onFalse(arm.setAngle(arm.getLastSetpoint()));
     // operatorController.povDown().whileTrue(Commands.runOnce(() -> arm.setAngularVelocity(ArmConstants.ARM_VELOCITY_WIGGLE)))
     //     .onFalse(Commands.runOnce(() -> arm.setAngularVelocity(RotationsPerSecond.of(0))));
@@ -372,7 +371,7 @@ public class RobotContainer {
 
   public void setMotorBrake(boolean isBrake) {
     if (isBrake) {
-      drivebase.applyRequest(() -> brake);
+      swerve.applyRequest(() -> brake);
     }
   }
 
@@ -381,9 +380,9 @@ public class RobotContainer {
     shooter.setDefaultCommand(shooter.set(ShooterConstants.IDLE_DUTYCYCLE));
     indexer.setDefaultCommand(indexer.stop());
     intake.setDefaultCommand(intake.stop());
-    lastHeading = drivebase.getState().Pose.getRotation();
+    lastHeading = swerve.getState().Pose.getRotation();
     // Swerve
-    drivebase.setDefaultCommand(drivebase.applyRequest(() -> {
+    swerve.setDefaultCommand(swerve.applyRequest(() -> {
       if (Math.hypot(driver.getRightX(),
           driver.getRightY()) > DrivebaseConstants.HEADING_DEADBAND) {
         lastHeading = new Rotation2d(-driver.getRightY(), -driver.getRightX());
