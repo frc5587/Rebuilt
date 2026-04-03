@@ -143,7 +143,7 @@ public final class Constants {
           .withFeedforward(new ArmFeedforward(0, 0.6, 0))
           .withSimFeedforward(new ArmFeedforward(0, 0, 0))
           .withTelemetry("ArmMotor", TelemetryVerbosity.HIGH)
-          .withGearing(new MechanismGearing(GearBox.fromReductionStages(5., 32. / 18.)))
+          .withGearing(new MechanismGearing(GearBox.fromReductionStages(25., 32. / 18.)))
           .withMotorInverted(false)
           .withIdleMode(MotorMode.BRAKE)
           .withSupplyCurrentLimit(Amps.of(40))
@@ -161,8 +161,8 @@ public final class Constants {
   public static class IntakeConstants {
     public static final double DUTY_CYCLE = 1.;
     public static final int MOTOR_ID = 22;
-    public static final double SUPPLY_CURRENT_LIMIT = 20.0;
-    public static final double STATOR_CURRENT_LIMIT = 30.0;
+    public static final double SUPPLY_CURRENT_LIMIT = 40.0;
+    public static final double STATOR_CURRENT_LIMIT = 80.0;
     public static final UnaryOperator<SmartMotorControllerConfig> APPLY_SMC_CONFIG = (
         SmartMotorControllerConfig config) -> {
       return config.withControlMode(ControlMode.OPEN_LOOP)
