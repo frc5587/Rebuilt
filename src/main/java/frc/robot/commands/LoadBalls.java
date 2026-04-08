@@ -35,25 +35,31 @@ public class LoadBalls extends Command {
     // }
 
     scheduler.schedule(intake.set(1.));
-    // DOWN
-    if (lastAngleSwitchTimestamp > Timer.getFPGATimestamp()-ArmConstants.WIGGLE_TIME_DOWN  &&  !isGoingUp) {
-      scheduler.schedule(arm.setAngle(ArmConstants.WIGGLE_ANGLE_DOWN));
-    }
-    // UP
-    else if (lastAngleSwitchTimestamp > Timer.getFPGATimestamp()-ArmConstants.WIGGLE_TIME_UP) {
-      scheduler.schedule(arm.setAngle(ArmConstants.WIGGLE_ANGLE_UP));
-    }
-    else {
-      isGoingUp = !isGoingUp;
-      lastAngleSwitchTimestamp = Timer.getFPGATimestamp();
+    if (arm != null) {
+      // DOWN
+      if (lastAngleSwitchTimestamp > Timer.getFPGATimestamp()-ArmConstants.WIGGLE_TIME_DOWN  &&  !isGoingUp) {
+        scheduler.schedule(arm.setAngle(ArmConstants.WIGGLE_ANGLE_DOWN));
+      }
+        // UP
+      else if (lastAngleSwitchTimestamp > Timer.getFPGATimestamp()-ArmConstants.WIGGLE_TIME_UP) {
+        scheduler.schedule(arm.setAngle(ArmConstants.WIGGLE_ANGLE_UP));
+      }
+      else {
+        isGoingUp = !isGoingUp;
+        lastAngleSwitchTimestamp = Timer.getFPGATimestamp();
+      }
     }
 
     if (shooter.atGoal().getAsBoolean()) {
-      scheduler.schedule(indexer.set(IndexerConstants.DUTY_CYCLE));
+      if (indexer != null) {
+        scheduler.schedule(indexer.set(IndexerConstants.DUTY_CYCLE));
+      }
       shooter.startIndexing();
     }
     else {
-      scheduler.schedule(indexer.set(0));
+      if (indexer != null) {
+        scheduler.schedule(indexer.set(0));
+      }
       shooter.stopIndexing();
     }
   }
@@ -67,3 +73,4 @@ public class LoadBalls extends Command {
     scheduler.cancel(shooter.getCurrentCommand());
   }
 }
+
