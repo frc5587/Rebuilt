@@ -38,7 +38,7 @@ import yams.motorcontrollers.remote.TalonFXWrapper;
 
 public class ShooterSubsystem extends SubsystemBase {
   private SmartMotorControllerConfig smcConfig = ShooterConstants.APPLY_SMC_CONFIG.apply(new SmartMotorControllerConfig(this));
-  private TalonFX kraken = new TalonFX(ShooterConstants.MOTOR_ID);
+  private TalonFX kraken = new TalonFX(ShooterConstants.MOTOR_ID, "canivore");
 
   private SmartMotorController smartMotorController = new TalonFXWrapper(kraken, DCMotor.getKrakenX60(1), smcConfig);
   private final FlyWheelConfig shooterConfig = ShooterConstants.APPLY_FLYWHEEL_CONFIG.apply(new FlyWheelConfig(smartMotorController));
