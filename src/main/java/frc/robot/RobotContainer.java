@@ -261,13 +261,13 @@ public class RobotContainer {
             .alongWith(Commands.runOnce(() -> {
               lastHeading = swerve.getState().Pose.getRotation();
             })));
-    driver.y().whileTrue(swerve.applyRequest(
-            () -> driveFacingAngle.withVelocityX(-driver.getLeftY() * DrivebaseConstants.MAX_SPEED)
-                .withVelocityY(-driver.getLeftX() * DrivebaseConstants.MAX_SPEED)
-                .withTargetDirection(Rotation2d.kZero))
+    driver.y().whileTrue(Commands.run(() -> lastHeading = Rotation2d.fromDegrees(Math.round(lastHeading.getDegrees()/180.)*180.))
         .alongWith(arm.setAngle(ArmConstants.BOTTOM_ANGLE).until(() -> !(arm.getAngle().in(Degrees) > ArmConstants.BOTTOM_ANGLE.in(Degrees) + 20))
         .andThen(arm.set(-.3))))
-        .onFalse(arm.set(0.));
+              .onFalse(arm.set(0.)
+                       .alongWith(Commands.runOnce(() -> {
+                           lastHeading = swerve.getState().Pose.getRotation();
+                       })));
     /*driverController.a().whileTrue(arm.setAngle(ArmConstants.BOTTOM_ANGLE)
     .alongWith(intake.set(IntakeConstants.DUTY_CYCLE))
     .alongWith(drivebase.applyRequest(() -> {
@@ -285,15 +285,10 @@ public class RobotContainer {
     })));
     */
     driver.a().whileTrue(arm.setAngle(ArmConstants.TOP_ANGLE)
-        .alongWith(swerve.applyRequest(
-            () -> driveFacingAngle.withVelocityX(-driver.getLeftY() * DrivebaseConstants.MAX_SPEED) // Drive
-                                                                                                              // forward
-                                                                                                              // with
-                                                                                                              // negative
-                                                                                                              // Y
-                                                                                                              // (forward)
-                .withVelocityY(-driver.getLeftX() * DrivebaseConstants.MAX_SPEED)
-                .withTargetDirection(Rotation2d.fromDegrees(45.)))));
+        .alongWith(Commands.run(() -> lastHeading = Rotation2d.fromDegrees(Math.round((lastHeading.getDegrees()+45.)/90.)*90.-45.))))
+              .onFalse(Commands.runOnce(() -> {
+                  lastHeading = swerve.getState().Pose.getRotation();
+              }));
     /*driver.leftBumper().onTrue(Commands.runOnce(() -> {
       if (aimingCommand != null && aimingCommand.isScheduled()) {
         aimingCommand.cancel();
@@ -351,12 +346,13 @@ public class RobotContainer {
     operator.povDown().whileTrue(intake.set(-1.));
 
     // Misc overrides
-    operator.back().whileTrue(new LoadBalls(arm, shooter, indexer, intake)); // TODO pass in null for the indexer
-    operator.start().whileTrue(new LoadBalls(arm, shooter, indexer, intake)); // TODO pass in null for the arm
+    operator.back().whileTrue(new LoadBalls(arm, shooter, null, intake)); // TODO pass in null for the indexer
+    operator.start().whileTrue(new LoadBalls(null, shooter, indexer, intake)); // TODO pass in null for the arm
 
     /* Climb
     operator.y().whileTrue(climb.set(ClimbConstants.SLOW_DUTYCYCLE)).onFalse(climb.set(0.));
-    operator.a().whileTrue(climb.set(-ClimbConstants.SLOW_DUTYCYCLE)).onFalse(climb.set(0.));
+    operator.a().whileTrue(climb.set(-ClimbConstants.SLOW_DUTYCYCLE)).o
+    nFalse(climb.set(0.));
     operator.povUp().whileTrue(climb.set(1.0)).onFalse(climb.set(0.));
     */
 
@@ -417,3 +413,5 @@ public class RobotContainer {
       } else {return false;}
     }
 }
+
+
