@@ -7,8 +7,11 @@ import static edu.wpi.first.units.Units.Volts;
 
 import java.util.function.DoubleConsumer;
 
+import com.revrobotics.PersistMode;
+import com.revrobotics.ResetMode;
 import com.revrobotics.spark.SparkMax;
 import com.revrobotics.spark.SparkLowLevel.MotorType;
+import com.revrobotics.spark.config.SparkBaseConfig;
 
 import edu.wpi.first.math.system.plant.DCMotor;
 import edu.wpi.first.units.measure.Angle;
@@ -23,6 +26,7 @@ import yams.mechanisms.config.ArmConfig;
 import yams.mechanisms.positional.Arm;
 import yams.motorcontrollers.SmartMotorController;
 import yams.motorcontrollers.SmartMotorControllerConfig;
+import yams.motorcontrollers.SmartMotorControllerConfig.MotorMode;
 import yams.motorcontrollers.local.SparkWrapper;
 
 public class ArmSubsystem extends SubsystemBase {
@@ -36,13 +40,14 @@ public class ArmSubsystem extends SubsystemBase {
   private SmartMotorController lSparkSmartMotorController = new SparkWrapper(leftSpark, DCMotor.getNEO(1),
       leftSMCConfig);
   private SmartMotorController rSparkSmartMotorController = new SparkWrapper(rightSpark, DCMotor.getNEO(1),
-      rightSMCConfig.withMotorInverted(true)
+      rightSMCConfig.withMotorInverted(false)
                     .withLooselyCoupledFollowers(lSparkSmartMotorController));
 
   private ArmConfig rightArmConfig = ArmConstants.APPLY_ARM_CONFIG.apply(new ArmConfig(rSparkSmartMotorController));
   private ArmConfig leftArmCfg = ArmConstants.APPLY_ARM_CONFIG.apply(new ArmConfig(lSparkSmartMotorController));
   private Arm arm = new Arm(rightArmConfig);
   private final DoubleConsumer rumbleConsumer;
+  private boolean brakeModeEnabled = true;
 
   private Angle lastAngle = ArmConstants.BOTTOM_ANGLE;
 
@@ -54,6 +59,7 @@ public class ArmSubsystem extends SubsystemBase {
     SmartDashboard.putBoolean("bottom arm resetencoders", false);
     SmartDashboard.putNumber("Left Arm Temp", (leftSpark.getMotorTemperature()*(9/5)+32));
     SmartDashboard.putNumber("Right Arm Temp", (rightSpark.getMotorTemperature()*(9/5)+32));
+    SmartDashboard.putBoolean("Toggle Brake Mode", false);
   }
 
   /**
@@ -151,6 +157,27 @@ public class ArmSubsystem extends SubsystemBase {
     if ((leftSpark.getMotorTemperature() >= 85) || (rightSpark.getMotorTemperature() >= 85)) { //TODO test
         rumbleConsumer.accept(1.);
     } else {rumbleConsumer.accept(0.);}
+
+    if (SmartDashboard.getBoolean("Toggle Brake Mode", false)) {
+      if (leftSMCConfig.getIdleMode().orElse(null) == MotorMode.BRAKE) {
+        brakeModeEnabled = true;
+      }
+      else {
+        brakeModeEnabled = false;
+      }
+
+      if (brakeModeEnabled) {
+        leftSpark.configure((SparkBaseConfig)leftSMCConfig.withIdleMode(MotorMode.BRAKE).getVendorConfig().orElse(null), ResetMode.kNoResetSafeParameters, PersistMode.kNoPersistParameters);
+        rightSpark.configure((SparkBaseConfig)rightSMCConfig.withIdleMode(MotorMode.BRAKE).getVendorConfig().orElse(null), ResetMode.kNoResetSafeParameters, PersistMode.kNoPersistParameters);
+      } 
+      else {
+        leftSpark.configure((SparkBaseConfig)leftSMCConfig.withIdleMode(MotorMode.COAST).getVendorConfig().orElse(null), ResetMode.kNoResetSafeParameters, PersistMode.kNoPersistParameters);
+        rightSpark.configure((SparkBaseConfig)rightSMCConfig.withIdleMode(MotorMode.COAST).getVendorConfig().orElse(null), ResetMode.kNoResetSafeParameters, PersistMode.kNoPersistParameters);
+     }
+    }
+    SmartDashboard.putBoolean("Toggle Brake Mode", false);
+
+    SmartDashboard.putBoolean("Arm Brake Mode Enabled?", brakeModeEnabled);
   }
 
   @Override

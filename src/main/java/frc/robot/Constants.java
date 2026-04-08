@@ -33,6 +33,7 @@ import yams.gearing.MechanismGearing;
 import yams.mechanisms.config.ArmConfig;
 import yams.mechanisms.config.FlyWheelConfig;
 import yams.motorcontrollers.SmartMotorControllerConfig;
+import yams.motorcontrollers.SmartMotorController.ClosedLoopControllerSlot;
 import yams.motorcontrollers.SmartMotorControllerConfig.ControlMode;
 import yams.motorcontrollers.SmartMotorControllerConfig.MotorMode;
 import yams.motorcontrollers.SmartMotorControllerConfig.TelemetryVerbosity;
@@ -82,8 +83,10 @@ public final class Constants {
     public static final UnaryOperator<SmartMotorControllerConfig> APPLY_SMC_CONFIG = (
         SmartMotorControllerConfig config) -> {
       return config.withControlMode(ControlMode.CLOSED_LOOP)
-          .withClosedLoopController(0.08, 0., 0.3)
-          .withSimClosedLoopController(1., 0., 0.)
+          .withClosedLoopController(0.02, 0., 0.3, ClosedLoopControllerSlot.SLOT_0)
+          .withSimClosedLoopController(1., 0., 0., ClosedLoopControllerSlot.SLOT_0)
+          .withClosedLoopController(0.1, 0., 0.3, ClosedLoopControllerSlot.SLOT_1)
+          .withSimClosedLoopController(10000., 0., 0., ClosedLoopControllerSlot.SLOT_1)
           .withFeedforward(new SimpleMotorFeedforward(0, 0.127, 0))
           .withSimFeedforward(new SimpleMotorFeedforward(0, 0, 0))
           .withTelemetry("ShooterMotor", TelemetryVerbosity.HIGH)
@@ -144,7 +147,7 @@ public final class Constants {
           .withSimFeedforward(new ArmFeedforward(0, 0, 0))
           .withTelemetry("ArmMotor", TelemetryVerbosity.HIGH)
           .withGearing(new MechanismGearing(GearBox.fromReductionStages(25., 32. / 18.)))
-          .withMotorInverted(false)
+          .withMotorInverted(true)
           .withIdleMode(MotorMode.BRAKE)
           .withSupplyCurrentLimit(Amps.of(40))
           .withStatorCurrentLimit(Amps.of(80));
@@ -191,8 +194,8 @@ public final class Constants {
           .withGearing(new MechanismGearing(GearBox.fromReductionStages(5)))
           .withMotorInverted(false)
           .withIdleMode(MotorMode.COAST)
-          .withSupplyCurrentLimit(Amps.of(20))
-          .withStatorCurrentLimit(Amps.of(30));
+          .withSupplyCurrentLimit(Amps.of(40))
+          .withStatorCurrentLimit(Amps.of(120));
     };
     public static final UnaryOperator<FlyWheelConfig> APPLY_INDEXER_CONFIG = (FlyWheelConfig config) -> {
       return config.withDiameter(Inches.of(1))

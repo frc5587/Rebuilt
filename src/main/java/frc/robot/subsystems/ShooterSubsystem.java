@@ -25,12 +25,14 @@ import edu.wpi.first.units.measure.LinearVelocity;
 import edu.wpi.first.wpilibj.smartdashboard.SmartDashboard;
 import edu.wpi.first.wpilibj2.command.Command;
 import edu.wpi.first.wpilibj2.command.SubsystemBase;
+import edu.wpi.first.wpilibj2.command.button.Trigger;
 import frc.robot.Constants.ShooterConstants;
 import swervelib.simulation.ironmaple.simulation.SimulatedArena;
 import yams.mechanisms.config.FlyWheelConfig;
 import yams.mechanisms.velocity.FlyWheel;
 import yams.motorcontrollers.SmartMotorController;
 import yams.motorcontrollers.SmartMotorControllerConfig;
+import yams.motorcontrollers.SmartMotorController.ClosedLoopControllerSlot;
 import yams.motorcontrollers.remote.TalonFXWrapper;
 
 
@@ -38,8 +40,8 @@ public class ShooterSubsystem extends SubsystemBase {
   private SmartMotorControllerConfig smcConfig = ShooterConstants.APPLY_SMC_CONFIG.apply(new SmartMotorControllerConfig(this));
   private TalonFX kraken = new TalonFX(ShooterConstants.MOTOR_ID);
 
-  private SmartMotorController sparkSmartMotorController = new TalonFXWrapper(kraken, DCMotor.getKrakenX60(1), smcConfig);
-  private final FlyWheelConfig shooterConfig = ShooterConstants.APPLY_FLYWHEEL_CONFIG.apply(new FlyWheelConfig(sparkSmartMotorController));
+  private SmartMotorController smartMotorController = new TalonFXWrapper(kraken, DCMotor.getKrakenX60(1), smcConfig);
+  private final FlyWheelConfig shooterConfig = ShooterConstants.APPLY_FLYWHEEL_CONFIG.apply(new FlyWheelConfig(smartMotorController));
   private FlyWheel shooter = new FlyWheel(shooterConfig);
   private StructArrayPublisher<Pose3d> fuelPosePublisher = NetworkTableInstance.getDefault()
     .getStructArrayTopic("Fuel", Pose3d.struct)
@@ -119,15 +121,23 @@ public class ShooterSubsystem extends SubsystemBase {
     return shooter.sysId(Volts.of(7), Volts.of(2).per(Second), Seconds.of(4));
   }
 
+  public void startIndexing() {
+    smartMotorController.setClosedLoopSlot(ClosedLoopControllerSlot.SLOT_1);
+  }
+
+  public void stopIndexing() {
+    smartMotorController.setClosedLoopSlot(ClosedLoopControllerSlot.SLOT_0);
+  }
+
   @Override
   public void periodic() {
     // This method will be called once per scheduler run
     shooter.updateTelemetry();
-    SmartDashboard.putNumber("flywheel velocity", sparkSmartMotorController.getMechanismVelocity().in(RPM));
-    if (sparkSmartMotorController.getMechanismSetpointVelocity().isPresent()) {
-      SmartDashboard.putNumber("flywheel setpoint", sparkSmartMotorController.getMechanismSetpointVelocity().get().in(RPM));
+    SmartDashboard.putNumber("flywheel velocity", smartMotorController.getMechanismVelocity().in(RPM));
+    if (smartMotorController.getMechanismSetpointVelocity().isPresent()) {
+      SmartDashboard.putNumber("flywheel setpoint", smartMotorController.getMechanismSetpointVelocity().get().in(RPM));
     }
-    SmartDashboard.putNumber("flywheel dutycycle", sparkSmartMotorController.getDutyCycle());
+    SmartDashboard.putNumber("flywheel dutycycle", smartMotorController.getDutyCycle());
     SmartDashboard.putNumber("Shooter Temp", shooter.getMotor().getTemperature().in(Celsius));
   }
 
@@ -141,7 +151,7 @@ public class ShooterSubsystem extends SubsystemBase {
     fuelPosePublisher.accept(fuelPoses);
   }
 
-  public boolean atGoal() {
-    return ((sparkSmartMotorController.getMechanismSetpointVelocity().orElse(RPM.of(0.)).in(RPM)*0.95) <= sparkSmartMotorController.getMechanismVelocity().in(RPM));
+  public Trigger atGoal() {
+    return new Trigger(() -> ((smartMotorController.getMechanismSetpointVelocity().orElse(RPM.of(0.)).in(RPM)*0.95) <= smartMotorController.getMechanismVelocity().in(RPM)));
   }
 }

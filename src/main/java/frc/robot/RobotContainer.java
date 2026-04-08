@@ -12,7 +12,6 @@ import java.util.function.Supplier;
 import com.ctre.phoenix6.swerve.SwerveModule.DriveRequestType;
 
 import frc.robot.Constants.ArmConstants;
-import frc.robot.Constants.ClimbConstants;
 import frc.robot.Constants.DrivebaseConstants;
 import frc.robot.Constants.IndexerConstants;
 import frc.robot.Constants.IntakeConstants;
@@ -23,7 +22,6 @@ import frc.robot.math.Vector3;
 import frc.robot.subsystems.ShooterSubsystem;
 import frc.robot.subsystems.SwerveSubsystem;
 import frc.robot.subsystems.ArmSubsystem;
-import frc.robot.subsystems.ClimbSubsystem;
 import frc.robot.subsystems.IndexerSubsystem;
 import frc.robot.subsystems.IntakeSubsystem;
 import frc.robot.subsystems.LEDController;
@@ -129,7 +127,7 @@ public class RobotContainer {
     NamedCommands.registerCommand("Shoot Preload",
         new SequentialCommandGroup(
             Commands.runOnce(() -> shooter.setBallVelocity(() -> MetersPerSecond.of(6.80873631)).schedule()),
-            Commands.waitUntil(() -> shooter.atGoal()).raceWith(Commands.waitSeconds(ShooterConstants.SPIN_UP_TIME)),
+            Commands.waitUntil(() -> shooter.atGoal().getAsBoolean()).raceWith(Commands.waitSeconds(ShooterConstants.SPIN_UP_TIME)),
             Commands.waitSeconds(ShooterConstants.SPIN_UP_DELAY),
             new LoadBalls(arm, shooter, indexer, intake).raceWith(Commands.waitSeconds(5.)),
             Commands.runOnce(() -> indexer.set(0.).schedule()),
@@ -138,7 +136,7 @@ public class RobotContainer {
     NamedCommands.registerCommand("Shoot Hopper",
         new SequentialCommandGroup(
             Commands.runOnce(() -> shooter.setBallVelocity(() -> MetersPerSecond.of(6.80873631)).schedule()),
-            Commands.waitUntil(() -> shooter.atGoal()).raceWith(Commands.waitSeconds(ShooterConstants.SPIN_UP_TIME)),
+            Commands.waitUntil(() -> shooter.atGoal().getAsBoolean()).raceWith(Commands.waitSeconds(ShooterConstants.SPIN_UP_TIME)),
             Commands.waitSeconds(ShooterConstants.SPIN_UP_DELAY),
             new LoadBalls(arm, shooter, indexer, intake).raceWith(Commands.waitSeconds(10.)),
             Commands.runOnce(() -> indexer.set(0.).schedule()),
@@ -230,6 +228,7 @@ public class RobotContainer {
     //     aimingCommand.getMath().resetSim();
     //   }
     // }));
+    
     driver.rightTrigger().whileTrue(shooter.useManualSpeed());
     driver.rightBumper().whileTrue(shooter.setAngularVelocity(() -> RPM.of(3200)));
     driver.leftTrigger().whileTrue(shooter.setAngularVelocity(() -> RPM.of(2900)));
@@ -269,21 +268,22 @@ public class RobotContainer {
         .alongWith(arm.setAngle(ArmConstants.BOTTOM_ANGLE).until(() -> !(arm.getAngle().in(Degrees) > ArmConstants.BOTTOM_ANGLE.in(Degrees) + 20))
         .andThen(arm.set(-.3))))
         .onFalse(arm.set(0.));
-    // driverController.a().whileTrue(arm.setAngle(ArmConstants.BOTTOM_ANGLE)
-    // .alongWith(intake.set(IntakeConstants.DUTY_CYCLE))
-    // .alongWith(drivebase.applyRequest(() -> {
-    // if (Math.hypot(driverController.getLeftY(), driverController.getLeftX()) >
-    // DrivebaseConstants.INTAKE_HEADING_DEADBAND) {
-    // lastHeading = new Rotation2d(-driverController.getLeftY(),
-    // -driverController.getLeftX());
-    // }
-    // return driveFacingAngle.withVelocityX(-driverController.getLeftY() *
-    // DrivebaseConstants.MAX_SPEED) // Drive forward with negative Y (forward)
-    // .withVelocityY(-driverController.getLeftX() * DrivebaseConstants.MAX_SPEED)
-    // // Drive left with negative X (left)
-    // .withTargetDirection(lastHeading); // Drive counterclockwise with negative X
-    // (left)
-    // })));
+    /*driverController.a().whileTrue(arm.setAngle(ArmConstants.BOTTOM_ANGLE)
+    .alongWith(intake.set(IntakeConstants.DUTY_CYCLE))
+    .alongWith(drivebase.applyRequest(() -> {
+    if (Math.hypot(driverController.getLeftY(), driverController.getLeftX()) >
+    DrivebaseConstants.INTAKE_HEADING_DEADBAND) {
+    lastHeading = new Rotation2d(-driverController.getLeftY(),
+    -driverController.getLeftX());
+    }
+    return driveFacingAngle.withVelocityX(-driverController.getLeftY() *
+    DrivebaseConstants.MAX_SPEED) // Drive forward with negative Y (forward)
+    .withVelocityY(-driverController.getLeftX() * DrivebaseConstants.MAX_SPEED)
+    // Drive left with negative X (left)
+    .withTargetDirection(lastHeading); // Drive counterclockwise with negative X
+    (left)
+    })));
+    */
     driver.a().whileTrue(arm.setAngle(ArmConstants.TOP_ANGLE)
         .alongWith(swerve.applyRequest(
             () -> driveFacingAngle.withVelocityX(-driver.getLeftY() * DrivebaseConstants.MAX_SPEED) // Drive
@@ -294,24 +294,26 @@ public class RobotContainer {
                                                                                                               // (forward)
                 .withVelocityY(-driver.getLeftX() * DrivebaseConstants.MAX_SPEED)
                 .withTargetDirection(Rotation2d.fromDegrees(45.)))));
-    // driver.leftBumper().onTrue(Commands.runOnce(() -> {
-    //   if (aimingCommand != null && aimingCommand.isScheduled()) {
-    //     aimingCommand.cancel();
-    //   }
-    //   aimingCommand = new AimTowardsGoal(
-    //       () -> new Vector3(-driver.getLeftY() * DrivebaseConstants.SHOOT_WHILE_MOVING_SPEED,
-    //           -driver.getLeftX() * DrivebaseConstants.SHOOT_WHILE_MOVING_SPEED, 0),
-    //       shooter,
-    //       drivebase,
-    //       ShooterConstants.getGoal(DriverStation.getAlliance().get()));
-    //   CommandScheduler.getInstance().schedule(aimingCommand);
-    // }))
-    //     .onFalse(Commands.runOnce(() -> aimingCommand.cancel()));
+    /*driver.leftBumper().onTrue(Commands.runOnce(() -> {
+      if (aimingCommand != null && aimingCommand.isScheduled()) {
+        aimingCommand.cancel();
+      }
+      aimingCommand = new AimTowardsGoal(
+          () -> new Vector3(-driver.getLeftY() * DrivebaseConstants.SHOOT_WHILE_MOVING_SPEED,
+              -driver.getLeftX() * DrivebaseConstants.SHOOT_WHILE_MOVING_SPEED, 0),
+          shooter,
+          drivebase,
+          ShooterConstants.getGoal(DriverStation.getAlliance().get()));
+      CommandScheduler.getInstance().schedule(aimingCommand);
+    }))
+        .onFalse(Commands.runOnce(() -> aimingCommand.cancel()));
+    */
 
-    // Indexer
-    // driverController.rightBumper().whileTrue(Commands.run(() ->
-    // {driverAllowIndexing = true;}))
-    // .onFalse(Commands.run(() -> {driverAllowIndexing = false;}));
+    /* Indexer
+    driverController.rightBumper().whileTrue(Commands.run(() ->
+    {driverAllowIndexing = true;}))
+    .onFalse(Commands.run(() -> {driverAllowIndexing = false;}));
+    */
 
     // Operator
 
@@ -323,41 +325,43 @@ public class RobotContainer {
         .onFalse(arm.set(0.));
     operator.leftTrigger().whileTrue(arm.setAngle(ArmConstants.TOP_ANGLE));
 
-    // Indexer
+    /* Indexer wait for shooter
     operator.rightBumper().whileTrue(Commands.runOnce(() -> {
-        if (shooter.atGoal()) {
+        if (shooter.atGoal().getAsBoolean()) {
           CommandScheduler.getInstance().schedule(indexer.set(IndexerConstants.DUTY_CYCLE));
         }}))
         .onFalse(indexer.set(0));
+    */
 
-    operator.leftBumper().whileTrue(indexer.set(IndexerConstants.DUTY_CYCLE));
+    // Shoot commands
+    operator.leftBumper().whileTrue(new LoadBalls(arm, shooter, indexer, intake));
+    operator.rightBumper().whileTrue(new LoadBalls(arm, shooter, indexer, intake));
 
-    // Silly shooter override (set this to shoot from an easy to drive to position,
-    // like in front of the hub)
-    operator.x().whileTrue(new LoadBalls(arm, shooter, indexer, intake));
-    operator.b().whileTrue(shooter.useManualSpeed());
+    // Forward overrides
+    operator.x().whileTrue(indexer.set(IndexerConstants.DUTY_CYCLE));
+    operator.y().whileTrue(shooter.useManualSpeed());
+    operator.b().whileTrue(arm.set(1.))
+                .onFalse(arm.setAngle(arm.getLastSetpoint()));
+    operator.a().whileTrue(intake.set(1.));
 
-    // Climb
-    // operator.y().whileTrue(climb.set(ClimbConstants.SLOW_DUTYCYCLE)).onFalse(climb.set(0.));
-    // operator.a().whileTrue(climb.set(-ClimbConstants.SLOW_DUTYCYCLE)).onFalse(climb.set(0.));
-    // operator.povUp().whileTrue(climb.set(1.0)).onFalse(climb.set(0.));
+    // Reverse overrides
+    operator.povLeft().whileTrue(indexer.set(-0.5));
+    operator.povUp().whileTrue(shooter.set(-0.3));
+    // operator.povRight()
+    operator.povDown().whileTrue(intake.set(-1.));
 
-    // Utils
-    operator.povRight().whileTrue(indexer.set(-0.5).alongWith(shooter.set(-0.3)));
-    operator.povLeft().whileTrue(intake.set(-1.));
-    operator.povUp().whileTrue(arm.set(1.))
-      .onFalse(arm.setAngle(arm.getLastSetpoint()));
-    // operatorController.povDown().whileTrue(Commands.runOnce(() -> arm.setAngularVelocity(ArmConstants.ARM_VELOCITY_WIGGLE)))
-    //     .onFalse(Commands.runOnce(() -> arm.setAngularVelocity(RotationsPerSecond.of(0))));
+    // Misc overrides
+    operator.back().whileTrue(new LoadBalls(arm, shooter, indexer, intake)); // TODO pass in null for the indexer
+    operator.start().whileTrue(new LoadBalls(arm, shooter, indexer, intake)); // TODO pass in null for the arm
 
-    // Reset Arm Gyro
-    operator.start().onTrue(Commands.runOnce(() -> arm.resetAngle(ArmConstants.BOTTOM_ANGLE)));
-
+    /* Climb
+    operator.y().whileTrue(climb.set(ClimbConstants.SLOW_DUTYCYCLE)).onFalse(climb.set(0.));
+    operator.a().whileTrue(climb.set(-ClimbConstants.SLOW_DUTYCYCLE)).onFalse(climb.set(0.));
+    operator.povUp().whileTrue(climb.set(1.0)).onFalse(climb.set(0.));
+    */
 
     // Triggers
-    armUp.whileTrue(shooter.stop()
-          .alongWith(indexer.stop()))
-          .onFalse(shooter.set(ShooterConstants.IDLE_DUTYCYCLE));
+    armUp.whileTrue(indexer.stop()); // TODO if we put a net back on, make it stop the shooter
   }
 
   /**
@@ -401,11 +405,11 @@ public class RobotContainer {
     }
 
     public boolean intakeIsStalling() {
-      return intake.isStalling();
+      return intake.isStalling().getAsBoolean();
     }
 
     public boolean shooterAtGoal() {
-      return shooter.atGoal();
+      return shooter.atGoal().getAsBoolean();
     }
     public boolean shooterUsingNonDefaultCommand() {
       if (shooter.getCurrentCommand() != shooter.getDefaultCommand()) {

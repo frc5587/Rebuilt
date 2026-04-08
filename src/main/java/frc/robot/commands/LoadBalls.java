@@ -1,12 +1,10 @@
 package frc.robot.commands;
 
 import edu.wpi.first.wpilibj.Timer;
-import edu.wpi.first.wpilibj.smartdashboard.SmartDashboard;
 import edu.wpi.first.wpilibj2.command.Command;
 import edu.wpi.first.wpilibj2.command.CommandScheduler;
 import frc.robot.Constants.ArmConstants;
 import frc.robot.Constants.IndexerConstants;
-import frc.robot.Constants.ShooterConstants;
 import frc.robot.subsystems.ArmSubsystem;
 import frc.robot.subsystems.IndexerSubsystem;
 import frc.robot.subsystems.IntakeSubsystem;
@@ -18,7 +16,7 @@ public class LoadBalls extends Command {
   private IndexerSubsystem indexer;
   private IntakeSubsystem intake;
 
-  private double lastTimestampNotAtGoal = Timer.getFPGATimestamp();
+  // private double lastTimestampNotAtGoal = Timer.getFPGATimestamp();
   private double lastAngleSwitchTimestamp = Timer.getFPGATimestamp();
   private boolean isGoingUp = true;
 
@@ -32,9 +30,9 @@ public class LoadBalls extends Command {
   @Override
   public void execute() {
     CommandScheduler scheduler = CommandScheduler.getInstance();
-    if (!shooter.atGoal()) {
-      lastTimestampNotAtGoal = Timer.getFPGATimestamp();
-    }
+    // if (!shooter.atGoal()) {
+    //   lastTimestampNotAtGoal = Timer.getFPGATimestamp();
+    // }
 
     scheduler.schedule(intake.set(1.));
     // DOWN
@@ -50,11 +48,13 @@ public class LoadBalls extends Command {
       lastAngleSwitchTimestamp = Timer.getFPGATimestamp();
     }
 
-    if (shooter.atGoal()) {
+    if (shooter.atGoal().getAsBoolean()) {
       scheduler.schedule(indexer.set(IndexerConstants.DUTY_CYCLE));
+      shooter.startIndexing();
     }
     else {
       scheduler.schedule(indexer.set(0));
+      shooter.stopIndexing();
     }
   }
 

@@ -11,6 +11,7 @@ import edu.wpi.first.units.measure.AngularVelocity;
 import edu.wpi.first.wpilibj.smartdashboard.SmartDashboard;
 import edu.wpi.first.wpilibj2.command.Command;
 import edu.wpi.first.wpilibj2.command.SubsystemBase;
+import edu.wpi.first.wpilibj2.command.button.Trigger;
 import frc.robot.Constants.IntakeConstants;
 import yams.mechanisms.config.FlyWheelConfig;
 import yams.mechanisms.velocity.FlyWheel;
@@ -68,10 +69,8 @@ public class IntakeSubsystem extends SubsystemBase {
     return intake.set(0);
   }
 
-  public boolean isStalling() {
-    if (spark.getOutputCurrent() >= 0.90*IntakeConstants.SUPPLY_CURRENT_LIMIT) {
-      return true;
-    } else {return false;}
+  public Trigger isStalling() {
+    return new Trigger(() -> spark.getOutputCurrent() >= 0.90*IntakeConstants.SUPPLY_CURRENT_LIMIT);
   }
 
   @Override
@@ -82,7 +81,7 @@ public class IntakeSubsystem extends SubsystemBase {
     if (sparkSmartMotorController.getMechanismSetpointVelocity().isPresent()) {
       SmartDashboard.putNumber("intake setpoint", sparkSmartMotorController.getMechanismSetpointVelocity().get().in(RPM));
     }
-    SmartDashboard.putBoolean("Intake Stalling", isStalling());
+    SmartDashboard.putBoolean("Intake Stalling", isStalling().getAsBoolean());
   }
 
   @Override
