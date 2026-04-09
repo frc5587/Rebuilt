@@ -4,8 +4,6 @@ import edu.wpi.first.units.measure.Angle;
 import edu.wpi.first.wpilibj.Timer;
 import edu.wpi.first.wpilibj2.command.Command;
 import edu.wpi.first.wpilibj2.command.CommandScheduler;
-import frc.robot.Constants.ArmConstants;
-import frc.robot.Constants.IndexerConstants;
 import frc.robot.subsystems.ArmSubsystem;
 import frc.robot.subsystems.IndexerSubsystem;
 import frc.robot.subsystems.IntakeSubsystem;
@@ -64,13 +62,13 @@ public class LoadBalls extends Command {
 
     if (shooter.atGoal().getAsBoolean()) {
       if (indexer != null) {
-        scheduler.schedule(indexer.set(IndexerConstants.DUTY_CYCLE));
+        scheduler.schedule(indexer.start());
       }
       shooter.startIndexing();
     }
     else {
       if (indexer != null) {
-        scheduler.schedule(indexer.set(0));
+        scheduler.schedule(indexer.stop());
       }
       shooter.stopIndexing();
     }
@@ -80,7 +78,7 @@ public class LoadBalls extends Command {
   public void end(boolean interrupted) {
     CommandScheduler scheduler = CommandScheduler.getInstance();
     if (arm != null) {
-      scheduler.schedule(arm.setAngle(ArmConstants.BOTTOM_ANGLE));
+      scheduler.schedule(arm.bottom());
     }
     scheduler.cancel(intake.getCurrentCommand());
     if (indexer != null) {

@@ -71,6 +71,10 @@ public class IndexerSubsystem extends SubsystemBase {
     return indexer.set(0);
   }
 
+  public Command start() {
+    return indexer.set(IndexerConstants.DUTY_CYCLE);
+  }
+
   @Override
   public void periodic() {
     indexer.updateTelemetry();

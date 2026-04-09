@@ -171,6 +171,7 @@ public final class Constants {
 
   public static class IntakeConstants {
     public static final double DUTY_CYCLE = 0.3;
+    public static final AngularVelocity VELOCITY = RPM.of(300);
     public static final int MOTOR_ID = 22;
     public static final double SUPPLY_CURRENT_LIMIT = 40.0;
     public static final double STATOR_CURRENT_LIMIT = 80.0;

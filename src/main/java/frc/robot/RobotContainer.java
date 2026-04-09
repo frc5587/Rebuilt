@@ -13,8 +13,6 @@ import com.ctre.phoenix6.swerve.SwerveModule.DriveRequestType;
 
 import frc.robot.Constants.ArmConstants;
 import frc.robot.Constants.DrivebaseConstants;
-import frc.robot.Constants.IndexerConstants;
-import frc.robot.Constants.IntakeConstants;
 import frc.robot.Constants.ShooterConstants;
 import frc.robot.commands.AimTowardsGoal;
 import frc.robot.commands.LoadBalls;
@@ -121,7 +119,7 @@ public class RobotContainer {
     NamedCommands.registerCommand("Arm Up", Commands.runOnce(() -> arm.top().schedule()));
     NamedCommands.registerCommand("Arm Down", Commands.runOnce(() -> arm.bottom().schedule()));
 
-    NamedCommands.registerCommand("Intake Forward", Commands.runOnce(() -> intake.set(IntakeConstants.DUTY_CYCLE).schedule())
+    NamedCommands.registerCommand("Intake Forward", Commands.runOnce(() -> intake.start().schedule())
                                                          .alongWith(Commands.runOnce(() -> arm.intake().schedule())));
     NamedCommands.registerCommand("Intake Stop", Commands.runOnce(() -> intake.stop().schedule()));
 
@@ -258,13 +256,12 @@ public class RobotContainer {
               lastHeading = swerve.getState().Pose.getRotation();
             })));
     driver.y().whileTrue(Commands.run(() -> lastHeading = Rotation2d.fromDegrees(Math.round(lastHeading.getDegrees()/180.)*180.))
-        .alongWith(arm.bottom().until(() -> !(arm.getAngle().in(Degrees) > ArmConstants.BOTTOM_ANGLE.in(Degrees) + 20))
-        .andThen(arm.set(-.3))))
+        .alongWith(arm.intake()))
               .onFalse(arm.stop()
                        .alongWith(Commands.runOnce(() -> {
                            lastHeading = swerve.getState().Pose.getRotation();
                        })));
-    driver.a().whileTrue(arm.setAngle(ArmConstants.TOP_ANGLE)
+    driver.a().whileTrue(arm.top()
         .alongWith(Commands.run(() -> lastHeading = Rotation2d.fromDegrees(Math.round((lastHeading.getDegrees()+45.)/90.)*90.-45.))))
               .onFalse(Commands.runOnce(() -> {
                   lastHeading = swerve.getState().Pose.getRotation();
@@ -290,28 +287,27 @@ public class RobotContainer {
 
     // Arm
     operator.rightTrigger().whileTrue(
-        intake.set(IntakeConstants.DUTY_CYCLE)
-        .alongWith(arm.bottom().until(() -> !(arm.getAngle().in(Degrees) > ArmConstants.BOTTOM_ANGLE.in(Degrees) + 20))
-        .andThen(arm.set(-.3))))
+        intake.start()
+        .alongWith(arm.intake()))
         .onFalse(arm.stop());
-    operator.leftTrigger().whileTrue(arm.setAngle(ArmConstants.TOP_ANGLE));
+    operator.leftTrigger().whileTrue(arm.top());
 
     // Shoot commands
     operator.leftBumper().whileTrue(new LoadBalls(arm, shooter, indexer, intake, ArmConstants.WIGGLE1_ANGLE_UP, ArmConstants.WIGGLE1_ANGLE_DOWN, ArmConstants.WIGGLE1_TIME_UP, ArmConstants.WIGGLE1_TIME_DOWN));
     operator.rightBumper().whileTrue(new LoadBalls(arm, shooter, indexer, intake, ArmConstants.WIGGLE2_ANGLE_UP, ArmConstants.WIGGLE2_ANGLE_DOWN, ArmConstants.WIGGLE2_TIME_UP, ArmConstants.WIGGLE2_TIME_DOWN));
 
     // Forward overrides
-    operator.x().whileTrue(indexer.set(IndexerConstants.DUTY_CYCLE));
+    operator.x().whileTrue(indexer.start());
     operator.y().whileTrue(shooter.useManualSpeed());
     operator.b().whileTrue(arm.set(1.))
                 .onFalse(arm.setAngle(arm.getLastSetpoint()));
-    operator.a().whileTrue(intake.set(1.));
+    operator.a().whileTrue(intake.start());
 
     // Reverse overrides
     operator.povLeft().whileTrue(indexer.set(-1.));
-    operator.povUp().whileTrue(shooter.set(-0.3));
+    operator.povUp().whileTrue(shooter.idle());
     // operator.povRight()
-    operator.povDown().whileTrue(intake.set(-1.));
+    operator.povDown().whileTrue(intake.start());
 
     // Misc overrides
     operator.back().whileTrue(new LoadBalls(arm, shooter, null, intake, ArmConstants.WIGGLE3_ANGLE_UP, ArmConstants.WIGGLE3_ANGLE_DOWN, ArmConstants.WIGGLE3_TIME_UP, ArmConstants.WIGGLE3_TIME_DOWN));
