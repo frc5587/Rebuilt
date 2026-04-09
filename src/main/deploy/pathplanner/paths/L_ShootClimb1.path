@@ -12,7 +12,7 @@
         "y": 5.038689281807566
       },
       "isLocked": false,
-      "linkedName": "Top Shoot Position"
+      "linkedName": "Left Manual Shoot"
     },
     {
       "anchor": {
@@ -25,7 +25,7 @@
       },
       "nextControl": null,
       "isLocked": false,
-      "linkedName": "[1] Right Side Climb Lineup"
+      "linkedName": "[1] Right Side Climb"
     }
   ],
   "rotationTargets": [],

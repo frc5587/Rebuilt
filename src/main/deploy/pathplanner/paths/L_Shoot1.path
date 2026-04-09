@@ -12,7 +12,7 @@
         "y": 7.133808844507846
       },
       "isLocked": false,
-      "linkedName": "Top Start"
+      "linkedName": "Left Start"
     },
     {
       "anchor": {
@@ -25,7 +25,7 @@
       },
       "nextControl": null,
       "isLocked": false,
-      "linkedName": "Top Shoot Position"
+      "linkedName": "Left Manual Shoot"
     }
   ],
   "rotationTargets": [

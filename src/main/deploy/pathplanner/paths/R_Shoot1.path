@@ -12,7 +12,7 @@
         "y": 0.8780707585704293
       },
       "isLocked": false,
-      "linkedName": "Bottom Start"
+      "linkedName": "Right Start"
     },
     {
       "anchor": {
@@ -25,7 +25,7 @@
       },
       "nextControl": null,
       "isLocked": false,
-      "linkedName": "Bottom Shoot"
+      "linkedName": "Right Manual Shoot"
     }
   ],
   "rotationTargets": [
