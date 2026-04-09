@@ -277,11 +277,11 @@ public class RobotContainer {
                                                        new Vector3(swerve.getState().Speeds.vxMetersPerSecond, 0, 0),
                                                        0.,
                                                        new Vector3(2., 0, 0))))));
-    driver.rightTrigger().whileTrue(Commands.run(() -> lastHeading = Rotation2d.fromDegrees(
+    driver.rightTrigger().whileTrue(Commands.run(() -> lastHeading = Rotation2d.fromRadians(
                                         AimingMath.getIdealHeading(
                                         new Vector3(swerve.getState().Pose), 
-                                        swerve.getState().Pose.getRotation().getDegrees(), 
-                                        new Vector3(swerve.getState().Speeds), 
+                                        swerve.getState().Pose.getRotation().getRadians(), 
+                                        Vector3.getOrigin(), 
                                         0, 
                                         ShooterConstants.getGoal(DriverStation.getAlliance().get())))));
     driver.leftTrigger().whileTrue(shooter.useManualSpeed());

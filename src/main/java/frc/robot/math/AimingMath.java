@@ -139,7 +139,7 @@ public class AimingMath {
   }
 
   public static double getIdealHeading(Vector3 robotPosition, double heading, Vector3 robotVelocity, double angularVelocity, Vector3 goalPosition) {
-    return getIdealHeading(robotPosition, heading, robotVelocity, angularVelocity, goalPosition);
+    return getIdealHeading(0., 0., robotPosition, heading, robotVelocity, angularVelocity, goalPosition);
   }
 
   public static double getIdealHeading(double speed, double lookahead, Vector3 robotPosition, double heading, Vector3 robotVelocity, double angularVelocity, Vector3 goalPosition) {

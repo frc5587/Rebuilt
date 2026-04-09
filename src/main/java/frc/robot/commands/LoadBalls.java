@@ -79,9 +79,13 @@ public class LoadBalls extends Command {
   @Override
   public void end(boolean interrupted) {
     CommandScheduler scheduler = CommandScheduler.getInstance();
-    scheduler.schedule(arm.setAngle(ArmConstants.BOTTOM_ANGLE));
+    if (arm != null) {
+      scheduler.schedule(arm.setAngle(ArmConstants.BOTTOM_ANGLE));
+    }
     scheduler.cancel(intake.getCurrentCommand());
-    scheduler.cancel(indexer.getCurrentCommand());
+    if (indexer != null) {
+      scheduler.cancel(indexer.getCurrentCommand());
+    }
     scheduler.cancel(shooter.getCurrentCommand());
   }
 }
