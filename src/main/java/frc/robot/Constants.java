@@ -108,7 +108,7 @@ public final class Constants {
     public static final double PITCH = 1.13446;
     public static final double LOOKAHEAD = 0.1;
     public static final double SHOTS_PER_SECOND = 2;
-    public static final double SPIN_UP_TIME = 1.0; // TODO set
+    public static final double SPIN_UP_TIME = 0.5; // TODO set
     public static final double TIME_BETWEEN_LOG_TIMESTAMPS = 0.055;
     public static final Vector3 SHOOTER_POSITION = new Vector3(0.05, 0, 0.5);
     public static final Vector3 BLUE_ALLIANCE_GOAL = new Vector3(4.625626, 4.0346315, 1.8288);
@@ -228,9 +228,9 @@ public final class Constants {
           .withSimFeedforward(new SimpleMotorFeedforward(0, 0, 0))
           .withTelemetry("ClimbMotor", TelemetryVerbosity.HIGH)
           .withGearing(new MechanismGearing(GearBox.fromReductionStages(4, 4, 3)))
-          .withMotorInverted(LEFT_MOTOR_INVERTED) // TODO check inversion states
+          .withMotorInverted(LEFT_MOTOR_INVERTED)
           .withIdleMode(MotorMode.BRAKE)
-          .withSoftLimit(Rotations.of(DOWN_ANGLE.in(Rotations)-0.1), Rotations.of(UP_ANGLE.in(Rotations)+10.1)) //TODO i temporarily increased top soft limit
+          .withSoftLimit(Rotations.of(DOWN_ANGLE.in(Rotations)-5.0), Rotations.of(UP_ANGLE.in(Rotations)+5.0))
           .withSupplyCurrentLimit(Amps.of(40))
           .withStatorCurrentLimit(Amps.of(100));
 

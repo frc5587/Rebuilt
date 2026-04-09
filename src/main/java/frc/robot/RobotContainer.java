@@ -106,6 +106,7 @@ public class RobotContainer {
   /**
    * The container for the robot. Contains subsystems, OI devices, and commands.
    */
+  @SuppressWarnings("removal")
   public RobotContainer() {
     // PLEASE DON'T SET DEFAULT COMMANDS UP HERE!! USE TELEOPINIT() AT BOTTOM OF
     // FILE
@@ -327,8 +328,8 @@ public class RobotContainer {
     operator.povDown().whileTrue(intake.set(-1.));
 
     // Misc overrides
-    operator.back().whileTrue(new LoadBalls(arm, shooter, null, intake, ArmConstants.WIGGLE3_ANGLE_UP, ArmConstants.WIGGLE3_ANGLE_DOWN, ArmConstants.WIGGLE3_TIME_UP, ArmConstants.WIGGLE3_TIME_DOWN)); // TODO pass in null for the indexer
-    operator.start().whileTrue(new LoadBalls(null, shooter, indexer, intake, ArmConstants.WIGGLE3_ANGLE_UP, ArmConstants.WIGGLE3_ANGLE_DOWN, ArmConstants.WIGGLE3_TIME_UP, ArmConstants.WIGGLE3_TIME_DOWN)); // TODO pass in null for the arm
+    operator.back().whileTrue(new LoadBalls(arm, shooter, null, intake, ArmConstants.WIGGLE3_ANGLE_UP, ArmConstants.WIGGLE3_ANGLE_DOWN, ArmConstants.WIGGLE3_TIME_UP, ArmConstants.WIGGLE3_TIME_DOWN));
+    operator.start().whileTrue(new LoadBalls(null, shooter, indexer, intake, ArmConstants.WIGGLE3_ANGLE_UP, ArmConstants.WIGGLE3_ANGLE_DOWN, ArmConstants.WIGGLE3_TIME_UP, ArmConstants.WIGGLE3_TIME_DOWN)); 
 
     // Triggers
     armUp.whileTrue(indexer.stop()); // TODO if we put a net back on, make it stop the shooter

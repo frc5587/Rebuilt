@@ -258,7 +258,6 @@ public class Vision {
 
   /**
    * Camera Enum to select each camera
-   * TODO: edit positions
    */
   enum Cameras {
     /**
@@ -271,14 +270,14 @@ public class Vision {
             Units.inchesToMeters(8.575626)),
         VecBuilder.fill(4, 4, 8), VecBuilder.fill(0.5, 0.5, 1)),
     /**
-     * Right Camera // TODO uncomment when right camera is plugged back in
+     * Right Camera
      */
-    // RIGHT_CAM("right",
-    //     new Rotation3d(0., 0., Math.toRadians(-90.)),
-    //     new Translation3d(Units.inchesToMeters(-8.378073), 
-    //         Units.inchesToMeters(-12.037120),
-    //         Units.inchesToMeters(8.590626)),
-    //     VecBuilder.fill(4, 4, 8), VecBuilder.fill(0.5, 0.5, 1)),
+    RIGHT_CAM("right",
+        new Rotation3d(0., 0., Math.toRadians(-90.)),
+        new Translation3d(Units.inchesToMeters(-8.378073), 
+            Units.inchesToMeters(-12.037120),
+            Units.inchesToMeters(8.590626)),
+        VecBuilder.fill(4, 4, 8), VecBuilder.fill(0.5, 0.5, 1)),
     /**
      * Center Camera
      */
@@ -353,6 +352,7 @@ public class Vision {
      * @param multiTagStdDevsMatrix Multi AprilTag standard deviations of estimated
      *                              poses from the camera.
      */
+    @SuppressWarnings("removal")
     Cameras(String name, Rotation3d robotToCamRotation, Translation3d robotToCamTranslation,
         Matrix<N3, N1> singleTagStdDevs, Matrix<N3, N1> multiTagStdDevsMatrix) {
       latencyAlert = new Alert("'" + name + "' Camera is experiencing high latency.", AlertType.kWarning);
