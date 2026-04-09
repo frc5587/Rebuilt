@@ -19,19 +19,19 @@
         {
           "type": "path",
           "data": {
-            "pathName": "M_ShootClimb2"
+            "pathName": null
           }
         },
         {
           "type": "path",
           "data": {
-            "pathName": "M_ShootClimb3"
+            "pathName": null
           }
         },
         {
           "type": "path",
           "data": {
-            "pathName": "M_ShootClimb4"
+            "pathName": null
           }
         }
       ]

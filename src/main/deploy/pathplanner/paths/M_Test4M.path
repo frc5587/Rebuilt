@@ -3,29 +3,29 @@
   "waypoints": [
     {
       "anchor": {
-        "x": 1.6583452211126959,
+        "x": 3.579067738018211,
         "y": 4.043836582019173
       },
       "prevControl": null,
       "nextControl": {
-        "x": 1.5577972744982378,
-        "y": 4.915010662389976
+        "x": 3.329067738018211,
+        "y": 4.043836582019173
       },
       "isLocked": false,
-      "linkedName": "Middle Manual Shoot"
+      "linkedName": "Middle Start"
     },
     {
       "anchor": {
-        "x": 1.7570843373493976,
-        "y": 4.177060240963855
+        "x": 0.625,
+        "y": 4.043836582019173
       },
       "prevControl": {
-        "x": 2.451125465341409,
-        "y": 4.166373030467082
+        "x": 0.875,
+        "y": 4.043836582019173
       },
       "nextControl": null,
       "isLocked": false,
-      "linkedName": "[1] Right Side Climb"
+      "linkedName": null
     }
   ],
   "rotationTargets": [],
