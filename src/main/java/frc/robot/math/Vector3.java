@@ -2,6 +2,8 @@ package frc.robot.math;
 
 import java.math.BigDecimal;
 
+import edu.wpi.first.math.geometry.Pose2d;
+import edu.wpi.first.math.kinematics.ChassisSpeeds;
 import edu.wpi.first.util.sendable.Sendable;
 import edu.wpi.first.util.sendable.SendableBuilder;
 
@@ -14,6 +16,18 @@ public class Vector3 implements Sendable {
     x = inputX;
     y = inputY;
     z = inputZ;
+  }
+  
+  public Vector3(Pose2d pose) {
+    x = pose.getX();
+    y = pose.getY();
+    z = 0.;
+  }
+
+  public Vector3(ChassisSpeeds speed) {
+    x = speed.vxMetersPerSecond;
+    y = speed.vyMetersPerSecond;
+    z = 0.;
   }
 
   @Override

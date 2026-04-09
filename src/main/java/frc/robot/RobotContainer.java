@@ -270,22 +270,6 @@ public class RobotContainer {
                        .alongWith(Commands.runOnce(() -> {
                            lastHeading = swerve.getState().Pose.getRotation();
                        })));
-    /*driverController.a().whileTrue(arm.bottom()
-    .alongWith(intake.set(IntakeConstants.DUTY_CYCLE))
-    .alongWith(drivebase.applyRequest(() -> {
-    if (Math.hypot(driverController.getLeftY(), driverController.getLeftX()) >
-    DrivebaseConstants.INTAKE_HEADING_DEADBAND) {
-    lastHeading = new Rotation2d(-driverController.getLeftY(),
-    -driverController.getLeftX());
-    }
-    return driveFacingAngle.withVelocityX(-driverController.getLeftY() *
-    DrivebaseConstants.MAX_SPEED) // Drive forward with negative Y (forward)
-    .withVelocityY(-driverController.getLeftX() * DrivebaseConstants.MAX_SPEED)
-    // Drive left with negative X (left)
-    .withTargetDirection(lastHeading); // Drive counterclockwise with negative X
-    (left)
-    })));
-    */
     driver.a().whileTrue(arm.setAngle(ArmConstants.TOP_ANGLE)
         .alongWith(Commands.run(() -> lastHeading = Rotation2d.fromDegrees(Math.round((lastHeading.getDegrees()+45.)/90.)*90.-45.))))
               .onFalse(Commands.runOnce(() -> {
@@ -299,6 +283,13 @@ public class RobotContainer {
                                                        new Vector3(swerve.getState().Speeds.vxMetersPerSecond, 0, 0),
                                                        0.,
                                                        new Vector3(2., 0, 0))))));
+    driver.rightTrigger().whileTrue(Commands.run(() -> lastHeading = Rotation2d.fromDegrees(
+                                        AimingMath.getIdealHeading(
+                                        new Vector3(swerve.getState().Pose), 
+                                        swerve.getState().Pose.getRotation().getDegrees(), 
+                                        new Vector3(swerve.getState().Speeds), 
+                                        0, 
+                                        ShooterConstants.getGoal(DriverStation.getAlliance().get())))));
 
     // Operator
 
@@ -329,7 +320,14 @@ public class RobotContainer {
 
     // Misc overrides
     operator.back().whileTrue(new LoadBalls(arm, shooter, null, intake, ArmConstants.WIGGLE3_ANGLE_UP, ArmConstants.WIGGLE3_ANGLE_DOWN, ArmConstants.WIGGLE3_TIME_UP, ArmConstants.WIGGLE3_TIME_DOWN));
-    operator.start().whileTrue(new LoadBalls(null, shooter, indexer, intake, ArmConstants.WIGGLE3_ANGLE_UP, ArmConstants.WIGGLE3_ANGLE_DOWN, ArmConstants.WIGGLE3_TIME_UP, ArmConstants.WIGGLE3_TIME_DOWN)); 
+    operator.start().whileTrue(new LoadBalls(null, shooter, indexer, intake, ArmConstants.WIGGLE3_ANGLE_UP, ArmConstants.WIGGLE3_ANGLE_DOWN, ArmConstants.WIGGLE3_TIME_UP, ArmConstants.WIGGLE3_TIME_DOWN));
+    operator.povRight().whileTrue(shooter.setBallVelocity(() -> MetersPerSecond.of(
+                                      AimingMath.getIdealShotSpeed(0., 
+                                      new Vector3(swerve.getState().Pose), 
+                                      swerve.getState().Pose.getRotation().getDegrees(), 
+                                      new Vector3(swerve.getState().Speeds), 
+                                      0, 
+                                      ShooterConstants.getGoal(DriverStation.getAlliance().get())))));
 
     // Triggers
     armUp.whileTrue(indexer.stop()); // TODO if we put a net back on, make it stop the shooter

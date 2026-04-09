@@ -138,6 +138,10 @@ public class AimingMath {
     return getIdealHeading(speed, lookahead, robotPosition, heading, robotVelocity, angularVelocity, goalPosition);
   }
 
+  public static double getIdealHeading(Vector3 robotPosition, double heading, Vector3 robotVelocity, double angularVelocity, Vector3 goalPosition) {
+    return getIdealHeading(robotPosition, heading, robotVelocity, angularVelocity, goalPosition);
+  }
+
   public static double getIdealHeading(double speed, double lookahead, Vector3 robotPosition, double heading, Vector3 robotVelocity, double angularVelocity, Vector3 goalPosition) {
     Vector3 position = Vector3.add(robotPosition,
                                    Vector3.rotate(ShooterConstants.SHOOTER_POSITION,

@@ -42,13 +42,13 @@ public class AimTowardsGoal extends Command {
 
   Supplier<Vector3> position = () -> {
     Pose2d position = swerve.getState().Pose;
-    return new Vector3(position.getX(), position.getY(), 0);
+    return new Vector3(position);
   };
   DoubleSupplier heading = () -> swerve.getState().RawHeading.getRadians();
   Supplier<Vector3> velocity = () -> {
     ChassisSpeeds velocity = swerve.getState().Speeds;
     velocity = ChassisSpeeds.fromRobotRelativeSpeeds(velocity, swerve.getState().Pose.getRotation());
-    Vector3 input = new Vector3(velocity.vxMetersPerSecond, velocity.vyMetersPerSecond, 0);
+    Vector3 input = new Vector3(velocity);
     return input;
   };
   DoubleSupplier angularVelocity = () -> swerve.getState().Speeds.omegaRadiansPerSecond;
