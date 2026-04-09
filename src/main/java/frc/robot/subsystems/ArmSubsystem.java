@@ -115,6 +115,38 @@ public class ArmSubsystem extends SubsystemBase {
     return arm.sysId(Volts.of(7), Volts.of(2).per(Second), Seconds.of(4));
   }
 
+  /**
+   * Sets the arm angle to it's top position.
+   * @return {@link edu.wpi.first.wpilibj2.command.RunCommand}
+   */
+  public Command top() {
+    return setAngle(ArmConstants.TOP_ANGLE);
+  }
+
+  /**
+   * Sets the arm angle to it's bottom position.
+   * @return {@link edu.wpi.first.wpilibj2.command.RunCommand}
+   */
+  public Command bottom() {
+    return setAngle(ArmConstants.BOTTOM_ANGLE);
+  }
+
+  /**
+   * Forces the arm down using duty cycle to prevent fuel from pushing the arm up.
+   * @return {@link edu.wpi.first.wpilibj2.command.RunCommand}
+   */
+  public Command intake() {
+    return set(-ArmConstants.INTAKE_DUTYCYCLE);
+  }
+
+  /**
+   * Stops the arm.
+   * @return {@link edu.wpi.first.wpilibj2.command.RunCommand}
+   */
+  public Command stop() {
+    return set(0);
+  }
+
   /*
    * Resets angle
    */

@@ -131,6 +131,7 @@ public final class Constants {
     private static final double BALANCE_OFFSET = 19;
     public static final Angle TOP_ANGLE = Degrees.of(105. + BALANCE_OFFSET);
     public static final Angle BOTTOM_ANGLE = Degrees.of(-8. + BALANCE_OFFSET);
+    public static final double INTAKE_DUTYCYCLE = 0.1;
     public static final Angle WIGGLE1_ANGLE_UP = Degrees.of(20. + BALANCE_OFFSET);
     public static final Angle WIGGLE1_ANGLE_DOWN = BOTTOM_ANGLE;
     public static final double WIGGLE1_TIME_UP = 0.5;

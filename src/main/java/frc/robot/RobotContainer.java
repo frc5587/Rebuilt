@@ -109,7 +109,7 @@ public class RobotContainer {
   public RobotContainer() {
     // PLEASE DON'T SET DEFAULT COMMANDS UP HERE!! USE TELEOPINIT() AT BOTTOM OF
     // FILE
-    indexer.setDefaultCommand(indexer.set(0.));
+    indexer.setDefaultCommand(indexer.stop());
 
     // Configure the trigger bindings
     configureBindings();
@@ -118,12 +118,12 @@ public class RobotContainer {
     // Create the NamedCommands that will be used in PathPlanner
     NamedCommands.registerCommand("test", Commands.print("I EXIST"));
 
-    NamedCommands.registerCommand("Arm Up", Commands.runOnce(() -> arm.setAngle(ArmConstants.TOP_ANGLE).schedule()));
-    NamedCommands.registerCommand("Arm Down", Commands.runOnce(() -> arm.setAngle(ArmConstants.BOTTOM_ANGLE).schedule()));
+    NamedCommands.registerCommand("Arm Up", Commands.runOnce(() -> arm.top().schedule()));
+    NamedCommands.registerCommand("Arm Down", Commands.runOnce(() -> arm.bottom().schedule()));
 
     NamedCommands.registerCommand("Intake Forward", Commands.runOnce(() -> intake.set(IntakeConstants.DUTY_CYCLE).schedule())
-                                                         .alongWith(Commands.runOnce(() -> arm.set(-0.3).schedule())));
-    NamedCommands.registerCommand("Intake Stop", Commands.runOnce(() -> intake.set(0).schedule()));
+                                                         .alongWith(Commands.runOnce(() -> arm.intake().schedule())));
+    NamedCommands.registerCommand("Intake Stop", Commands.runOnce(() -> intake.stop().schedule()));
 
     NamedCommands.registerCommand("Shoot Preload",
         new SequentialCommandGroup(
@@ -131,8 +131,8 @@ public class RobotContainer {
             Commands.waitUntil(() -> shooter.atGoal().getAsBoolean()).raceWith(Commands.waitSeconds(ShooterConstants.SPIN_UP_TIME)),
             Commands.waitSeconds(ShooterConstants.SPIN_UP_DELAY),
             new LoadBalls(arm, shooter, indexer, intake, ArmConstants.WIGGLE3_ANGLE_UP, ArmConstants.WIGGLE3_ANGLE_DOWN, ArmConstants.WIGGLE3_TIME_UP, ArmConstants.WIGGLE3_TIME_DOWN).raceWith(Commands.waitSeconds(5.)),
-            Commands.runOnce(() -> indexer.set(0.).schedule()),
-            Commands.runOnce(() -> shooter.set(0.).schedule())));
+            Commands.runOnce(() -> indexer.stop().schedule()),
+            Commands.runOnce(() -> shooter.stop().schedule())));
 
     NamedCommands.registerCommand("Shoot Hopper",
         new SequentialCommandGroup(
@@ -140,8 +140,8 @@ public class RobotContainer {
             Commands.waitUntil(() -> shooter.atGoal().getAsBoolean()).raceWith(Commands.waitSeconds(ShooterConstants.SPIN_UP_TIME)),
             Commands.waitSeconds(ShooterConstants.SPIN_UP_DELAY),
             new LoadBalls(arm, shooter, indexer, intake, ArmConstants.WIGGLE3_ANGLE_UP, ArmConstants.WIGGLE3_ANGLE_DOWN, ArmConstants.WIGGLE3_TIME_UP, ArmConstants.WIGGLE3_TIME_DOWN).raceWith(Commands.waitSeconds(10.)),
-            Commands.runOnce(() -> indexer.set(0.).schedule()),
-            Commands.runOnce(() -> shooter.set(0.).schedule())));
+            Commands.runOnce(() -> indexer.stop().schedule()),
+            Commands.runOnce(() -> shooter.stop().schedule())));
     NamedCommands.registerCommand("Climb Up", Commands.runOnce(() -> System.out.println("no climb rn")));
     NamedCommands.registerCommand("Climb Down", Commands.runOnce(() -> System.out.println("no climb rn")));
 
@@ -263,13 +263,13 @@ public class RobotContainer {
               lastHeading = swerve.getState().Pose.getRotation();
             })));
     driver.y().whileTrue(Commands.run(() -> lastHeading = Rotation2d.fromDegrees(Math.round(lastHeading.getDegrees()/180.)*180.))
-        .alongWith(arm.setAngle(ArmConstants.BOTTOM_ANGLE).until(() -> !(arm.getAngle().in(Degrees) > ArmConstants.BOTTOM_ANGLE.in(Degrees) + 20))
+        .alongWith(arm.bottom().until(() -> !(arm.getAngle().in(Degrees) > ArmConstants.BOTTOM_ANGLE.in(Degrees) + 20))
         .andThen(arm.set(-.3))))
-              .onFalse(arm.set(0.)
+              .onFalse(arm.stop()
                        .alongWith(Commands.runOnce(() -> {
                            lastHeading = swerve.getState().Pose.getRotation();
                        })));
-    /*driverController.a().whileTrue(arm.setAngle(ArmConstants.BOTTOM_ANGLE)
+    /*driverController.a().whileTrue(arm.bottom()
     .alongWith(intake.set(IntakeConstants.DUTY_CYCLE))
     .alongWith(drivebase.applyRequest(() -> {
     if (Math.hypot(driverController.getLeftY(), driverController.getLeftX()) >
@@ -295,19 +295,18 @@ public class RobotContainer {
                           AimingMath.getIdealShotSpeed(0.,
                                                        new Vector3(swerve.getState().Pose.getX(), 0, 0),
                                                        -180.,
-                                                       Vector3.getOrigin(),
+                                                       new Vector3(swerve.getState().Speeds.vxMetersPerSecond, 0, 0),
                                                        0.,
                                                        new Vector3(2., 0, 0))))));
-
 
     // Operator
 
     // Arm
     operator.rightTrigger().whileTrue(
         intake.set(IntakeConstants.DUTY_CYCLE)
-        .alongWith(arm.setAngle(ArmConstants.BOTTOM_ANGLE).until(() -> !(arm.getAngle().in(Degrees) > ArmConstants.BOTTOM_ANGLE.in(Degrees) + 20))
+        .alongWith(arm.bottom().until(() -> !(arm.getAngle().in(Degrees) > ArmConstants.BOTTOM_ANGLE.in(Degrees) + 20))
         .andThen(arm.set(-.3))))
-        .onFalse(arm.set(0.));
+        .onFalse(arm.stop());
     operator.leftTrigger().whileTrue(arm.setAngle(ArmConstants.TOP_ANGLE));
 
     // Shoot commands
@@ -352,7 +351,7 @@ public class RobotContainer {
 
   public void teleopInit() {
     arm.setVoid(0.);
-    shooter.setDefaultCommand(shooter.set(ShooterConstants.IDLE_DUTYCYCLE));
+    shooter.setDefaultCommand(shooter.idle());
     indexer.setDefaultCommand(indexer.stop());
     intake.setDefaultCommand(intake.stop());
     lastHeading = swerve.getState().Pose.getRotation();

@@ -67,7 +67,7 @@ public class ShooterSubsystem extends SubsystemBase {
   /**
    * Gets the current velocity of the shooter.
    * 
-   * @return Shooter velocity.
+   * @return {@link edu.wpi.first.units.measure.AngularVelocity}
    */
   public AngularVelocity getVelocity() {return shooter.getSpeed();}
 
@@ -100,10 +100,14 @@ public class ShooterSubsystem extends SubsystemBase {
   /**
    * Sets the shooter velocity to zero.
    * 
-   * @return {@link edu.wpi.first.wpilibj2.command.runCommand}
+   * @return {@link edu.wpi.first.wpilibj2.command.RunCommand}
    */
   public Command stop() {
     return setAngularVelocity(() -> RPM.of(0));
+  }
+
+  public Command idle() {
+    return set(ShooterConstants.IDLE_DUTYCYCLE);
   }
 
   /**
