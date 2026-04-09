@@ -18,6 +18,7 @@ import frc.robot.Constants.IntakeConstants;
 import frc.robot.Constants.ShooterConstants;
 import frc.robot.commands.AimTowardsGoal;
 import frc.robot.commands.LoadBalls;
+import frc.robot.math.AimingMath;
 import frc.robot.math.Vector3;
 import frc.robot.subsystems.ShooterSubsystem;
 import frc.robot.subsystems.SwerveSubsystem;
@@ -129,7 +130,7 @@ public class RobotContainer {
             Commands.runOnce(() -> shooter.setBallVelocity(() -> MetersPerSecond.of(6.80873631)).schedule()),
             Commands.waitUntil(() -> shooter.atGoal().getAsBoolean()).raceWith(Commands.waitSeconds(ShooterConstants.SPIN_UP_TIME)),
             Commands.waitSeconds(ShooterConstants.SPIN_UP_DELAY),
-            new LoadBalls(arm, shooter, indexer, intake).raceWith(Commands.waitSeconds(5.)),
+            new LoadBalls(arm, shooter, indexer, intake, ArmConstants.WIGGLE3_ANGLE_UP, ArmConstants.WIGGLE3_ANGLE_DOWN, ArmConstants.WIGGLE3_TIME_UP, ArmConstants.WIGGLE3_TIME_DOWN).raceWith(Commands.waitSeconds(5.)),
             Commands.runOnce(() -> indexer.set(0.).schedule()),
             Commands.runOnce(() -> shooter.set(0.).schedule())));
 
@@ -138,7 +139,7 @@ public class RobotContainer {
             Commands.runOnce(() -> shooter.setBallVelocity(() -> MetersPerSecond.of(6.80873631)).schedule()),
             Commands.waitUntil(() -> shooter.atGoal().getAsBoolean()).raceWith(Commands.waitSeconds(ShooterConstants.SPIN_UP_TIME)),
             Commands.waitSeconds(ShooterConstants.SPIN_UP_DELAY),
-            new LoadBalls(arm, shooter, indexer, intake).raceWith(Commands.waitSeconds(10.)),
+            new LoadBalls(arm, shooter, indexer, intake, ArmConstants.WIGGLE3_ANGLE_UP, ArmConstants.WIGGLE3_ANGLE_DOWN, ArmConstants.WIGGLE3_TIME_UP, ArmConstants.WIGGLE3_TIME_DOWN).raceWith(Commands.waitSeconds(10.)),
             Commands.runOnce(() -> indexer.set(0.).schedule()),
             Commands.runOnce(() -> shooter.set(0.).schedule())));
     NamedCommands.registerCommand("Climb Up", Commands.runOnce(() -> System.out.println("no climb rn")));
@@ -289,26 +290,15 @@ public class RobotContainer {
               .onFalse(Commands.runOnce(() -> {
                   lastHeading = swerve.getState().Pose.getRotation();
               }));
-    /*driver.leftBumper().onTrue(Commands.runOnce(() -> {
-      if (aimingCommand != null && aimingCommand.isScheduled()) {
-        aimingCommand.cancel();
-      }
-      aimingCommand = new AimTowardsGoal(
-          () -> new Vector3(-driver.getLeftY() * DrivebaseConstants.SHOOT_WHILE_MOVING_SPEED,
-              -driver.getLeftX() * DrivebaseConstants.SHOOT_WHILE_MOVING_SPEED, 0),
-          shooter,
-          drivebase,
-          ShooterConstants.getGoal(DriverStation.getAlliance().get()));
-      CommandScheduler.getInstance().schedule(aimingCommand);
-    }))
-        .onFalse(Commands.runOnce(() -> aimingCommand.cancel()));
-    */
+    driver.b().whileTrue(Commands.run(() -> lastHeading = Rotation2d.fromDegrees(180.))
+                         .alongWith(shooter.setBallVelocity(() -> MetersPerSecond.of(
+                          AimingMath.getIdealShotSpeed(0.,
+                                                       new Vector3(swerve.getState().Pose.getX(), 0, 0),
+                                                       -180.,
+                                                       Vector3.getOrigin(),
+                                                       0.,
+                                                       new Vector3(2., 0, 0))))));
 
-    /* Indexer
-    driverController.rightBumper().whileTrue(Commands.run(() ->
-    {driverAllowIndexing = true;}))
-    .onFalse(Commands.run(() -> {driverAllowIndexing = false;}));
-    */
 
     // Operator
 
@@ -320,17 +310,9 @@ public class RobotContainer {
         .onFalse(arm.set(0.));
     operator.leftTrigger().whileTrue(arm.setAngle(ArmConstants.TOP_ANGLE));
 
-    /* Indexer wait for shooter
-    operator.rightBumper().whileTrue(Commands.runOnce(() -> {
-        if (shooter.atGoal().getAsBoolean()) {
-          CommandScheduler.getInstance().schedule(indexer.set(IndexerConstants.DUTY_CYCLE));
-        }}))
-        .onFalse(indexer.set(0));
-    */
-
     // Shoot commands
-    operator.leftBumper().whileTrue(new LoadBalls(arm, shooter, indexer, intake));
-    operator.rightBumper().whileTrue(new LoadBalls(arm, shooter, indexer, intake));
+    operator.leftBumper().whileTrue(new LoadBalls(arm, shooter, indexer, intake, ArmConstants.WIGGLE1_ANGLE_UP, ArmConstants.WIGGLE1_ANGLE_DOWN, ArmConstants.WIGGLE1_TIME_UP, ArmConstants.WIGGLE1_TIME_DOWN));
+    operator.rightBumper().whileTrue(new LoadBalls(arm, shooter, indexer, intake, ArmConstants.WIGGLE2_ANGLE_UP, ArmConstants.WIGGLE2_ANGLE_DOWN, ArmConstants.WIGGLE2_TIME_UP, ArmConstants.WIGGLE2_TIME_DOWN));
 
     // Forward overrides
     operator.x().whileTrue(indexer.set(IndexerConstants.DUTY_CYCLE));
@@ -340,21 +322,14 @@ public class RobotContainer {
     operator.a().whileTrue(intake.set(1.));
 
     // Reverse overrides
-    operator.povLeft().whileTrue(indexer.set(-0.5));
+    operator.povLeft().whileTrue(indexer.set(-1.));
     operator.povUp().whileTrue(shooter.set(-0.3));
     // operator.povRight()
     operator.povDown().whileTrue(intake.set(-1.));
 
     // Misc overrides
-    operator.back().whileTrue(new LoadBalls(arm, shooter, null, intake)); // TODO pass in null for the indexer
-    operator.start().whileTrue(new LoadBalls(null, shooter, indexer, intake)); // TODO pass in null for the arm
-
-    /* Climb
-    operator.y().whileTrue(climb.set(ClimbConstants.SLOW_DUTYCYCLE)).onFalse(climb.set(0.));
-    operator.a().whileTrue(climb.set(-ClimbConstants.SLOW_DUTYCYCLE)).o
-    nFalse(climb.set(0.));
-    operator.povUp().whileTrue(climb.set(1.0)).onFalse(climb.set(0.));
-    */
+    operator.back().whileTrue(new LoadBalls(arm, shooter, null, intake, ArmConstants.WIGGLE3_ANGLE_UP, ArmConstants.WIGGLE3_ANGLE_DOWN, ArmConstants.WIGGLE3_TIME_UP, ArmConstants.WIGGLE3_TIME_DOWN)); // TODO pass in null for the indexer
+    operator.start().whileTrue(new LoadBalls(null, shooter, indexer, intake, ArmConstants.WIGGLE3_ANGLE_UP, ArmConstants.WIGGLE3_ANGLE_DOWN, ArmConstants.WIGGLE3_TIME_UP, ArmConstants.WIGGLE3_TIME_DOWN)); // TODO pass in null for the arm
 
     // Triggers
     armUp.whileTrue(indexer.stop()); // TODO if we put a net back on, make it stop the shooter
