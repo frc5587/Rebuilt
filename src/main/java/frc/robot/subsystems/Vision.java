@@ -352,7 +352,6 @@ public class Vision {
      * @param multiTagStdDevsMatrix Multi AprilTag standard deviations of estimated
      *                              poses from the camera.
      */
-    @SuppressWarnings("removal")
     Cameras(String name, Rotation3d robotToCamRotation, Translation3d robotToCamTranslation,
         Matrix<N3, N1> singleTagStdDevs, Matrix<N3, N1> multiTagStdDevsMatrix) {
       latencyAlert = new Alert("'" + name + "' Camera is experiencing high latency.", AlertType.kWarning);

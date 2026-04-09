@@ -106,7 +106,6 @@ public class RobotContainer {
   /**
    * The container for the robot. Contains subsystems, OI devices, and commands.
    */
-  @SuppressWarnings("removal")
   public RobotContainer() {
     // PLEASE DON'T SET DEFAULT COMMANDS UP HERE!! USE TELEOPINIT() AT BOTTOM OF
     // FILE
@@ -231,11 +230,6 @@ public class RobotContainer {
     //   }
     // }));
     
-    driver.rightTrigger().whileTrue(shooter.useManualSpeed());
-    driver.rightBumper().whileTrue(shooter.setAngularVelocity(() -> RPM.of(3200)));
-    driver.leftTrigger().whileTrue(shooter.setAngularVelocity(() -> RPM.of(2900)));
-    driver.leftBumper().whileTrue(shooter.setAngularVelocity(() -> RPM.of(3000)));
-
     // Main controls
     driver.x().onTrue(Commands.runOnce(() -> {
       if (aimingCommand != null && aimingCommand.isScheduled()) {
@@ -290,6 +284,7 @@ public class RobotContainer {
                                         new Vector3(swerve.getState().Speeds), 
                                         0, 
                                         ShooterConstants.getGoal(DriverStation.getAlliance().get())))));
+    driver.leftTrigger().whileTrue(shooter.useManualSpeed());
 
     // Operator
 
