@@ -132,7 +132,7 @@ public final class Constants {
     public static final Angle TOP_ANGLE = Degrees.of(100. + BALANCE_OFFSET);
     public static final Angle BOTTOM_ANGLE = Degrees.of(-2. + BALANCE_OFFSET);
     public static final double INTAKE_DUTYCYCLE = 0.1;
-    public static final Angle WIGGLE1_ANGLE_UP = Degrees.of(20. + BALANCE_OFFSET);
+    public static final Angle WIGGLE1_ANGLE_UP = Degrees.of(30. + BALANCE_OFFSET);
     public static final Angle WIGGLE1_ANGLE_DOWN = BOTTOM_ANGLE;
     public static final double WIGGLE1_TIME_UP = 0.5;
     public static final double WIGGLE1_TIME_DOWN = 1.;
@@ -154,7 +154,7 @@ public final class Constants {
           .withFeedforward(new ArmFeedforward(0, 0.3, 0))
           .withSimFeedforward(new ArmFeedforward(0, 0, 0))
           .withTelemetry("ArmMotor", TelemetryVerbosity.HIGH)
-          .withGearing(new MechanismGearing(GearBox.fromReductionStages(25., 32. / 18.)))
+          .withGearing(new MechanismGearing(GearBox.fromReductionStages(25., (22. / 18.))))
           .withMotorInverted(true)
           .withIdleMode(MotorMode.BRAKE)
           .withSupplyCurrentLimit(Amps.of(40))
@@ -171,7 +171,7 @@ public final class Constants {
 
   public static class IntakeConstants {
     public static final double DUTY_CYCLE = 0.3;
-    public static final AngularVelocity VELOCITY = RPM.of(300);
+    public static final AngularVelocity VELOCITY = RPM.of(250);
     public static final int MOTOR_ID = 22;
     public static final double SUPPLY_CURRENT_LIMIT = 40.0;
     public static final double STATOR_CURRENT_LIMIT = 80.0;
@@ -179,8 +179,9 @@ public final class Constants {
         SmartMotorControllerConfig config) -> {
       return config.withControlMode(ControlMode.CLOSED_LOOP)
           .withTelemetry("IntakeMotor", TelemetryVerbosity.HIGH)
-          .withClosedLoopController(1., 0, 0)
+          .withClosedLoopController(0.1, 0, 0)
           .withSimClosedLoopController(1, 0, 0)
+          .withFeedforward(new SimpleMotorFeedforward(0., 0.65))
           .withGearing(new MechanismGearing(GearBox.fromReductionStages(5)))
           .withMotorInverted(true)
           .withIdleMode(MotorMode.COAST)

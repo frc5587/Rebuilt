@@ -301,13 +301,14 @@ public class RobotContainer {
     operator.y().whileTrue(shooter.useManualSpeed());
     operator.b().whileTrue(arm.set(1.))
                 .onFalse(arm.setAngle(arm.getLastSetpoint()));
-    operator.a().whileTrue(intake.start());
+    operator.a().whileTrue(intake.set(.5));
 
     // Reverse overrides
     operator.povLeft().whileTrue(indexer.set(-1.));
-    operator.povUp().whileTrue(shooter.idle());
+    operator.povUp().whileTrue(shooter.set(-0.3));
+    operator.povUpLeft().whileTrue(indexer.set(-1.).alongWith(shooter.set(-0.3)));
     // operator.povRight()
-    operator.povDown().whileTrue(intake.start());
+    operator.povDown().whileTrue(intake.set(-0.5));
 
     // Misc overrides
     operator.back().whileTrue(new LoadBalls(arm, shooter, null, intake, ArmConstants.WIGGLE3_ANGLE_UP, ArmConstants.WIGGLE3_ANGLE_DOWN, ArmConstants.WIGGLE3_TIME_UP, ArmConstants.WIGGLE3_TIME_DOWN));

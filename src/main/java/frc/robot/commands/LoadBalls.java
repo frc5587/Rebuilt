@@ -44,7 +44,7 @@ public class LoadBalls extends Command {
     //   lastTimestampNotAtGoal = Timer.getFPGATimestamp();
     // }
 
-    scheduler.schedule(intake.set(1.));
+    scheduler.schedule(intake.set(0.3));
     if (arm != null) {
       // DOWN
       if (lastAngleSwitchTimestamp > Timer.getFPGATimestamp()-wiggleTimeDown  &&  !isGoingUp) {

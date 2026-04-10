@@ -49,17 +49,9 @@ public class ShooterSubsystem extends SubsystemBase {
   private InterpolatingDoubleTreeMap ballSpeedToRPM = new InterpolatingDoubleTreeMap();
 
   public ShooterSubsystem() {
-    ballSpeedToRPM.put(1.,500.);
-    // 2026-3-12
-    // ballSpeedToRPM.put(7.24667899,2860.);
-    // ballSpeedToRPM.put(7.54408842,2960.);
-    // ballSpeedToRPM.put(8.49759462,3300.);
-    ballSpeedToRPM.put(6.42585517,2600.);
-    ballSpeedToRPM.put(7.04282644,2825.);
-    ballSpeedToRPM.put(7.77575949,3050.);
-    ballSpeedToRPM.put(8.20538041,3225.);
-    ballSpeedToRPM.put(8.97973555,3500.);
-    ballSpeedToRPM.put(20., 10000.);
+    ballSpeedToRPM.put(6.53291598, 2725.);
+    ballSpeedToRPM.put(7.52778734, 3050.);
+    ballSpeedToRPM.put(8.38625947, 3575.);
     SmartDashboard.putNumber("manual flywheel speed", 3100.);
     SmartDashboard.putNumber("Shooter Temp", shooter.getMotor().getTemperature().in(Fahrenheit));
   }
@@ -156,6 +148,6 @@ public class ShooterSubsystem extends SubsystemBase {
   }
 
   public Trigger atGoal() {
-    return new Trigger(() -> ((smartMotorController.getMechanismSetpointVelocity().orElse(RPM.of(0.)).in(RPM)*0.95) <= smartMotorController.getMechanismVelocity().in(RPM)));
+    return new Trigger(() -> ((smartMotorController.getMechanismSetpointVelocity().orElse(RPM.of(2500.)).in(RPM)*0.95) <= smartMotorController.getMechanismVelocity().in(RPM)));
   }
 }

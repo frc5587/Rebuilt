@@ -7,7 +7,7 @@
         {
           "type": "path",
           "data": {
-            "pathName": "M_ShootClimb1"
+            "pathName": "M_DepotShootPosition"
           }
         },
         {
@@ -17,21 +17,39 @@
           }
         },
         {
-          "type": "path",
+          "type": "named",
           "data": {
-            "pathName": null
+            "name": "Arm Down"
+          }
+        },
+        {
+          "type": "named",
+          "data": {
+            "name": "Intake Forward"
           }
         },
         {
           "type": "path",
           "data": {
-            "pathName": null
+            "pathName": "L_DepotShoot1"
           }
         },
         {
           "type": "path",
           "data": {
-            "pathName": null
+            "pathName": "L_DepotShoot2"
+          }
+        },
+        {
+          "type": "path",
+          "data": {
+            "pathName": "L_DepotShoot3"
+          }
+        },
+        {
+          "type": "named",
+          "data": {
+            "name": "Shoot Hopper"
           }
         }
       ]
