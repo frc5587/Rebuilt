@@ -136,7 +136,8 @@ public class ArmSubsystem extends SubsystemBase {
    * @return {@link edu.wpi.first.wpilibj2.command.RunCommand}
    */
   public Command intake() {
-    return set(-ArmConstants.INTAKE_DUTYCYCLE);
+    return bottom().until(() -> getAngle().in(Degrees) < ArmConstants.BOTTOM_ANGLE.in(Degrees) + 10.)
+           .andThen(set(-ArmConstants.INTAKE_DUTYCYCLE));
   }
 
   /**
