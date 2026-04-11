@@ -148,6 +148,6 @@ public class ShooterSubsystem extends SubsystemBase {
   }
 
   public Trigger atGoal() {
-    return new Trigger(() -> ((smartMotorController.getMechanismSetpointVelocity().orElse(RPM.of(2500.)).in(RPM)*0.92) <= smartMotorController.getMechanismVelocity().in(RPM)));
+    return new Trigger(() -> (shooter.getSpeed().in(RPM) < 2000.));
   }
 }

@@ -84,7 +84,6 @@ public class LoadBalls extends Command {
     if (indexer != null) {
       scheduler.cancel(indexer.getCurrentCommand());
     }
-    scheduler.cancel(shooter.getCurrentCommand());
   }
 }
 
