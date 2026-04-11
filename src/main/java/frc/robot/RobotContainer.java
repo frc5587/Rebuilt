@@ -125,7 +125,7 @@ public class RobotContainer {
 
     NamedCommands.registerCommand("Shoot Preload",
         new SequentialCommandGroup(
-            Commands.runOnce(() -> shooter.setBallVelocity(() -> MetersPerSecond.of(6.53291598)).schedule()),
+            Commands.runOnce(() -> shooter.setBallVelocity(() -> MetersPerSecond.of(6.7)).schedule()),
             Commands.runOnce(() -> arm.bottom().schedule()),
             Commands.waitUntil(() -> shooter.atGoal().getAsBoolean()).raceWith(Commands.waitSeconds(ShooterConstants.SPIN_UP_TIME)),
             Commands.waitSeconds(ShooterConstants.SPIN_UP_DELAY),
@@ -135,7 +135,7 @@ public class RobotContainer {
 
     NamedCommands.registerCommand("Shoot Hopper",
         new SequentialCommandGroup(
-            Commands.runOnce(() -> shooter.setBallVelocity(() -> MetersPerSecond.of(6.53291598)).schedule()),
+            Commands.runOnce(() -> shooter.setBallVelocity(() -> MetersPerSecond.of(6.7)).schedule()),
             Commands.runOnce(() -> arm.bottom().schedule()),
             Commands.waitUntil(() -> shooter.atGoal().getAsBoolean()).raceWith(Commands.waitSeconds(ShooterConstants.SPIN_UP_TIME)),
             Commands.waitSeconds(ShooterConstants.SPIN_UP_DELAY),
