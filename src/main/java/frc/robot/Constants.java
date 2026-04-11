@@ -58,7 +58,7 @@ public final class Constants {
     public static final double LOOP_TIME = 0.13; // s, 20ms + 110ms sprk max velocity lag
     public static final double WHEEL_LOCK_TIME = 10; // seconds
 
-    public static final double MAX_SPEED = Units.feetToMeters(8);
+    public static final double MAX_SPEED = Units.feetToMeters(15);
     public static final double MAX_SPIN_SPEED_RADIANS_PER_SECOND = 1.5 * Math.PI;
     public static final double MAX_SPIN_ACCEL = 2 * Math.PI;
     public static final double HEADING_DEADBAND = 0.3;
@@ -72,9 +72,9 @@ public final class Constants {
     public static final ProfiledPIDController SHOOT_WHILE_MOVE_HEADING_CONTROLLER = new ProfiledPIDController(25, 0, 0,
         new Constraints(MAX_SPIN_SPEED_RADIANS_PER_SECOND, MAX_SPIN_ACCEL));
 
-    public static final Pose2d RED_ALLIANCE_MIDDLE_HUB = new Pose2d(new Translation2d(16.072, 0.455),
-        Rotation2d.k180deg);
-    public static final Pose2d BLUE_ALLIANCE_MIDDLE_HUB = new Pose2d(new Translation2d(0.455, 7.621), Rotation2d.kZero);
+    public static final Pose2d RED_ALLIANCE_MIDDLE_HUB = new Pose2d(new Translation2d(12.980, 4.044),
+        Rotation2d.kZero);
+    public static final Pose2d BLUE_ALLIANCE_MIDDLE_HUB = new Pose2d(new Translation2d(3.579, 4.044), Rotation2d.k180deg);
   }
 
   public static class ShooterConstants {

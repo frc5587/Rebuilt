@@ -125,7 +125,7 @@ public class RobotContainer {
 
     NamedCommands.registerCommand("Shoot Preload",
         new SequentialCommandGroup(
-            Commands.runOnce(() -> shooter.setBallVelocity(() -> MetersPerSecond.of(6.80873631)).schedule()),
+            Commands.runOnce(() -> shooter.setBallVelocity(() -> MetersPerSecond.of(6.53291598)).schedule()),
             Commands.waitUntil(() -> shooter.atGoal().getAsBoolean()).raceWith(Commands.waitSeconds(ShooterConstants.SPIN_UP_TIME)),
             Commands.waitSeconds(ShooterConstants.SPIN_UP_DELAY),
             new LoadBalls(arm, shooter, indexer, intake, ArmConstants.WIGGLE3_ANGLE_UP, ArmConstants.WIGGLE3_ANGLE_DOWN, ArmConstants.WIGGLE3_TIME_UP, ArmConstants.WIGGLE3_TIME_DOWN).raceWith(Commands.waitSeconds(5.)),
@@ -134,7 +134,7 @@ public class RobotContainer {
 
     NamedCommands.registerCommand("Shoot Hopper",
         new SequentialCommandGroup(
-            Commands.runOnce(() -> shooter.setBallVelocity(() -> MetersPerSecond.of(6.80873631)).schedule()),
+            Commands.runOnce(() -> shooter.setBallVelocity(() -> MetersPerSecond.of(6.53291598)).schedule()),
             Commands.waitUntil(() -> shooter.atGoal().getAsBoolean()).raceWith(Commands.waitSeconds(ShooterConstants.SPIN_UP_TIME)),
             Commands.waitSeconds(ShooterConstants.SPIN_UP_DELAY),
             new LoadBalls(arm, shooter, indexer, intake, ArmConstants.WIGGLE3_ANGLE_UP, ArmConstants.WIGGLE3_ANGLE_DOWN, ArmConstants.WIGGLE3_TIME_UP, ArmConstants.WIGGLE3_TIME_DOWN).raceWith(Commands.waitSeconds(10.)),
@@ -299,12 +299,10 @@ public class RobotContainer {
     // Forward overrides
     operator.x().whileTrue(indexer.start());
     operator.y().whileTrue(shooter.useManualSpeed());
-    operator.b().whileTrue(arm.set(1.))
-                .onFalse(arm.setAngle(arm.getLastSetpoint()));
     operator.a().whileTrue(intake.set(.5));
 
     // Reverse overrides
-    operator.povLeft().whileTrue(indexer.set(-1.));
+    operator.povLeft().whileTrue(intake.set(1)); //TODO revert
     operator.povUp().whileTrue(shooter.set(-0.3));
     operator.povUpLeft().whileTrue(indexer.set(-1.).alongWith(shooter.set(-0.3)));
     // operator.povRight()

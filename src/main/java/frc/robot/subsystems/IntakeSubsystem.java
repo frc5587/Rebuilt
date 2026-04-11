@@ -71,7 +71,7 @@ public class IntakeSubsystem extends SubsystemBase {
   }
 
   public Command start() {
-    return Commands.run(() -> intake.setMechanismVelocitySetpoint(IntakeConstants.VELOCITY));
+    return intake.set(0.5);
   }
 
   public Trigger isStalling() {
