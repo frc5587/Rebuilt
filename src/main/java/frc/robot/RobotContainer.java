@@ -126,6 +126,7 @@ public class RobotContainer {
     NamedCommands.registerCommand("Shoot Preload",
         new SequentialCommandGroup(
             Commands.runOnce(() -> shooter.setBallVelocity(() -> MetersPerSecond.of(6.53291598)).schedule()),
+            Commands.runOnce(() -> arm.bottom().schedule()),
             Commands.waitUntil(() -> shooter.atGoal().getAsBoolean()).raceWith(Commands.waitSeconds(ShooterConstants.SPIN_UP_TIME)),
             Commands.waitSeconds(ShooterConstants.SPIN_UP_DELAY),
             new LoadBalls(arm, shooter, indexer, intake, ArmConstants.WIGGLE3_ANGLE_UP, ArmConstants.WIGGLE3_ANGLE_DOWN, ArmConstants.WIGGLE3_TIME_UP, ArmConstants.WIGGLE3_TIME_DOWN).raceWith(Commands.waitSeconds(5.)),
@@ -135,6 +136,7 @@ public class RobotContainer {
     NamedCommands.registerCommand("Shoot Hopper",
         new SequentialCommandGroup(
             Commands.runOnce(() -> shooter.setBallVelocity(() -> MetersPerSecond.of(6.53291598)).schedule()),
+            Commands.runOnce(() -> arm.bottom().schedule()),
             Commands.waitUntil(() -> shooter.atGoal().getAsBoolean()).raceWith(Commands.waitSeconds(ShooterConstants.SPIN_UP_TIME)),
             Commands.waitSeconds(ShooterConstants.SPIN_UP_DELAY),
             new LoadBalls(arm, shooter, indexer, intake, ArmConstants.WIGGLE3_ANGLE_UP, ArmConstants.WIGGLE3_ANGLE_DOWN, ArmConstants.WIGGLE3_TIME_UP, ArmConstants.WIGGLE3_TIME_DOWN).raceWith(Commands.waitSeconds(10.)),

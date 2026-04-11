@@ -49,7 +49,7 @@ public class ShooterSubsystem extends SubsystemBase {
   private InterpolatingDoubleTreeMap ballSpeedToRPM = new InterpolatingDoubleTreeMap();
 
   public ShooterSubsystem() {
-    ballSpeedToRPM.put(6.53291598, 2725.);
+    ballSpeedToRPM.put(6.53291598, 2775.);
     ballSpeedToRPM.put(7.52778734, 3050.);
     ballSpeedToRPM.put(8.38625947, 3575.);
     SmartDashboard.putNumber("manual flywheel speed", 3100.);

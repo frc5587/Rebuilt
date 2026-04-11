@@ -170,7 +170,7 @@ public final class Constants {
   }
 
   public static class IntakeConstants {
-    public static final double DUTY_CYCLE = 0.3;
+    public static final double DUTY_CYCLE = 0.5;
     public static final AngularVelocity VELOCITY = RPM.of(250);
     public static final int MOTOR_ID = 22;
     public static final double SUPPLY_CURRENT_LIMIT = 40.0;
@@ -182,7 +182,7 @@ public final class Constants {
           .withClosedLoopController(0.1, 0, 0)
           .withSimClosedLoopController(1, 0, 0)
           .withFeedforward(new SimpleMotorFeedforward(0., 0.65))
-          .withGearing(new MechanismGearing(GearBox.fromReductionStages(5)))
+          .withGearing(new MechanismGearing(GearBox.fromReductionStages(1)))
           .withMotorInverted(true)
           .withIdleMode(MotorMode.COAST)
           .withSupplyCurrentLimit(Amps.of(SUPPLY_CURRENT_LIMIT))

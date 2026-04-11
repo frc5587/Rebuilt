@@ -71,7 +71,7 @@ public class IntakeSubsystem extends SubsystemBase {
   }
 
   public Command start() {
-    return intake.set(0.5);
+    return intake.set(IntakeConstants.DUTY_CYCLE);
   }
 
   public Trigger isStalling() {
