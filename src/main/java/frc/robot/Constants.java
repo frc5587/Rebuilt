@@ -85,7 +85,7 @@ public final class Constants {
       return config.withControlMode(ControlMode.CLOSED_LOOP)
           .withClosedLoopController(0.5, 0.0, 0.0, ClosedLoopControllerSlot.SLOT_0)
           .withSimClosedLoopController(1., 0., 0., ClosedLoopControllerSlot.SLOT_0)
-          .withClosedLoopController(0.8, 0., 0.0, ClosedLoopControllerSlot.SLOT_1)
+          .withClosedLoopController(0.5, 0., 0.0, ClosedLoopControllerSlot.SLOT_1)
           .withSimClosedLoopController(10000., 0., 0., ClosedLoopControllerSlot.SLOT_1)
           .withFeedforward(new SimpleMotorFeedforward(0, 0.116, 0))
           .withSimFeedforward(new SimpleMotorFeedforward(0, 0, 0))
