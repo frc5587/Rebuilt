@@ -205,7 +205,7 @@ public class RobotContainer {
     // Zero Gyro
     driver.start().onTrue((Commands.runOnce(swerve::seedFieldCentric))
         .alongWith(Commands.runOnce(() -> {
-          lastHeading = Rotation2d.fromDegrees(0.);
+          lastHeading = Rotation2d.kZero;
         })));
     // Zero Odometry
     driver.back().onTrue(Commands.runOnce(() -> {
