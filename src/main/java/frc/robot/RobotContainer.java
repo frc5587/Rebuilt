@@ -4,45 +4,26 @@
 
 package frc.robot;
 
-import static edu.wpi.first.units.Units.*;
-
 import java.util.function.DoubleSupplier;
 import java.util.function.Supplier;
 
 import com.ctre.phoenix6.swerve.SwerveModule.DriveRequestType;
 
-import frc.robot.Constants.ArmConstants;
 import frc.robot.Constants.DrivebaseConstants;
-import frc.robot.Constants.ShooterConstants;
-import frc.robot.commands.AimTowardsGoal;
-import frc.robot.commands.LoadBalls;
-import frc.robot.math.AimingMath;
 import frc.robot.math.Vector3;
 import frc.robot.subsystems.ShooterSubsystem;
 import frc.robot.subsystems.SwerveSubsystem;
-import frc.robot.subsystems.ArmSubsystem;
 import frc.robot.subsystems.IndexerSubsystem;
-import frc.robot.subsystems.IntakeSubsystem;
 import frc.robot.subsystems.LEDController;
 
 import com.ctre.phoenix6.swerve.SwerveRequest;
-import com.pathplanner.lib.auto.AutoBuilder;
-import com.pathplanner.lib.auto.NamedCommands;
-
 import edu.wpi.first.math.geometry.Pose2d;
 import edu.wpi.first.math.geometry.Rotation2d;
 import edu.wpi.first.math.kinematics.ChassisSpeeds;
 import edu.wpi.first.wpilibj.DriverStation;
 import edu.wpi.first.wpilibj.PowerDistribution;
-import edu.wpi.first.wpilibj.DriverStation.Alliance;
-import edu.wpi.first.wpilibj.smartdashboard.SendableChooser;
-import edu.wpi.first.wpilibj.smartdashboard.SmartDashboard;
-import edu.wpi.first.wpilibj.GenericHID.RumbleType;
-
 import edu.wpi.first.wpilibj2.command.Command;
-import edu.wpi.first.wpilibj2.command.CommandScheduler;
 import edu.wpi.first.wpilibj2.command.Commands;
-import edu.wpi.first.wpilibj2.command.SequentialCommandGroup;
 import edu.wpi.first.wpilibj2.command.button.CommandXboxController;
 import edu.wpi.first.wpilibj2.command.button.Trigger;
 
@@ -62,15 +43,11 @@ public class RobotContainer {
   
   private final ShooterSubsystem shooter = new ShooterSubsystem();
   private final SwerveSubsystem swerve = TunerConstants.createDrivetrain();
-  private final ArmSubsystem arm = new ArmSubsystem((rumbleMagnitude) -> {
-            driver.getHID().setRumble(RumbleType.kBothRumble, rumbleMagnitude);
-            operator.getHID().setRumble(RumbleType.kBothRumble, rumbleMagnitude);});
-  private final IntakeSubsystem intake = new IntakeSubsystem();
   private final IndexerSubsystem indexer = new IndexerSubsystem();
-  // private final ClimbSubsystem climb = new ClimbSubsystem();
+
   private final LEDController ledController = new LEDController();
 
-  private Trigger armUp = new Trigger(() -> arm.getCurrentSetpoint() == ArmConstants.TOP_ANGLE);
+  private Trigger shooterSpunUp = new Trigger(() -> shooterAtGoal());
 
   private final SwerveRequest.FieldCentricFacingAngle driveFacingAngle = new SwerveRequest.FieldCentricFacingAngle()
       .withDeadband(DrivebaseConstants.MAX_SPEED * 0.1) // Add a 10% deadband
@@ -79,7 +56,6 @@ public class RobotContainer {
       .withHeadingPID(DrivebaseConstants.HEADING_CONTROLLER.getP(), DrivebaseConstants.HEADING_CONTROLLER.getI(),
           DrivebaseConstants.HEADING_CONTROLLER.getD());
   private final SwerveRequest.SwerveDriveBrake brake = new SwerveRequest.SwerveDriveBrake();
-  private AimTowardsGoal aimingCommand = null;
   Supplier<Vector3> position = () -> {
     Pose2d position = swerve.getState().Pose;
     return new Vector3(position.getX(), position.getY(), 0);
@@ -99,8 +75,6 @@ public class RobotContainer {
 
   private final PowerDistribution pdh = new PowerDistribution();
 
-  private final SendableChooser<Command> autoChooser;
-
   /**
    * The container for the robot. Contains subsystems, OI devices, and commands.
    */
@@ -112,43 +86,6 @@ public class RobotContainer {
     // Configure the trigger bindings
     configureBindings();
     DriverStation.silenceJoystickConnectionWarning(true);
-
-    // Create the NamedCommands that will be used in PathPlanner
-    NamedCommands.registerCommand("test", Commands.print("I EXIST"));
-
-    NamedCommands.registerCommand("Arm Up", Commands.runOnce(() -> arm.top().schedule()));
-    NamedCommands.registerCommand("Arm Down", Commands.runOnce(() -> arm.bottom().schedule()));
-
-    NamedCommands.registerCommand("Intake Forward", Commands.runOnce(() -> intake.start().schedule())
-                                                         .alongWith(Commands.runOnce(() -> arm.intake().schedule())));
-    NamedCommands.registerCommand("Intake Stop", Commands.runOnce(() -> intake.stop().schedule()));
-
-    NamedCommands.registerCommand("Shoot Preload",
-        new SequentialCommandGroup(
-            Commands.runOnce(() -> shooter.setBallVelocity(() -> MetersPerSecond.of(6.7)).schedule()),
-            Commands.runOnce(() -> arm.bottom().schedule()),
-            Commands.waitUntil(() -> shooter.atGoal().getAsBoolean()).raceWith(Commands.waitSeconds(ShooterConstants.SPIN_UP_TIME)),
-            Commands.waitSeconds(ShooterConstants.SPIN_UP_DELAY),
-            new LoadBalls(arm, shooter, indexer, intake, ArmConstants.WIGGLE3_ANGLE_UP, ArmConstants.WIGGLE3_ANGLE_DOWN, ArmConstants.WIGGLE3_TIME_UP, ArmConstants.WIGGLE3_TIME_DOWN).raceWith(Commands.waitSeconds(5.)),
-            Commands.runOnce(() -> indexer.stop().schedule()),
-            Commands.runOnce(() -> shooter.stop().schedule())));
-
-    NamedCommands.registerCommand("Shoot Hopper",
-        new SequentialCommandGroup(
-            Commands.runOnce(() -> shooter.setBallVelocity(() -> MetersPerSecond.of(6.7)).schedule()),
-            Commands.runOnce(() -> arm.bottom().schedule()),
-            Commands.waitUntil(() -> shooter.atGoal().getAsBoolean()).raceWith(Commands.waitSeconds(ShooterConstants.SPIN_UP_TIME)),
-            Commands.waitSeconds(ShooterConstants.SPIN_UP_DELAY),
-            new LoadBalls(arm, shooter, indexer, intake, ArmConstants.WIGGLE3_ANGLE_UP, ArmConstants.WIGGLE3_ANGLE_DOWN, ArmConstants.WIGGLE3_TIME_UP, ArmConstants.WIGGLE3_TIME_DOWN).raceWith(Commands.waitSeconds(10.)),
-            Commands.runOnce(() -> indexer.stop().schedule()),
-            Commands.runOnce(() -> shooter.stop().schedule())));
-    NamedCommands.registerCommand("Climb Up", Commands.runOnce(() -> System.out.println("no climb rn")));
-    NamedCommands.registerCommand("Climb Down", Commands.runOnce(() -> System.out.println("no climb rn")));
-
-    // Have the autoChooser pull in all PathPlanner autos as options
-    autoChooser = AutoBuilder.buildAutoChooser();
-    SmartDashboard.putData("Auto Chooser", autoChooser);
-
     pdh.setSwitchableChannel(true);
     pdh.clearStickyFaults();
   }
@@ -169,160 +106,35 @@ public class RobotContainer {
    */
   private void configureBindings() {
     /**
-     * Driver Controls
+     * ** Driver Controls **
      * Left Stick: Drive (field oriented)
      * Right Stick: Rotate robot (heading control)
-     * 
      * Start: Zero robot gyro (use if field oriented feels off)
      * 
-     * Right Bumper: Together indexer
+     * ** Operator Controls **
+     * Left Trigger: Spin up shooter (to manual speed)
+     * Right Trigger: Spin indexer (if shooter up to speed)
+     * Start: Indexer Override
      * 
-     * X: Shoot while moving swerve
-     * Y: Point forward and arm down (for trench)
-     * A: 45deg swerve angle for bump
-     * Left Bumper: Alternate shoot on the move control
-     * 
-     * Operator Controls
-     * Right Bumper: Together indexer
-     * Left Bumper: Override indexer
-     * 
-     * Right Trigger: Arm down + intake forward
-     * Left Trigger: Arm up
-     * B: Arm angled (for shooting)
-     * 
-     * X: Shooter override (constant speed)
-     * 
-     * Y: Climb top
-     * A: Climb bottom
-     * 
-     * POV Up: 100% intake speed
-     * POV Right: Reverse indexer and shooter
-     * POV Down: Reverse intake
-     * 
-     * Start: reset arm position to top
+     * POV Up: Reverse shooter
+     * POV Down: Reverse shooter and indexer
      */
-
-    // Driver
 
     // Zero Gyro
     driver.start().onTrue((Commands.runOnce(swerve::seedFieldCentric))
         .alongWith(Commands.runOnce(() -> {
           lastHeading = Rotation2d.kZero;
         })));
-    // Zero Odometry
-    driver.back().onTrue(Commands.runOnce(() -> {
-      if (DriverStation.getAlliance().get() == Alliance.Blue) {
-        swerve.resetPose(DrivebaseConstants.BLUE_ALLIANCE_MIDDLE_HUB);
-      } else if (DriverStation.getAlliance().get() == Alliance.Red) {
-        swerve.resetPose(DrivebaseConstants.RED_ALLIANCE_MIDDLE_HUB);
-      }
-    }));
-
-    // Sim stuff
-    // driver.leftTrigger().onTrue(Commands.runOnce(() -> {
-    //   if (aimingCommand != null) {
-    //     aimingCommand.getMath().logSim();
-    //   }
-    // }));
-    // driver.rightTrigger().onTrue(Commands.runOnce(() -> {
-    //   if (aimingCommand != null) {
-    //     aimingCommand.getMath().resetSim();
-    //   }
-    // }));
-    
-    // Main controls
-    driver.x().onTrue(Commands.runOnce(() -> {
-      if (aimingCommand != null && aimingCommand.isScheduled()) {
-        aimingCommand.cancel();
-      }
-      aimingCommand = new AimTowardsGoal(() -> {
-        Vector3 goalVector = Vector3
-            .normalize(Vector3.subtract(ShooterConstants.getGoal(DriverStation.getAlliance().get()),
-                new Vector3(swerve.getState().Pose.getX(), swerve.getState().Pose.getY(), 0)).get2D());
-        double goalAngle = Vector3.getCounterclockwiseAngle(goalVector);
-        Vector3 input = new Vector3(driver.getLeftY() * DrivebaseConstants.SHOOT_WHILE_MOVING_SPEED,
-            driver.getLeftX() * DrivebaseConstants.SHOOT_WHILE_MOVING_SPEED, 0);
-        if (DriverStation.getAlliance().get() == Alliance.Red) {
-          input = Vector3.scale(input, -1.);
-        }
-        input = Vector3.rotate(input, Vector3.getOrigin(), goalAngle);
-        return input;
-      },
-          shooter,
-          swerve,
-          ShooterConstants.getGoal(DriverStation.getAlliance().get()));
-      CommandScheduler.getInstance().schedule(aimingCommand);
-    }))
-        .onFalse(Commands.runOnce(() -> aimingCommand.cancel())
-            .alongWith(Commands.runOnce(() -> {
-              lastHeading = swerve.getState().Pose.getRotation();
-            })));
-    driver.y().whileTrue(Commands.run(() -> lastHeading = Rotation2d.fromDegrees(Math.round(lastHeading.getDegrees()/180.)*180.))
-        .alongWith(arm.intake()))
-              .onFalse(arm.stop()
-                       .alongWith(Commands.runOnce(() -> {
-                           lastHeading = swerve.getState().Pose.getRotation();
-                       })));
-    driver.a().whileTrue(arm.top()
-        .alongWith(Commands.run(() -> lastHeading = Rotation2d.fromDegrees(Math.round((lastHeading.getDegrees()+45.)/90.)*90.-45.))))
-              .onFalse(Commands.runOnce(() -> {
-                  lastHeading = swerve.getState().Pose.getRotation();
-              }));
-    driver.b().whileTrue(Commands.run(() -> lastHeading = Rotation2d.fromDegrees(180.))
-                         .alongWith(shooter.setBallVelocity(() -> MetersPerSecond.of(
-                          AimingMath.getIdealShotSpeed(0.,
-                                                       new Vector3(swerve.getState().Pose.getX(), 0, 0),
-                                                       -180.,
-                                                       new Vector3(swerve.getState().Speeds.vxMetersPerSecond, 0, 0),
-                                                       0.,
-                                                       new Vector3(2., 0, 0))))));
-    driver.rightTrigger().whileTrue(Commands.run(() -> lastHeading = Rotation2d.fromRadians(
-                                        AimingMath.getIdealHeading(
-                                        new Vector3(swerve.getState().Pose), 
-                                        swerve.getState().Pose.getRotation().getRadians(), 
-                                        Vector3.getOrigin(), 
-                                        0, 
-                                        ShooterConstants.getGoal(DriverStation.getAlliance().get())))));
-    driver.leftTrigger().whileTrue(shooter.useManualSpeed());
-
-    // Operator
-
-    // Arm
-    operator.rightTrigger().whileTrue(
-        intake.start()
-        .alongWith(arm.intake()))
-        .onFalse(arm.stop());
-    operator.leftTrigger().whileTrue(arm.top());
-
-    // Shoot commands
-    operator.leftBumper().whileTrue(new LoadBalls(arm, shooter, indexer, intake, ArmConstants.WIGGLE1_ANGLE_UP, ArmConstants.WIGGLE1_ANGLE_DOWN, ArmConstants.WIGGLE1_TIME_UP, ArmConstants.WIGGLE1_TIME_DOWN));
-    operator.rightBumper().whileTrue(new LoadBalls(arm, shooter, indexer, intake, ArmConstants.WIGGLE2_ANGLE_UP, ArmConstants.WIGGLE2_ANGLE_DOWN, ArmConstants.WIGGLE2_TIME_UP, ArmConstants.WIGGLE2_TIME_DOWN));
 
     // Forward overrides
-    operator.x().whileTrue(indexer.start());
-    operator.y().whileTrue(shooter.useManualSpeed());
-    operator.a().whileTrue(intake.set(.5));
+    operator.leftTrigger().whileTrue(shooter.useManualSpeed());
+    operator.rightTrigger().and(shooterSpunUp).whileTrue(indexer.start());
+    operator.start().whileTrue(indexer.start());
 
     // Reverse overrides
-    operator.povLeft().whileTrue(intake.set(1)); //TODO revert
     operator.povUp().whileTrue(shooter.set(-0.3));
-    operator.povUpLeft().whileTrue(indexer.set(-1.).alongWith(shooter.set(-0.3)));
-    // operator.povRight()
-    operator.povDown().whileTrue(intake.set(-0.5));
+    operator.povDown().whileTrue(indexer.set(-1.).alongWith(shooter.set(-0.3)));
 
-    // Misc overrides
-    operator.back().whileTrue(new LoadBalls(arm, shooter, null, intake, ArmConstants.WIGGLE3_ANGLE_UP, ArmConstants.WIGGLE3_ANGLE_DOWN, ArmConstants.WIGGLE3_TIME_UP, ArmConstants.WIGGLE3_TIME_DOWN));
-    operator.start().whileTrue(new LoadBalls(null, shooter, indexer, intake, ArmConstants.WIGGLE3_ANGLE_UP, ArmConstants.WIGGLE3_ANGLE_DOWN, ArmConstants.WIGGLE3_TIME_UP, ArmConstants.WIGGLE3_TIME_DOWN));
-    operator.povRight().whileTrue(shooter.setBallVelocity(() -> MetersPerSecond.of(
-                                      AimingMath.getIdealShotSpeed(0., 
-                                      new Vector3(swerve.getState().Pose), 
-                                      swerve.getState().Pose.getRotation().getDegrees(), 
-                                      new Vector3(swerve.getState().Speeds), 
-                                      0, 
-                                      ShooterConstants.getGoal(DriverStation.getAlliance().get())))));
-
-    // Triggers
-    armUp.whileTrue(indexer.stop()); // TODO if we put a net back on, make it stop the shooter
   }
 
   /**
@@ -331,7 +143,7 @@ public class RobotContainer {
    * @return the command to run in autonomous
    */
   public Command getAutonomousCommand() {
-    return autoChooser.getSelected();
+    return null;
   }
 
   public void setMotorBrake(boolean isBrake) {
@@ -341,10 +153,8 @@ public class RobotContainer {
   }
 
   public void teleopInit() {
-    arm.setVoid(0.);
     shooter.setDefaultCommand(shooter.idle());
     indexer.setDefaultCommand(indexer.stop());
-    intake.setDefaultCommand(intake.stop());
     lastHeading = swerve.getState().Pose.getRotation();
     // Swerve
     swerve.setDefaultCommand(swerve.applyRequest(() -> {
@@ -363,10 +173,6 @@ public class RobotContainer {
   }
     public LEDController getLEDController() {
       return ledController;
-    }
-
-    public boolean intakeIsStalling() {
-      return intake.isStalling().getAsBoolean();
     }
 
     public boolean shooterAtGoal() {
