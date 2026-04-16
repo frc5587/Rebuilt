@@ -129,7 +129,7 @@ public final class Constants {
     public static final int LEFT_MOTOR_ID = 20;
     public static final int RIGHT_MOTOR_ID = 21;
     private static final double BALANCE_OFFSET = 19;
-    public static final Angle TOP_ANGLE = Degrees.of(100. + BALANCE_OFFSET);
+    public static final Angle TOP_ANGLE = Degrees.of(110. + BALANCE_OFFSET);
     public static final Angle BOTTOM_ANGLE = Degrees.of(-2. + BALANCE_OFFSET);
     public static final double INTAKE_DUTYCYCLE = 0.1;
     public static final Angle WIGGLE1_ANGLE_UP = Degrees.of(30. + BALANCE_OFFSET);
