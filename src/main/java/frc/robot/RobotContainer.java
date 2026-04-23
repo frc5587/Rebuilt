@@ -47,7 +47,7 @@ public class RobotContainer {
 
   private final LEDController ledController = new LEDController();
 
-  private Trigger shooterSpunUp = new Trigger(() -> shooterAtGoal());
+  private Trigger shooterSpunUp = new Trigger(() -> !shooterAtGoal());
 
   private final SwerveRequest.FieldCentricFacingAngle driveFacingAngle = new SwerveRequest.FieldCentricFacingAngle()
       .withDeadband(DrivebaseConstants.MAX_SPEED * 0.1) // Add a 10% deadband
@@ -127,8 +127,8 @@ public class RobotContainer {
         })));
 
     // Forward overrides
-    operator.leftTrigger().whileTrue(shooter.useManualSpeed());
-    operator.rightTrigger().and(shooterSpunUp).whileTrue(indexer.start());
+    driver.rightTrigger().whileTrue(shooter.useManualSpeed());
+    driver.rightTrigger().and(shooterSpunUp).and(shooter.notAtIdle()).whileTrue(indexer.start().raceWith(Commands.waitSeconds(1.)));
     operator.start().whileTrue(indexer.start());
 
     // Reverse overrides
@@ -178,6 +178,7 @@ public class RobotContainer {
     public boolean shooterAtGoal() {
       return shooter.atGoal().getAsBoolean();
     }
+
     public boolean shooterUsingNonDefaultCommand() {
       if (shooter.getCurrentCommand() != shooter.getDefaultCommand()) {
         return true;

@@ -58,8 +58,8 @@ public final class Constants {
     public static final double LOOP_TIME = 0.13; // s, 20ms + 110ms sprk max velocity lag
     public static final double WHEEL_LOCK_TIME = 10; // seconds
 
-    public static final double MAX_SPEED = Units.feetToMeters(15);
-    public static final double MAX_SPIN_SPEED_RADIANS_PER_SECOND = 1.5 * Math.PI;
+    public static final double MAX_SPEED = Units.feetToMeters(4.5); // normally 15ft/s
+    public static final double MAX_SPIN_SPEED_RADIANS_PER_SECOND = 1.25 * Math.PI;
     public static final double MAX_SPIN_ACCEL = 2 * Math.PI;
     public static final double HEADING_DEADBAND = 0.3;
     public static final double INTAKE_HEADING_DEADBAND = 0.1;
@@ -80,6 +80,7 @@ public final class Constants {
   public static class ShooterConstants {
     public static final int MOTOR_ID = 30;
     public static final double IDLE_DUTYCYCLE = 0.2;
+    public static final double MANUAL_SPEED = 2750.;
     public static final UnaryOperator<SmartMotorControllerConfig> APPLY_SMC_CONFIG = (
         SmartMotorControllerConfig config) -> {
       return config.withControlMode(ControlMode.CLOSED_LOOP)
@@ -198,7 +199,7 @@ public final class Constants {
 
   public static class IndexerConstants {
     public static final int MOTOR_ID = 23;
-    public static final double DUTY_CYCLE = 1.;
+    public static final double DUTY_CYCLE = .5;
     public static final UnaryOperator<SmartMotorControllerConfig> APPLY_SMC_CONFIG = (
         SmartMotorControllerConfig config) -> {
       return config.withControlMode(ControlMode.OPEN_LOOP)

@@ -52,7 +52,7 @@ public class ShooterSubsystem extends SubsystemBase {
     ballSpeedToRPM.put(6.53291598, 2775.);
     ballSpeedToRPM.put(7.52778734, 3050.);
     ballSpeedToRPM.put(8.38625947, 3575.);
-    SmartDashboard.putNumber("manual flywheel speed", 3100.);
+    SmartDashboard.putNumber("manual flywheel speed", ShooterConstants.MANUAL_SPEED);
     SmartDashboard.putNumber("Shooter Temp", shooter.getMotor().getTemperature().in(Fahrenheit));
   }
     
@@ -149,5 +149,9 @@ public class ShooterSubsystem extends SubsystemBase {
 
   public Trigger atGoal() {
     return new Trigger(() -> (shooter.getSpeed().in(RPM) < 2000.));
+  }
+
+  public Trigger notAtIdle() {
+    return new Trigger(() -> (shooter.getMotorController().getDutyCycle() != ShooterConstants.IDLE_DUTYCYCLE));
   }
 }

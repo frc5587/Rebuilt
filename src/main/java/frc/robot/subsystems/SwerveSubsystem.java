@@ -38,7 +38,6 @@ import edu.wpi.first.wpilibj2.command.sysid.SysIdRoutine;
 import frc.robot.Constants.ShooterConstants;
 import frc.robot.TunerConstants.TunerSwerveDrivetrain;
 import frc.robot.math.Vector3;
-import frc.robot.subsystems.Vision.Cameras;
 
 /**
  * Class that extends the Phoenix 6 SwerveDrivetrain class and implements
@@ -51,11 +50,7 @@ public class SwerveSubsystem extends TunerSwerveDrivetrain implements Subsystem 
   private static final double kSimLoopPeriod = 0.004; // 4 ms
   private Notifier m_simNotifier = null;
   private double m_lastSimTime;
-
-  private boolean visionDriveTest = true;
   
-    
-  private Vision vision;
 
   /* Blue alliance sees forward as 0 degrees (toward red alliance wall) */
   private static final Rotation2d kBlueAlliancePerspectiveRotation = Rotation2d.kZero;
@@ -158,9 +153,6 @@ public class SwerveSubsystem extends TunerSwerveDrivetrain implements Subsystem 
     if (Utils.isSimulation()) {
       startSimThread();
     }
-    if (visionDriveTest) {
-      configurePhotonVision();
-    }
     SmartDashboard.putBoolean("Vision Enabled", true);
     configureAutoBuilder();
     SmartDashboard.putNumber("Distance to hub",0.);
@@ -230,7 +222,6 @@ public class SwerveSubsystem extends TunerSwerveDrivetrain implements Subsystem 
       startSimThread();
     }
     configureAutoBuilder();
-    configurePhotonVision();
   }
 
   private void configureAutoBuilder() {
@@ -261,9 +252,6 @@ public class SwerveSubsystem extends TunerSwerveDrivetrain implements Subsystem 
     }
   }
 
-  private void configurePhotonVision() {
-    vision = new Vision(getState().Pose);
-  }
 
   /**
    * Returns a command that applies the specified control request to this swerve
@@ -328,15 +316,6 @@ public class SwerveSubsystem extends TunerSwerveDrivetrain implements Subsystem 
     super.addVisionMeasurement(visionRobotPoseMeters, Utils.fpgaToCurrentTime(timestampSeconds));
   }
   public void updatePoseEstimation() {
-  for (Cameras camera : Cameras.values()) {
-      Optional<EstimatedRobotPose> poseEst = vision.getEstimatedGlobalPose(camera);
-      if (poseEst.isPresent()) {
-        var pose = poseEst.get();
-        addVisionMeasurement(pose.estimatedPose.toPose2d(),
-            pose.timestampSeconds,
-            camera.curStdDevs);
-      }
-    }
   }
 
   /**
@@ -402,12 +381,6 @@ public class SwerveSubsystem extends TunerSwerveDrivetrain implements Subsystem 
                 : kBlueAlliancePerspectiveRotation);
         m_hasAppliedOperatorPerspective = true;
       });
-    }
-
-    visionDriveTest = SmartDashboard.getBoolean("Vision Enabled", true);
-
-    if (visionDriveTest) {
-      updatePoseEstimation();
     }
 
     currentPosePublisher.accept(getState().Pose);
