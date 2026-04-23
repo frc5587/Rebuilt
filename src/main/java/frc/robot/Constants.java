@@ -58,7 +58,7 @@ public final class Constants {
     public static final double LOOP_TIME = 0.13; // s, 20ms + 110ms sprk max velocity lag
     public static final double WHEEL_LOCK_TIME = 10; // seconds
 
-    public static final double MAX_SPEED = Units.feetToMeters(4.5); // normally 15ft/s
+    public static final double MAX_SPEED = Units.feetToMeters(3.5); // normally 15ft/s
     public static final double MAX_SPIN_SPEED_RADIANS_PER_SECOND = 1.25 * Math.PI;
     public static final double MAX_SPIN_ACCEL = 2 * Math.PI;
     public static final double HEADING_DEADBAND = 0.3;

@@ -3,6 +3,13 @@
   "grid_size": 64,
   "tabs": [
     {
+      "name": "Outreach",
+      "grid_layout": {
+        "layouts": [],
+        "containers": []
+      }
+    },
+    {
       "name": "Swerve",
       "grid_layout": {
         "layouts": [
@@ -607,7 +614,7 @@
       }
     },
     {
-      "name": "Shooter",
+      "name": "Outreach",
       "grid_layout": {
         "layouts": [],
         "containers": [
@@ -666,20 +673,6 @@
               "max_value": 6000.0,
               "color": 4278238420,
               "line_width": 2.0
-            }
-          },
-          {
-            "title": "Ideal ball speed",
-            "x": 640.0,
-            "y": 0.0,
-            "width": 128.0,
-            "height": 128.0,
-            "type": "Text Display",
-            "properties": {
-              "topic": "/SmartDashboard/Ideal ball speed",
-              "period": 0.06,
-              "data_type": "double",
-              "show_submit_button": false
             }
           },
           {
@@ -746,7 +739,7 @@
             "title": "manual flywheel speed",
             "x": 640.0,
             "y": 128.0,
-            "width": 128.0,
+            "width": 256.0,
             "height": 128.0,
             "type": "Text Display",
             "properties": {
@@ -827,19 +820,6 @@
             }
           },
           {
-            "title": "Vision Enabled",
-            "x": 768.0,
-            "y": 128.0,
-            "width": 128.0,
-            "height": 128.0,
-            "type": "Toggle Button",
-            "properties": {
-              "topic": "/SmartDashboard/Vision Enabled",
-              "period": 0.06,
-              "data_type": "boolean"
-            }
-          },
-          {
             "title": "kS",
             "x": 896.0,
             "y": 256.0,
@@ -871,7 +851,7 @@
             "title": "Shooter Temp",
             "x": 896.0,
             "y": 128.0,
-            "width": 128.0,
+            "width": 192.0,
             "height": 128.0,
             "type": "Text Display",
             "properties": {
@@ -879,19 +859,6 @@
               "period": 0.06,
               "data_type": "double",
               "show_submit_button": false
-            }
-          },
-          {
-            "title": "Auto Chooser",
-            "x": 768.0,
-            "y": 0.0,
-            "width": 192.0,
-            "height": 128.0,
-            "type": "ComboBox Chooser",
-            "properties": {
-              "topic": "/SmartDashboard/Auto Chooser",
-              "period": 0.06,
-              "sort_options": false
             }
           }
         ]
@@ -999,23 +966,15 @@
           },
           {
             "title": "Distance to hub",
-            "x": 1088.0,
-            "y": 0.0,
+            "x": 256.0,
+            "y": 640.0,
             "width": 256.0,
-            "height": 256.0,
-            "type": "Radial Gauge",
+            "height": 128.0,
+            "type": "Large Text Display",
             "properties": {
               "topic": "/SmartDashboard/Distance to hub",
-              "period": 0.06,
-              "data_type": "double",
-              "start_angle": -140.0,
-              "end_angle": 140.0,
-              "min_value": 0.0,
-              "max_value": 7.0,
-              "number_of_labels": 8,
-              "wrap_value": false,
-              "show_pointer": true,
-              "show_ticks": true
+              "period": 0.1,
+              "data_type": "double"
             }
           },
           {
@@ -1033,8 +992,8 @@
           },
           {
             "title": "Vision Enabled",
-            "x": 1472.0,
-            "y": 192.0,
+            "x": 1408.0,
+            "y": 0.0,
             "width": 256.0,
             "height": 128.0,
             "type": "Toggle Button",
@@ -1114,10 +1073,10 @@
           },
           {
             "title": "Back Camera",
-            "x": 1472.0,
-            "y": 576.0,
-            "width": 256.0,
-            "height": 256.0,
+            "x": 1280.0,
+            "y": 448.0,
+            "width": 512.0,
+            "height": 384.0,
             "type": "Camera Stream",
             "properties": {
               "topic": "/CameraPublisher/photonvision_Port_1184_Output_MJPEG_Server",
@@ -1127,10 +1086,10 @@
           },
           {
             "title": "Left Camera",
-            "x": 1344.0,
-            "y": 320.0,
-            "width": 256.0,
-            "height": 256.0,
+            "x": 1216.0,
+            "y": 128.0,
+            "width": 320.0,
+            "height": 320.0,
             "type": "Camera Stream",
             "properties": {
               "topic": "/CameraPublisher/photonvision_Port_1186_Output_MJPEG_Server",
@@ -1140,10 +1099,10 @@
           },
           {
             "title": "Right Camera",
-            "x": 1600.0,
-            "y": 320.0,
-            "width": 256.0,
-            "height": 256.0,
+            "x": 1536.0,
+            "y": 128.0,
+            "width": 320.0,
+            "height": 320.0,
             "type": "Camera Stream",
             "properties": {
               "topic": "/CameraPublisher/photonvision_Port_1182_Output_MJPEG_Server",
