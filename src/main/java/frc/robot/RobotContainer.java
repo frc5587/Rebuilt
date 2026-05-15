@@ -6,9 +6,6 @@ package frc.robot;
 
 import static edu.wpi.first.units.Units.*;
 
-import java.util.function.DoubleSupplier;
-import java.util.function.Supplier;
-
 import com.ctre.phoenix6.swerve.SwerveModule.DriveRequestType;
 
 import frc.robot.Constants.ArmConstants;
@@ -29,9 +26,7 @@ import com.ctre.phoenix6.swerve.SwerveRequest;
 import com.pathplanner.lib.auto.AutoBuilder;
 import com.pathplanner.lib.auto.NamedCommands;
 
-import edu.wpi.first.math.geometry.Pose2d;
 import edu.wpi.first.math.geometry.Rotation2d;
-import edu.wpi.first.math.kinematics.ChassisSpeeds;
 import edu.wpi.first.wpilibj.DriverStation;
 import edu.wpi.first.wpilibj.PowerDistribution;
 import edu.wpi.first.wpilibj.DriverStation.Alliance;
@@ -40,7 +35,6 @@ import edu.wpi.first.wpilibj.smartdashboard.SmartDashboard;
 import edu.wpi.first.wpilibj.GenericHID.RumbleType;
 
 import edu.wpi.first.wpilibj2.command.Command;
-import edu.wpi.first.wpilibj2.command.CommandScheduler;
 import edu.wpi.first.wpilibj2.command.Commands;
 import edu.wpi.first.wpilibj2.command.SequentialCommandGroup;
 import edu.wpi.first.wpilibj2.command.button.CommandXboxController;
@@ -79,21 +73,6 @@ public class RobotContainer {
       .withHeadingPID(DrivebaseConstants.HEADING_CONTROLLER.getP(), DrivebaseConstants.HEADING_CONTROLLER.getI(),
           DrivebaseConstants.HEADING_CONTROLLER.getD());
   private final SwerveRequest.SwerveDriveBrake brake = new SwerveRequest.SwerveDriveBrake();
-  private AimTowardsGoal aimingCommand = null;
-  Supplier<Vector3> position = () -> {
-    Pose2d position = swerve.getState().Pose;
-    return new Vector3(position.getX(), position.getY(), 0);
-  };
-  DoubleSupplier heading = () -> swerve.getState().RawHeading.getRadians();
-  Supplier<Vector3> velocity = () -> {
-    ChassisSpeeds velocity = swerve.getState().Speeds;
-    velocity = ChassisSpeeds.fromRobotRelativeSpeeds(velocity, swerve.getState().Pose.getRotation());
-    Vector3 input = new Vector3(velocity.vxMetersPerSecond, velocity.vyMetersPerSecond, 0);
-    return input;
-  };
-  DoubleSupplier angularVelocity = () -> swerve.getState().Speeds.omegaRadiansPerSecond;
-  Supplier<Vector3> inputVelocity = () -> Vector3.getOrigin();
-  DoubleSupplier inputAngularVelocity = () -> 0.;
 
   private Rotation2d lastHeading;
 
@@ -127,7 +106,7 @@ public class RobotContainer {
         new SequentialCommandGroup(
             Commands.runOnce(() -> shooter.setBallVelocity(() -> MetersPerSecond.of(6.7)).schedule()),
             Commands.runOnce(() -> arm.bottom().schedule()),
-            Commands.waitUntil(() -> shooter.atGoal().getAsBoolean()).raceWith(Commands.waitSeconds(ShooterConstants.SPIN_UP_TIME)),
+            Commands.waitUntil(shooter.atGoal()).raceWith(Commands.waitSeconds(ShooterConstants.SPIN_UP_TIME)),
             Commands.waitSeconds(ShooterConstants.SPIN_UP_DELAY),
             new LoadBalls(arm, shooter, indexer, intake, ArmConstants.WIGGLE3_ANGLE_UP, ArmConstants.WIGGLE3_ANGLE_DOWN, ArmConstants.WIGGLE3_TIME_UP, ArmConstants.WIGGLE3_TIME_DOWN).raceWith(Commands.waitSeconds(5.)),
             Commands.runOnce(() -> indexer.stop().schedule()),
@@ -137,7 +116,7 @@ public class RobotContainer {
         new SequentialCommandGroup(
             Commands.runOnce(() -> shooter.setBallVelocity(() -> MetersPerSecond.of(6.7)).schedule()),
             Commands.runOnce(() -> arm.bottom().schedule()),
-            Commands.waitUntil(() -> shooter.atGoal().getAsBoolean()).raceWith(Commands.waitSeconds(ShooterConstants.SPIN_UP_TIME)),
+            Commands.waitUntil(shooter.atGoal()).raceWith(Commands.waitSeconds(ShooterConstants.SPIN_UP_TIME)),
             Commands.waitSeconds(ShooterConstants.SPIN_UP_DELAY),
             new LoadBalls(arm, shooter, indexer, intake, ArmConstants.WIGGLE3_ANGLE_UP, ArmConstants.WIGGLE3_ANGLE_DOWN, ArmConstants.WIGGLE3_TIME_UP, ArmConstants.WIGGLE3_TIME_DOWN).raceWith(Commands.waitSeconds(10.)),
             Commands.runOnce(() -> indexer.stop().schedule()),
@@ -231,11 +210,7 @@ public class RobotContainer {
     // }));
     
     // Main controls
-    driver.x().onTrue(Commands.runOnce(() -> {
-      if (aimingCommand != null && aimingCommand.isScheduled()) {
-        aimingCommand.cancel();
-      }
-      aimingCommand = new AimTowardsGoal(() -> {
+    driver.x().whileTrue(new AimTowardsGoal(() -> {
         Vector3 goalVector = Vector3
             .normalize(Vector3.subtract(ShooterConstants.getGoal(DriverStation.getAlliance().get()),
                 new Vector3(swerve.getState().Pose.getX(), swerve.getState().Pose.getY(), 0)).get2D());
@@ -248,41 +223,41 @@ public class RobotContainer {
         input = Vector3.rotate(input, Vector3.getOrigin(), goalAngle);
         return input;
       },
-          shooter,
-          swerve,
-          ShooterConstants.getGoal(DriverStation.getAlliance().get()));
-      CommandScheduler.getInstance().schedule(aimingCommand);
-    }))
-        .onFalse(Commands.runOnce(() -> aimingCommand.cancel())
-            .alongWith(Commands.runOnce(() -> {
-              lastHeading = swerve.getState().Pose.getRotation();
-            })));
+      shooter,
+      swerve,
+      ShooterConstants.getGoal(DriverStation.getAlliance().get())))
+              .onFalse(Commands.runOnce(() -> lastHeading = swerve.getState().Pose.getRotation()));
+
     driver.y().whileTrue(Commands.run(() -> lastHeading = Rotation2d.fromDegrees(Math.round(lastHeading.getDegrees()/180.)*180.))
-        .alongWith(arm.intake()))
+                        .alongWith(arm.intake()))
               .onFalse(arm.stop()
-                       .alongWith(Commands.runOnce(() -> {
-                           lastHeading = swerve.getState().Pose.getRotation();
-                       })));
+                      .alongWith(Commands.runOnce(() -> {
+                        lastHeading = swerve.getState().Pose.getRotation();
+                      })));
+
     driver.a().whileTrue(arm.top()
-        .alongWith(Commands.run(() -> lastHeading = Rotation2d.fromDegrees(Math.round((lastHeading.getDegrees()+45.)/90.)*90.-45.))))
+                        .alongWith(Commands.run(() -> lastHeading = Rotation2d.fromDegrees(Math.round((lastHeading.getDegrees()+45.)/90.)*90.-45.))))
               .onFalse(Commands.runOnce(() -> {
-                  lastHeading = swerve.getState().Pose.getRotation();
+                lastHeading = swerve.getState().Pose.getRotation();
               }));
+
     driver.b().whileTrue(Commands.run(() -> lastHeading = Rotation2d.fromDegrees(180.))
                          .alongWith(shooter.setBallVelocity(() -> MetersPerSecond.of(
                           AimingMath.getIdealShotSpeed(0.,
                                                        new Vector3(swerve.getState().Pose.getX(), 0, 0),
-                                                       -180.,
+                                                       -Math.PI/2,
                                                        new Vector3(swerve.getState().Speeds.vxMetersPerSecond, 0, 0),
                                                        0.,
                                                        new Vector3(2., 0, 0))))));
+
     driver.rightTrigger().whileTrue(Commands.run(() -> lastHeading = Rotation2d.fromRadians(
                                         AimingMath.getIdealHeading(
-                                        new Vector3(swerve.getState().Pose), 
-                                        swerve.getState().Pose.getRotation().getRadians(), 
-                                        Vector3.getOrigin(), 
-                                        0, 
-                                        ShooterConstants.getGoal(DriverStation.getAlliance().get())))));
+                                            new Vector3(swerve.getState().Pose), 
+                                            swerve.getState().Pose.getRotation().getRadians(), 
+                                            Vector3.getOrigin(), 
+                                            0, 
+                                            ShooterConstants.getGoal(DriverStation.getAlliance().get())))));
+                                            
     driver.leftTrigger().whileTrue(shooter.useManualSpeed());
 
     // Operator
@@ -365,12 +340,12 @@ public class RobotContainer {
       return ledController;
     }
 
-    public boolean intakeIsStalling() {
-      return intake.isStalling().getAsBoolean();
+    public Trigger intakeIsStalling() {
+      return intake.isStalling();
     }
 
-    public boolean shooterAtGoal() {
-      return shooter.atGoal().getAsBoolean();
+    public Trigger shooterAtGoal() {
+      return shooter.atGoal();
     }
     public boolean shooterUsingNonDefaultCommand() {
       if (shooter.getCurrentCommand() != shooter.getDefaultCommand()) {

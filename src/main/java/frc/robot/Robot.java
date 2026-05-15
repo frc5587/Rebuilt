@@ -113,8 +113,8 @@ public class Robot extends TimedRobot {
           ledController.applyBlinkColor(LEDColor.YELLOW);
         },
         () -> {
-          boolean intakeStalling = robotContainer.intakeIsStalling();
-          boolean shooterAtGoal = robotContainer.shooterAtGoal();
+          boolean intakeStalling = robotContainer.intakeIsStalling().getAsBoolean();
+          boolean shooterAtGoal = robotContainer.shooterAtGoal().getAsBoolean();
           boolean shooterUsingNonDefaultCommand = robotContainer.shooterUsingNonDefaultCommand();
 
           LedState desiredState = LedState.IDLE;
