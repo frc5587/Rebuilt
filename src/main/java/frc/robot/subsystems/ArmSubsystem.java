@@ -186,9 +186,9 @@ public class ArmSubsystem extends SubsystemBase {
     SmartDashboard.putNumber("Left Arm Temp", (leftSpark.getMotorTemperature()));
     SmartDashboard.putNumber("Right Arm Temp", (rightSpark.getMotorTemperature()));
 
-    if ((leftSpark.getMotorTemperature() >= 85) || (rightSpark.getMotorTemperature() >= 85)) { //TODO test
-        rumbleConsumer.accept(1.);
-    } else {rumbleConsumer.accept(0.);}
+    // if ((leftSpark.getMotorTemperature() >= 85) || (rightSpark.getMotorTemperature() >= 85)) { //TODO test
+    //     rumbleConsumer.accept(1.);
+    // } else {rumbleConsumer.accept(0.);}
 
     if (SmartDashboard.getBoolean("Toggle Brake Mode", false)) {
       if (leftSMCConfig.getIdleMode().orElse(null) == MotorMode.BRAKE) {
