@@ -59,6 +59,11 @@ public final class Constants {
     public static final double WHEEL_LOCK_TIME = 10; // seconds
 
     public static final double MAX_SPEED = Units.feetToMeters(15);
+    public static final double MAX_ACCEL = 2 * Math.PI;
+    public static final double TRANSLATION_DEADBAND = 0.3;
+    public static final ProfiledPIDController TRANSFORM_CONTROLLER = new ProfiledPIDController(8, 0, 0.1,
+        new Constraints(MAX_SPEED, MAX_ACCEL));
+
     public static final double MAX_SPIN_SPEED_RADIANS_PER_SECOND = 1.5 * Math.PI;
     public static final double MAX_SPIN_ACCEL = 2 * Math.PI;
     public static final double HEADING_DEADBAND = 0.3;
@@ -83,10 +88,10 @@ public final class Constants {
     public static final UnaryOperator<SmartMotorControllerConfig> APPLY_SMC_CONFIG = (
         SmartMotorControllerConfig config) -> {
       return config.withControlMode(ControlMode.CLOSED_LOOP)
-          .withClosedLoopController(0.5, 0.0, 0.0, ClosedLoopControllerSlot.SLOT_0)
-          .withSimClosedLoopController(1., 0., 0., ClosedLoopControllerSlot.SLOT_0)
-          .withClosedLoopController(0.5, 0., 0.0, ClosedLoopControllerSlot.SLOT_1)
-          .withSimClosedLoopController(10000., 0., 0., ClosedLoopControllerSlot.SLOT_1)
+          .withClosedLoopController(0.01, 0.0, 0.0, ClosedLoopControllerSlot.SLOT_0)
+          .withSimClosedLoopController(.01, 0., 0., ClosedLoopControllerSlot.SLOT_0)
+          .withClosedLoopController(0.01, 0., 0.0, ClosedLoopControllerSlot.SLOT_1)
+          .withSimClosedLoopController(0.01, 0., 0., ClosedLoopControllerSlot.SLOT_1)
           .withFeedforward(new SimpleMotorFeedforward(0, 0.116, 0))
           .withSimFeedforward(new SimpleMotorFeedforward(0, 0, 0))
           .withTelemetry("ShooterMotor", TelemetryVerbosity.HIGH)
@@ -130,14 +135,14 @@ public final class Constants {
     public static final int RIGHT_MOTOR_ID = 21;
     private static final double BALANCE_OFFSET = 19;
     public static final Angle TOP_ANGLE = Degrees.of(110. + BALANCE_OFFSET);
-    public static final Angle BOTTOM_ANGLE = Degrees.of(-2. + BALANCE_OFFSET);
+    public static final Angle BOTTOM_ANGLE = Degrees.of(5. + BALANCE_OFFSET);
     public static final double INTAKE_DUTYCYCLE = 0.1;
     public static final Angle WIGGLE1_ANGLE_UP = Degrees.of(30. + BALANCE_OFFSET);
     public static final Angle WIGGLE1_ANGLE_DOWN = BOTTOM_ANGLE;
     public static final double WIGGLE1_TIME_UP = 0.5;
     public static final double WIGGLE1_TIME_DOWN = 1.;
-    public static final Angle WIGGLE2_ANGLE_UP = Degrees.of(40. + BALANCE_OFFSET);
-    public static final Angle WIGGLE2_ANGLE_DOWN = Degrees.of(20. + BALANCE_OFFSET);
+    public static final Angle WIGGLE2_ANGLE_UP = Degrees.of(60. + BALANCE_OFFSET);
+    public static final Angle WIGGLE2_ANGLE_DOWN = Degrees.of(40. + BALANCE_OFFSET);
     public static final double WIGGLE2_TIME_UP = 0.5;
     public static final double WIGGLE2_TIME_DOWN = 0.5;
     public static final Angle WIGGLE3_ANGLE_UP = Degrees.of(40. + BALANCE_OFFSET);
@@ -148,7 +153,8 @@ public final class Constants {
     public static final UnaryOperator<SmartMotorControllerConfig> APPLY_SMC_CONFIG = (
         SmartMotorControllerConfig config) -> {
       return config.withControlMode(ControlMode.CLOSED_LOOP)
-          .withClosedLoopController(2., 0, 0)
+          .withClosedLoopController(1.25, 0, 0)
+          // .withTrapezoidalProfile(RadiansPerSecond.of(1),RadiansPerSecondPerSecond())
           .withSimClosedLoopController(1, 0, 0)
           .withClosedLoopTolerance(Degrees.of(1.))
           .withFeedforward(new ArmFeedforward(0, 0.3, 0))
@@ -183,7 +189,7 @@ public final class Constants {
           .withSimClosedLoopController(1, 0, 0)
           .withFeedforward(new SimpleMotorFeedforward(0., 0.65))
           .withGearing(new MechanismGearing(GearBox.fromReductionStages(1)))
-          .withMotorInverted(true)
+          .withMotorInverted(false)
           .withIdleMode(MotorMode.COAST)
           .withSupplyCurrentLimit(Amps.of(SUPPLY_CURRENT_LIMIT))
           .withStatorCurrentLimit(Amps.of(STATOR_CURRENT_LIMIT));

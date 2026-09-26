@@ -64,13 +64,13 @@ public class LoadBalls extends Command {
       if (indexer != null) {
         scheduler.schedule(indexer.start());
       }
-      shooter.startIndexing();
+      // shooter.startIndexing();
     }
     else {
       if (indexer != null) {
         scheduler.schedule(indexer.stop());
       }
-      shooter.stopIndexing();
+      // shooter.stopIndexing();
     }
   }
 
@@ -84,6 +84,7 @@ public class LoadBalls extends Command {
     if (indexer != null) {
       scheduler.cancel(indexer.getCurrentCommand());
     }
+    shooter.stopIndexing();
   }
 }
 

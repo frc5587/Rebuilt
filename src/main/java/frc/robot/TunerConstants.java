@@ -63,9 +63,9 @@ public class TunerConstants {
         new CurrentLimitsConfigs()
           // Swerve azimuth does not require much torque output, so we can set a relatively low
           // stator current limit to help avoid brownouts without impacting performance.
-          .withSupplyCurrentLimit(Amps.of(40))
+          .withSupplyCurrentLimit(Amps.of(50))
           .withSupplyCurrentLowerTime(Seconds.of(1.0))
-          .withSupplyCurrentLowerLimit(Amps.of(40))
+          .withSupplyCurrentLowerLimit(Amps.of(50))
           .withStatorCurrentLimit(Amps.of(120))
           .withSupplyCurrentLimitEnable(true)
           .withStatorCurrentLimitEnable(true));
@@ -87,7 +87,7 @@ public class TunerConstants {
 
   // CAN bus that the devices are located on;
   // All swerve devices must share the same CAN bus
-  public static final CANBus kCANBus = new CANBus("canivore", "./logs/example.hoot");
+  public static final CANBus kCANBus = new CANBus("rio", "./logs/example.hoot");
 
   // Theoretical free speed (m/s) at 12 V applied output;
   // This needs to be tuned to your individual robot
